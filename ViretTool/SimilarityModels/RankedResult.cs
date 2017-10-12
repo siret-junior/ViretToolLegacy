@@ -23,14 +23,11 @@ namespace ViretTool.SimilarityModels
             return Rank.CompareTo(rf.Rank);
         }
 
-        public static List<RankedFrame> InitializeResultList(DataModel.Dataset dataset, List<DataModel.Frame> filteredFrames)
+        public static List<RankedFrame> InitializeResultList(DataModel.Dataset dataset)
         {
             List<RankedFrame> result = new List<RankedFrame>();
 
-            if (filteredFrames == null)
-                filteredFrames = dataset.Frames;
-
-            foreach (DataModel.Frame frame in filteredFrames)
+            foreach (DataModel.Frame frame in dataset.Frames)
                 result.Add(new RankedFrame(frame, 0));
 
             return result;

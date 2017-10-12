@@ -4,12 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows;
 
 namespace ViretTool.SimilarityModels
 {
     class ColorSignatureModel
     {
         private readonly DataModel.Dataset mDataset;
+
+        /// <summary>
+        /// A thumbnail based signature in RGB format, stored as a 1D byte array.
+        /// </summary>
         private List<byte[]> mColorSignatures;
 
         private const int mSignatureWidth = 20;
@@ -23,19 +28,20 @@ namespace ViretTool.SimilarityModels
             mDataset = dataset;
             mColorSignatures = new List<byte[]>();
 
-            // TODO - name should be connected to the dataset name
+            // TODO - name should be connected to the dataset name or ID
             mDescriptorsFilename = System.IO.Path.Combine(mDataset.AllExtractedFramesFilename, "ColorSignatures.vt");
 
             LoadDescriptors();
         }
 
-        public List<RankedFrame> RankFramesBasedOnSketch(List<Tuple<double, double, Color>> queryCentroids, List<DataModel.Frame> filteredFrames = null)
+        public List<RankedFrame> RankFramesBasedOnSketch(List<Tuple<Point, Color>> queryCentroids)
         {
-            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset, filteredFrames);
+            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset);
 
             // transform [x, y] to a list of investigated positions in mGridRadius
             List<Tuple<int[], Color>> queries = PrepareQueries(queryCentroids);
 
+            // TODO - cache results
             Parallel.For(0, result.Count(), i =>
             {
                 RankedFrame rf = result[i];
@@ -53,27 +59,28 @@ namespace ViretTool.SimilarityModels
                 }
             });
 
-            result.Sort();
-
             return result;
         }
 
-        private List<Tuple<int[], Color>> PrepareQueries(List<Tuple<double, double, Color>> queryCentroids)
+        /// <summary>
+        /// Precompute a set of 2D grid cells (represented as offsets in 1D array) that should be investigated for the most similar query color.
+        /// </summary>
+        /// <param name="queryCentroids">Set of colored points from the color sketch.</param>
+        /// <returns></returns>
+        private List<Tuple<int[], Color>> PrepareQueries(List<Tuple<Point, Color>> queryCentroids)
         {
             List<Tuple<int[], Color>> queries = new List<Tuple<int[], Color>>();
 
-            foreach (Tuple<double, double, Color> t in queryCentroids)
+            foreach (Tuple<Point, Color> t in queryCentroids)
             {
-                int x = (int)(t.Item1 * mSignatureWidth), y = (int)(t.Item2 * mSignatureHeight);
-                int x1 = Math.Max(0, x - mGridRadius), x2 = Math.Min(mSignatureWidth - 1, x + mGridRadius);
-                int y1 = Math.Max(0, y - mGridRadius), y2 = Math.Min(mSignatureHeight - 1, y + mGridRadius);
-
+                double x = t.Item1.X * mSignatureWidth, y = t.Item1.Y * mSignatureHeight;
                 List<int> offsets = new List<int>();
-                for (int i = x1; i <= x2; i++)
-                    for (int j = y1; j <= y2; j++)
-                        offsets.Add(j * mSignatureWidth * 3 + i * 3);
+                for (int i = 0; i < mSignatureWidth; i++)
+                    for (int j = 0; j < mSignatureHeight; j++)
+                        if (mGridRadius * mGridRadius >= (x - i - 0.5) * (x - i - 0.5) + (y - j - 0.5) * (y - j - 0.5))
+                            offsets.Add(j * mSignatureWidth * 3 + i * 3);
 
-                queries.Add(new Tuple<int[], System.Windows.Media.Color>(offsets.ToArray(), t.Item3));
+                queries.Add(new Tuple<int[], Color>(offsets.ToArray(), t.Item2));
             }
 
             return queries;
@@ -85,9 +92,9 @@ namespace ViretTool.SimilarityModels
         }
 
 
-        public List<RankedFrame> RankFramesBasedOnExampleFrames(List<DataModel.Frame> queryFrames, List<DataModel.Frame> filteredFrames = null)
+        public List<RankedFrame> RankFramesBasedOnExampleFrames(List<DataModel.Frame> queryFrames)
         {
-            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset, filteredFrames);
+            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset);
 
             Parallel.For(0, result.Count(), i =>
             {
@@ -95,8 +102,6 @@ namespace ViretTool.SimilarityModels
                 foreach (DataModel.Frame queryFrame in queryFrames)
                     rf.Rank += L2Distance(mColorSignatures[rf.Frame.ID], mColorSignatures[queryFrame.ID]);
             });
-
-            result.Sort();
 
             return result;
         }

@@ -54,8 +54,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BasicClient\SketchCanvasController.cs" />
     <Compile Include="ImageHelper.cs" />
+    <Compile Include="RankingModels\RankingManager.cs" />
     <Compile Include="SimilarityModels\ColorSignatureModel.cs" />
+    <Compile Include="SimilarityModels\DCNNFeatures\ByteVectorModel.cs" />
     <Compile Include="SimilarityModels\RankedResult.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -104,6 +107,9 @@
       <Project>{723c5402-fe70-4efb-8893-c7a2b4f20e40}</Project>
       <Name>FrameIO</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SimilarityModels\DCNNKeywords\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

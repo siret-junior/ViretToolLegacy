@@ -52,9 +52,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="ffmpeg\bin\ffmpeg.exe" />
-    <Content Include="ffmpeg\bin\ffplay.exe" />
-    <Content Include="ffmpeg\bin\ffprobe.exe" />
+    <Content Include="ffmpeg\ffmpeg.exe" />
+    <Content Include="ffmpeg\ffplay.exe" />
+    <Content Include="ffmpeg\ffprobe.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
