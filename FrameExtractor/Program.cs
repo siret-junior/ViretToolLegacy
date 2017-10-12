@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define PARALLEL
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -68,15 +69,16 @@ namespace FrameExtractor
             // statistics variables
             Stopwatch stopwatch = Stopwatch.StartNew();
             int processedCount = 0;
-#if !DEBUG
-            Parallel.ForEach(
-                videoFilePaths,
+
+#if PARALLEL && !DEBUG
+            Parallel.For(0, videoFilePaths.Length,
                 new ParallelOptions { MaxDegreeOfParallelism = maxParallelism },
-                videoFilePath =>
+                index =>
 #else
-            foreach (string videoFilePath in videoFilePaths)
+            for (int index = 0; index < videoFilePaths.Length; index++)
 #endif
             {
+                string videoFilePath = videoFilePaths[index];
                 // create output subdirectory for each video
                 string videoFilenameWithoutExtension = Path.GetFileNameWithoutExtension(videoFilePath);
                 string videoSubdirectory = Path.Combine(outputDirectory, videoFilenameWithoutExtension);
@@ -86,7 +88,7 @@ namespace FrameExtractor
                 int videoId = ParseVideoId(videoFilenameWithoutExtension);
 
                 // create temp directory for each task
-                string extractionTempDir = Path.GetFullPath("ffmpeg_extraction_temp_" + Task.CurrentId);
+                string extractionTempDir = Path.GetFullPath("ffmpeg_extraction_temp_" + index.ToString("00000"));
                 Directory.CreateDirectory(extractionTempDir);
 
                 // extract all frames using ffmpeg binary
@@ -103,7 +105,7 @@ namespace FrameExtractor
                 Interlocked.Increment(ref processedCount);
                 PrintStatistics(videoFilePaths, stopwatch, processedCount, videoId);
             }
-#if !DEBUG
+#if PARALLEL && !DEBUG
             );
 #endif
 
@@ -176,12 +178,12 @@ namespace FrameExtractor
             double processedPerSecond = processedCount / (stopwatch.ElapsedMilliseconds * 0.001);
             int secondsRemaining = (int)((videoFilePaths.Length - processedCount) / processedPerSecond);
             int hoursRemaining = secondsRemaining / (60 * 60);
-            int minutesRemaining = secondsRemaining / 60;
+            int minutesRemaining = secondsRemaining / 60 % 60;
             secondsRemaining = secondsRemaining % 60;
 
-            Console.WriteLine("Video ID:{0} processed. {1} of {2}, ({3} per second, {4}h{5}m{6}s remaining).", videoId,
+            Console.WriteLine("Video ID:{0} processed. {1} of {2}, ({3} per second, {4}h {5}m {6}s remaining).", videoId,
                 processedCount, videoFilePaths.Length, processedPerSecond.ToString("0.000"),
-                hoursRemaining, minutesRemaining, secondsRemaining);
+                hoursRemaining.ToString("00"), minutesRemaining.ToString("00"), secondsRemaining.ToString("00"));
         }
 
         private static int ParseVideoId(string videoFilenameWithoutExtension)
@@ -242,6 +244,7 @@ namespace FrameExtractor
             while (frameNumberAccumulator < frameFiles.Length)
             {
                 int frameId = (int)frameNumberAccumulator;
+                
 
                 string fileFrom = Path.Combine(copyFromDirectory,
                     frameId.ToString("00000000") 
@@ -251,12 +254,17 @@ namespace FrameExtractor
                     + "_f" + frameId.ToString("00000")
                     + "_" + second.ToString("0000.00") + "sec"
                     + "." + extension);
-                
-                if (File.Exists(fileTo))
+
+                // ffmpeg -start_number 0 not working fix
+                if (!File.Exists(fileFrom))
                 {
-                    File.Delete(fileTo);
+                    Directory.Delete(copyToDirectory, true);
+                    Console.Error.WriteLine("Frame {0} in video {1} is missing! Skipping whole video...", 
+                        frameId, videoId);
+                    return;
                 }
-                File.Move(fileFrom, fileTo);
+
+                File.Copy(fileFrom, fileTo, true);
 
                 frameNumberAccumulator += (frameEveryNthSecond * framerate);
                 second += frameEveryNthSecond;

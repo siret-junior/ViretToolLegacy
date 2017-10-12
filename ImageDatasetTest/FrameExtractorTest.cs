@@ -8,7 +8,7 @@ namespace ImageDatasetTest
     [TestClass]
     public class FrameExtractorTest
     {
-        const string FFMPEG_EXE = "..\\..\\..\\FrameExtractor\\ffmpeg\\bin\\ffmpeg.exe";
+        const string FFMPEG_EXE = "..\\..\\..\\FrameExtractor\\ffmpeg\\ffmpeg.exe";
 
         
         [TestMethod]

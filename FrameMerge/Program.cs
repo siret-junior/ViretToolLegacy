@@ -1,4 +1,6 @@
-﻿using FrameIO;
+﻿#define PARALLEL
+
+using FrameIO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -79,16 +81,30 @@ namespace FrameMerge
                         string[] filenames = Directory.GetFiles(videoDirectory);
                         Array.Sort(filenames);
 
-                        // convert image and write to binary file
-                        foreach (string filename in filenames)
+                        // convert images in parallel
+                        byte[][] resizedImageData = new byte[filenames.Length][];
+#if PARALLEL && !DEBUG
+                        Parallel.For(0, filenames.Length, index =>
+#else
+                        for (int index = 0; index < filenames.Length; index++)
+#endif
+                        {
+                            string filename = filenames[index];
+                            byte[] originalImageData = File.ReadAllBytes(filename);
+                            resizedImageData[index] = PreprocessImage(originalImageData, frameWidth, frameHeight);
+                        }
+#if PARALLEL && !DEBUG
+                        );
+#endif
+                        // append to binary file
+                        for (int i = 0; i < filenames.Length; i++)
                         {
                             int videoId = videoCounter;
-                            int frameId = ParseFrameId(filename);
-
-                            byte[] originalImageData = File.ReadAllBytes(filename);
-                            byte[] resizedImageData = PreprocessImage(originalImageData, frameWidth, frameHeight);
-                            writer.AppendFrame(resizedImageData, videoId, frameId);
+                            int frameId = ParseFrameId(filenames[i]);
+                            writer.AppendFrame(resizedImageData[i], videoId, frameId);
                         }
+
+
                         writer.NewVideo();
                         videoCounter++;
                         Console.WriteLine("DONE!");
@@ -111,10 +127,10 @@ namespace FrameMerge
         {
             int secondsElapsed = (int)(stopwatch.ElapsedMilliseconds * 0.001);
             int hoursElapsed = secondsElapsed / (60 * 60);
-            int minutesElapsed = secondsElapsed / 60;
+            int minutesElapsed = secondsElapsed / 60 % 60;
             secondsElapsed = secondsElapsed % 60;
-            Console.WriteLine("Merging of {0} files finished in {1}h{2}m{3}s.", videoDirectories.Length,
-                hoursElapsed, minutesElapsed, secondsElapsed);
+            Console.WriteLine("Merging of {0} files finished in {1}h {2}m {3}s.", videoDirectories.Length,
+                hoursElapsed.ToString("00"), minutesElapsed.ToString("00"), secondsElapsed.ToString("00"));
         }
 
         private static void PrintVideoStatistics(Stopwatch stopwatch, int processedVideosCount, string[] videoDirectories, string videoDirectory)
@@ -122,12 +138,12 @@ namespace FrameMerge
             double processedPerSecond = processedVideosCount / (stopwatch.ElapsedMilliseconds * 0.001);
             int secondsRemaining = (int)((videoDirectories.Length - processedVideosCount) / processedPerSecond);
             int hoursRemaining = secondsRemaining / (60 * 60);
-            int minutesRemaining = secondsRemaining / 60;
+            int minutesRemaining = secondsRemaining / 60 % 60;
             secondsRemaining = secondsRemaining % 60;
-            Console.WriteLine("Video ID: {0} processed: {1} of {2}, ({3} per second, {4}h{5}m{6}s remaining).",
+            Console.WriteLine("Video ID: {0} processed: {1} of {2}, ({3} per second, {4}h {5}m {6}s remaining).",
                 Path.GetFileName(videoDirectory),
                 processedVideosCount, videoDirectories.Length, processedPerSecond.ToString("0.000"),
-                hoursRemaining, minutesRemaining, secondsRemaining);
+                hoursRemaining.ToString("00"), minutesRemaining.ToString("00"), secondsRemaining.ToString("00"));
         }
 
         private static void ParseAdditionalArguments(string[] args, out int frameWidth, out int frameHeight, out decimal framerate, out int timestamp)
