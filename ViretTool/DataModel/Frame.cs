@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ViretTool.DataModel
 {
-    class Frame
+    public class Frame
     {
         public readonly Video FrameVideo;
 
@@ -33,6 +33,13 @@ namespace ViretTool.DataModel
         public System.Windows.Media.Imaging.BitmapSource GetImage()
         {
             return ImageHelper.StreamToImage(mJPGThumbnail);
+        }
+
+        public override string ToString()
+        {
+            return "ID: " + ID.ToString("00000") 
+                + ", frame: " + FrameNumber.ToString("00000") 
+                + ", Video ID: " + FrameVideo.VideoID.ToString("00000");
         }
     }
 }

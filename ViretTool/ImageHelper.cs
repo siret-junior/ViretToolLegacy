@@ -14,7 +14,7 @@ namespace ViretTool
         {
             BitmapImage BI = new BitmapImage();
             
-            BI.BeginInit();            
+            BI.BeginInit();
             BI.StreamSource = new System.IO.MemoryStream(JPGThumbnail);
             BI.EndInit();
 

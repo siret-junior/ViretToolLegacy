@@ -99,6 +99,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FrameIO\FrameIO.csproj">
+      <Project>{723c5402-fe70-4efb-8893-c7a2b4f20e40}</Project>
+      <Name>FrameIO</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FrameIO;
 
 namespace ViretTool.DataModel
 {
-    class Dataset
+    public class Dataset : IDisposable
     {
+        // TRECVid dataset specific (TODO: remove, use ID -> filename mapping stored in a text file)
+        private const int TRECVID_VIDEO_ID_OFFSET = 35345;
+
         public readonly List<Video> Videos;
         public readonly List<Frame> Frames;
 
@@ -22,24 +26,82 @@ namespace ViretTool.DataModel
         /// </summary>
         public readonly int DatasetID;
 
+        /// <summary>
+        /// Reader used to read all extracted frames from a binary file lazily.
+        /// </summary>
+        public readonly FrameReader AllExtractedFramesReader;
+
+        /// <summary>
+        /// Loads selected frames into memory and initializes reader of all extracted frames.
+        /// </summary>
+        /// <param name="selectedFramesFilename"></param>
+        /// <param name="allExtractedFramesFilename"></param>
         public Dataset(string selectedFramesFilename, string allExtractedFramesFilename)
         {
-            Videos = new List<Video>();
-            Frames = new List<Frame>();
             DatasetDirectory = System.IO.Path.GetDirectoryName(selectedFramesFilename);
             AllExtractedFramesFilename = allExtractedFramesFilename;
+            AllExtractedFramesReader = new FrameReader(allExtractedFramesFilename);
 
-            using (System.IO.BinaryReader BR = new System.IO.BinaryReader(System.IO.File.OpenRead(selectedFramesFilename)))
+            using (FrameReader selectedFramesReader = new FrameReader(selectedFramesFilename))
             {
-                // TODO - parse DatasetID
+                DatasetID = selectedFramesReader.DatasetId;
 
-                LoadVideosAndFrames(BR);
+                Videos = new List<Video>(selectedFramesReader.VideoCount);
+                Frames = new List<Frame>(selectedFramesReader.FrameCount);
+
+                CheckFileConsistency(AllExtractedFramesReader, selectedFramesReader);
+                LoadVideosAndFrames(selectedFramesReader);
             }
         }
 
-        private void LoadVideosAndFrames(System.IO.BinaryReader BR)
+        /// <summary>
+        /// Populates the Video and Frame collections of the dataset.
+        /// </summary>
+        /// <param name="reader"></param>
+        private void LoadVideosAndFrames(FrameReader reader)
         {
-            // TODO - create videos and frames
+            int frameCounter = 0;
+            for (int i = 0; i < reader.VideoCount; i++)
+            {
+                // create video and add to the video collection
+                Video video = new Video(this, (i + TRECVID_VIDEO_ID_OFFSET).ToString("00000") + ".mp4", i);
+                Videos.Add(video);
+
+                // read video frames and add them to the video and the frame collection
+                Tuple<int, int, byte[]>[] videoFrames = reader.ReadVideoFrames(i);
+                foreach (Tuple<int, int, byte[]> frameData in videoFrames)
+                {
+                    int videoId = frameData.Item1;
+                    int frameNumber = frameData.Item2;
+                    byte[] jpgThumbnail = frameData.Item3;
+
+                    Frame frame = new Frame(video, frameCounter++, frameNumber, jpgThumbnail);
+                    video.AddFrame(frame);
+                    Frames.Add(frame);
+                }
+            }
+        }
+        
+        private void CheckFileConsistency(FrameReader fileA, FrameReader fileB)
+        {
+            if (fileA.DatasetId != fileB.DatasetId)
+            {
+                throw new FormatException("Dataset IDs do not match: " 
+                    + fileA.DatasetId + " vs. " + fileB.DatasetId);
+            }
+            if (fileA.VideoCount != fileB.VideoCount)
+            {
+                throw new FormatException("Video counts do not match: "
+                    + fileA.VideoCount + " vs. " + fileB.VideoCount);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (AllExtractedFramesReader != null)
+            {
+                AllExtractedFramesReader.Dispose();
+            }
         }
     }
 }
