@@ -15,6 +15,9 @@ namespace ImageDatasetTest
         private const string THUMBNAILS_FILE = "..\\..\\TestData\\thumbnails.thumb";
         private const string KEYFRAMES_FILE = "..\\..\\TestData\\keyframes.thumb";
 
+        //private const string THUMBNAILS_FILE = "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb";
+        //private const string KEYFRAMES_FILE = "..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb";
+
         [TestMethod]
         public void ConstructDataset()
         {
