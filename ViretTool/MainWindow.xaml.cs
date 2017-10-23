@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using ViretTool.RankingModels;
+
 namespace ViretTool
 {
     /// <summary>
@@ -23,6 +25,21 @@ namespace ViretTool
         public MainWindow()
         {
             InitializeComponent();
+
+            var dataset = new DataModel.Dataset(
+                "..\\..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb",
+                "..\\..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
+
+            var engine = new RankingEngine(dataset);
+
+            engine.InitKeywordModel(
+                (BasicClient.Controls.SuggestionTextBox)FindName("SuggestionTextBox"),
+                new string[] {
+                    "..\\..\\..\\..\\TestData\\ITEC\\GoogLeNet",
+                    "..\\..\\..\\..\\TestData\\ITEC\\YFCC100M"
+                });
+
+            engine.BuildEngine((BasicClient.Controls.ModelSelector)FindName("ModelSelector"));
         }
     }
 }

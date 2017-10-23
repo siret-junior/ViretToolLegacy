@@ -4,9 +4,82 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ViretTool"
+        xmlns:controls="clr-namespace:ViretTool.BasicClient.Controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
+        Title="ViretTool"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized">
+    <Window.Resources>
+
+        <!--#region Keyword Search Styles -->
         
-    </Grid>
+        <Style TargetType="{x:Type controls:QueryTextBlock}">
+            <Setter Property="Background" Value="WhiteSmoke"/>
+            <Setter Property="Padding" Value="5,2,5,2" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" Value="LightGray"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Highlights searched phrase in suggestions -->
+        <controls:StringHighlightingConverter x:Key="StringHighlightingConverter"/>
+
+        <!-- Templates distinguishing various types of suggested items (red / green background) -->
+        <DataTemplate x:Key="SuggestionResultItemTemplate_OnlyChildren">
+            <Border Padding="5" Background="#44DD88DD">
+                <StackPanel Orientation="Vertical">
+                    <ContentControl FontWeight="Bold" Content="{Binding Path=Name, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
+                    <TextBlock Text="{Binding Path=Hyponyms, StringFormat=Being: \{0\}}" Margin="0,0,0,2" FontStyle="Italic" TextWrapping="Wrap"/>
+                    <ContentControl Content="{Binding Path=Description, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SuggestionResultItemTemplate_WithChildren">
+            <Border Padding="5" Background="#4488DDDD">
+                <StackPanel Orientation="Vertical">
+                    <ContentControl FontWeight="Bold" Content="{Binding Path=Name, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
+                    <TextBlock Text="{Binding Path=Hyponyms, StringFormat=Including: \{0\}}" Margin="0,0,0,2" FontStyle="Italic" TextWrapping="Wrap"/>
+                    <ContentControl Content="{Binding Path=Description, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SuggestionResultItemTemplate_Base">
+            <Border Padding="5">
+                <StackPanel Orientation="Vertical">
+                    <ContentControl FontWeight="Bold" Content="{Binding Path=Name, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
+                    <ContentControl Content="{Binding Path=Description, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <controls:SuggestionTemplateSelector x:Key="HypernymSelector"
+                                             OnlyChildren="{StaticResource SuggestionResultItemTemplate_OnlyChildren}"
+                                             WithChildren="{StaticResource SuggestionResultItemTemplate_WithChildren}"
+                                             Base="{StaticResource SuggestionResultItemTemplate_Base}"/>
+
+        <!--#endregion Keyword Search Styles -->
+        
+    </Window.Resources>
+
+    <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Vertical" Width="400" Margin="10, 0, 10, 0">
+
+            <controls:ModelSelector x:Name="ModelSelector"></controls:ModelSelector>
+            
+            <!--#region Keyword Search -->
+            <controls:SuggestionTextBox x:Name="SuggestionTextBox"
+                                    ItemTemplateSelector="{StaticResource ResourceKey=HypernymSelector}">
+                <controls:SuggestionTextBox.LoadingPlaceholder>
+                    <TextBlock Text="Loading..."
+                               Margin="5"/>
+                </controls:SuggestionTextBox.LoadingPlaceholder>
+            </controls:SuggestionTextBox>
+            <!--#endregion Keyword Search -->
+            
+        </StackPanel>
+    </StackPanel>
+
 </Window>

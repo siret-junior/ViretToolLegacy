@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -37,6 +38,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -55,12 +58,39 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BasicClient\Controls\ModelSelector.cs" />
+    <Compile Include="BasicClient\KeywordSearchController.cs" />
+    <Compile Include="BasicClient\Utils\IIdentifiable.cs" />
+    <Compile Include="BasicClient\Utils\SuggestionResultItem.cs" />
+    <Compile Include="RankingModels\IRankingModel.cs" />
+    <Compile Include="RankingModels\RankingEngine.cs" />
+    <Compile Include="SimilarityModels\DCNNKeywords\IQueryPart.cs" />
+    <Compile Include="BasicClient\Controls\Suggestion\QueryTextBlock.cs" />
+    <Compile Include="BasicClient\Controls\Suggestion\Styles\StringHighlightingConverter.cs" />
+    <Compile Include="BasicClient\Controls\Suggestion\Styles\SuggestionTemplateSelector.cs" />
+    <Compile Include="BasicClient\Controls\Suggestion\SuggestionPopup.cs" />
+    <Compile Include="BasicClient\Controls\Suggestion\SuggestionTextBox.cs" />
     <Compile Include="BasicClient\SketchCanvasController.cs" />
+    <Compile Include="SimilarityModels\DCNNKeywords\Label.cs" />
+    <Compile Include="SimilarityModels\DCNNKeywords\LabelProvider.cs" />
+    <Compile Include="BasicClient\Utils\Streams\BufferedByteStream.cs" />
+    <Compile Include="BasicClient\Utils\SuggestionProvider.cs" />
+    <Compile Include="BasicClient\Utils\TextSearch\AhoCorasick.cs" />
+    <Compile Include="BasicClient\Utils\TextSearch\Occurrence.cs" />
     <Compile Include="ImageHelper.cs" />
     <Compile Include="RankingModels\RankingManager.cs" />
     <Compile Include="SimilarityModels\ColorSignatureModel.cs" />
     <Compile Include="SimilarityModels\DCNNFeatures\ByteVectorModel.cs" />
+    <Compile Include="SimilarityModels\DCNNKeywords\KeywordModel.cs" />
     <Compile Include="SimilarityModels\RankedResult.cs" />
+    <Page Include="BasicClient\Controls\Suggestion\Themes\SuggestionPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BasicClient\Controls\Suggestion\Themes\SuggestionTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -109,8 +139,6 @@
       <Name>FrameIO</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SimilarityModels\DCNNKeywords\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

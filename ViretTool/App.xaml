@@ -4,6 +4,14 @@
              xmlns:local="clr-namespace:ViretTool"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        
+        <!-- Include styles for SuggestionTextBox for Keyword Search -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/BasicClient/Controls/Suggestion/Themes/SuggestionPopup.xaml"/>
+                <ResourceDictionary Source="/BasicClient/Controls/Suggestion/Themes/SuggestionTextBox.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        
     </Application.Resources>
 </Application>
