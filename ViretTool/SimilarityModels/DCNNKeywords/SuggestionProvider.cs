@@ -4,10 +4,9 @@ using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-using ViretTool.BasicClient.Controls;
-using ViretTool.SimilarityModels.DCNNKeywords;
+using ViretTool.Utils;
 
-namespace ViretTool.BasicClient.Utils {
+namespace ViretTool.SimilarityModels.DCNNKeywords {
 
     class SuggestionProvider {
 
@@ -191,7 +190,7 @@ namespace ViretTool.BasicClient.Utils {
         /// <param name="hits">An enunerable of results from the Aho-Corasick search</param>
         /// <param name="text">A string the highlighting is done on</param>
         /// <returns></returns>
-        private HighlightedStringWithRelevance HighlightAndRankPhrase(IEnumerable<Occurrence> hits, string text) {
+        private HighlightedStringWithRelevance HighlightAndRankPhrase(IEnumerable<AhoCorasick.Occurrence> hits, string text) {
             int startsAt = 0;
             byte count = 0;
 

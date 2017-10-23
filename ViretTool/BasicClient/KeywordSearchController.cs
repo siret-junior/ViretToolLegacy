@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ViretTool.BasicClient.Controls;
-using ViretTool.BasicClient.Utils;
 using ViretTool.SimilarityModels.DCNNKeywords;
 
 namespace ViretTool.BasicClient {

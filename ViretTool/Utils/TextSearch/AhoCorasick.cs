@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ViretTool.BasicClient.Utils {
+namespace ViretTool.Utils {
 
     /// <summary>
     /// AhoCorasick text search algorithm
@@ -148,6 +148,24 @@ namespace ViretTool.BasicClient.Utils {
 
             IEnumerator IEnumerable.GetEnumerator() {
                 return GetEnumerator();
+            }
+        }
+
+        /// <summary>
+        /// Represents one result form AhoCorasick search
+        /// </summary>
+        public struct Occurrence {
+            /// <summary>
+            /// Found word
+            /// </summary>
+            public string Word { get; set; }
+            /// <summary>
+            /// Position of the word in a text
+            /// </summary>
+            public uint StartsAt { get; set; }
+
+            public override string ToString() {
+                return string.Format("{0} ({1})", Word, StartsAt);
             }
         }
     }

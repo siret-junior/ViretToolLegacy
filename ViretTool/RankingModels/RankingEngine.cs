@@ -15,6 +15,9 @@ namespace ViretTool.RankingModels {
             mDataset = dataset;
         }
 
+        // only add here your init method
+        // it should add your model(s) into mRankingModels list
+
         public void InitKeywordModel(BasicClient.Controls.SuggestionTextBox box, string[] datasets) {
             var controller = new BasicClient.KeywordSearchController(mDataset, box, datasets);
 

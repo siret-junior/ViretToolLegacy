@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.BasicClient.Utils {
+namespace ViretTool.Utils {
 
     /// <summary>
     /// For faster read and write of ints, floats and longs.

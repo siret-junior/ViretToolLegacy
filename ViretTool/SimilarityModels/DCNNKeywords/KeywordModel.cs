@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ViretTool.BasicClient.Utils;
 using ViretTool.DataModel;
 using ViretTool.RankingModels;
+using ViretTool.Utils;
 
 namespace ViretTool.SimilarityModels.DCNNKeywords {
     

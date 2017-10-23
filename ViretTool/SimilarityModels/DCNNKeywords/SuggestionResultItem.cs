@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ViretTool.SimilarityModels.DCNNKeywords;
 
-namespace ViretTool.BasicClient.Utils {
+namespace ViretTool.SimilarityModels.DCNNKeywords {
     class SuggestionResultItem : IIdentifiable, IComparable<SuggestionResultItem> {
 
         public Label Label { get; set; }

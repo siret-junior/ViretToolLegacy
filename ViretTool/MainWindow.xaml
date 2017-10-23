@@ -79,6 +79,7 @@
             </controls:SuggestionTextBox>
             <!--#endregion Keyword Search -->
             
+            <!-- add your user control here -->
         </StackPanel>
     </StackPanel>
 

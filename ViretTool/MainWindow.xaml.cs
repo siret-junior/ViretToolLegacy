@@ -39,6 +39,8 @@ namespace ViretTool
                     "..\\..\\..\\..\\TestData\\ITEC\\YFCC100M"
                 });
 
+            // add your model init here
+
             engine.BuildEngine((BasicClient.Controls.ModelSelector)FindName("ModelSelector"));
         }
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.BasicClient.Utils {
+namespace ViretTool.SimilarityModels.DCNNKeywords {
 
     /// <summary>
     /// Interface for each suggestion item, providing the actual text to write in a seach box
