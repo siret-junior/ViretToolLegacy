@@ -136,20 +136,43 @@ namespace ViretTool.SimilarityModels.DCNNKeywords {
         private List<RankedFrame> GetRankedFrames(List<List<int>> ids) {
             List<RankedFrame> res = RankedFrame.InitializeResultList(mDataset);
 
-            List<Dictionary<int, RankedFrame>> clauses = UniteClauses(ids);
-            foreach (KeyValuePair<int, RankedFrame> pair in clauses[0]) {
-                res[pair.Key].Rank = pair.Value.Rank;
+            List<Dictionary<int, RankedFrame>> clauses = ResolveClauses(ids);
+            Dictionary<int, RankedFrame> query = UniteClauses(clauses);
+
+            foreach (KeyValuePair<int, RankedFrame> pair in query) {
+                res[pair.Key] = pair.Value;
             }
-            for (int i = 1; i < clauses.Count; i++) {
-                foreach (KeyValuePair<int, RankedFrame> pair in clauses[i]) {
-                    res[pair.Key].Rank *= pair.Value.Rank;
-                }
-            }
+
+            //for (int i = 1; i < clauses.Count; i++) {
+            //    foreach (KeyValuePair<int, RankedFrame> pair in clauses[i]) {
+            //        var rf = new RankedFrame(pair.Value.Frame, pair.Value.Rank * res[pair.Key].Rank);
+            //        res[pair.Key] = rf;
+            //    }
+            //}
 
             return res;
         }
 
-        private List<Dictionary<int, RankedFrame>> UniteClauses(List<List<int>> ids) {
+
+        private Dictionary<int, RankedFrame> UniteClauses(List<Dictionary<int, RankedFrame>> clauses) {
+            var result = clauses[clauses.Count - 1];
+            clauses.RemoveAt(clauses.Count - 1);
+
+            foreach (Dictionary < int, RankedFrame > clause in clauses) {
+                Dictionary<int, RankedFrame> tempResult = new Dictionary<int, RankedFrame>();
+
+                foreach (KeyValuePair<int, RankedFrame> rf in clause) {
+                    RankedFrame rfFromResult;
+                    if (result.TryGetValue(rf.Value.Frame.ID, out rfFromResult)) {
+                        tempResult.Add(rf.Value.Frame.ID, new RankedFrame(rf.Value.Frame, rf.Value.Rank * rfFromResult.Rank));
+                    }
+                }
+                result = tempResult;
+            }
+            return result;
+        }
+
+        private List<Dictionary<int, RankedFrame>> ResolveClauses(List<List<int>> ids) {
             var list = new List<Dictionary<int, RankedFrame>>();
 
             // should be fast

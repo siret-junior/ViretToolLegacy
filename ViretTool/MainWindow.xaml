@@ -61,14 +61,46 @@
                                              Base="{StaticResource SuggestionResultItemTemplate_Base}"/>
 
         <!--#endregion Keyword Search Styles -->
+
+
+
+
+        <Style x:Key="ImageAnnotationId" TargetType="TextBlock">
+            <Setter Property="Background" Value="#70FFFFFF" />
+            <Setter Property="Padding" Value="4,2" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        
+        <Style x:Key="ImageAnnotationProbability" TargetType="TextBlock">
+            <Setter Property="Padding" Value="4,2" />
+            <Setter Property="Background" Value="#70FFFFFF" />
+            <Setter Property="Foreground" Value="Red" />
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        
+        <DataTemplate x:Key="ImageListItemTemplate">
+            <Grid>
+                <Image Source="{Binding Path=Frame.Bitmap}" Stretch="Fill"/>
+                <TextBlock Text="{Binding Path=Frame.ID}" Style="{StaticResource ImageAnnotationId}"/>
+                <TextBlock Text="{Binding Path=Rank, StringFormat=N2}" Style="{StaticResource ImageAnnotationProbability}"/>
+            </Grid>
+        </DataTemplate>
         
     </Window.Resources>
 
-    <StackPanel Orientation="Horizontal">
+    <DockPanel>
+
         <StackPanel Orientation="Vertical" Width="400" Margin="10, 0, 10, 0">
 
             <controls:ModelSelector x:Name="ModelSelector"></controls:ModelSelector>
-            
+
             <!--#region Keyword Search -->
             <controls:SuggestionTextBox x:Name="SuggestionTextBox"
                                     ItemTemplateSelector="{StaticResource ResourceKey=HypernymSelector}">
@@ -78,9 +110,24 @@
                 </controls:SuggestionTextBox.LoadingPlaceholder>
             </controls:SuggestionTextBox>
             <!--#endregion Keyword Search -->
-            
+
             <!-- add your user control here -->
         </StackPanel>
-    </StackPanel>
+
+        <DockPanel>
+            <Grid>
+
+                <ItemsControl x:Name="ImageList" ItemTemplate="{StaticResource ImageListItemTemplate}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="8" Margin="5" Rows="7"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+            </Grid>
+        </DockPanel>
+        
+    </DockPanel>
 
 </Window>

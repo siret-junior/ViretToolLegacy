@@ -48,15 +48,15 @@ namespace ViretTool.RankingModels
             if (colorSketch && mColorSignatureBasedRanking != null)
             {
                 double max = mColorSignatureBasedRanking.Select(x => x.Rank).Max();
-                Parallel.For(0, result.Count, i =>
-                    result[i].Rank += mColorSignatureBasedRanking[i].Rank / max);
+                //Parallel.For(0, result.Count, i =>
+                //    result[i].Rank += mColorSignatureBasedRanking[i].Rank / max);
             }
 
             if (VGGvector && mVGGByteVectorBasedRanking != null)
             {
                 double max = mVGGByteVectorBasedRanking.Select(x => x.Rank).Max();
-                Parallel.For(0, result.Count, i =>
-                    result[i].Rank += mVGGByteVectorBasedRanking[i].Rank / max);
+                //Parallel.For(0, result.Count, i =>
+                //    result[i].Rank += mVGGByteVectorBasedRanking[i].Rank / max);
             }
 
             // TODO - use some parallel sorting

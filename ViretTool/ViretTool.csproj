@@ -59,6 +59,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BasicClient\Controls\ModelSelector.cs" />
+    <Compile Include="BasicClient\ImageListController.cs" />
     <Compile Include="BasicClient\KeywordSearchController.cs" />
     <Compile Include="SimilarityModels\DCNNKeywords\IIdentifiable.cs" />
     <Compile Include="SimilarityModels\DCNNKeywords\SuggestionResultItem.cs" />

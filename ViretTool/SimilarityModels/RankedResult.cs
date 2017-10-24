@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace ViretTool.SimilarityModels
 {
-    // TODO - Change class to struct if possible
+    // DONE - Change class to struct if possible
     //        >> RankedFrame will then be considered as value type (not reference type)
     //        >> One pointer jump will be saved for every op with the struct
     //        >> But the Rank value will behave as regular double (thus edit after copy will not effect the value of the original struct)
-    class RankedFrame : IComparable<RankedFrame>
+    struct RankedFrame : IComparable<RankedFrame>
     {
-        public readonly DataModel.Frame Frame;
-        public double Rank;
+        public DataModel.Frame Frame { get; }
+        public double Rank { get; set; }
 
         public RankedFrame(DataModel.Frame frame, double rank)
         {
@@ -23,7 +23,7 @@ namespace ViretTool.SimilarityModels
 
         public int CompareTo(RankedFrame other)
         {
-            return Rank.CompareTo(other.Rank);
+            return -Rank.CompareTo(other.Rank);
         }
 
         public static List<RankedFrame> InitializeResultList(DataModel.Dataset dataset)

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace ViretTool.RankingModels {
     class RankingEngine {
 
+        private BasicClient.ImageListController mImageController;
         private readonly DataModel.Dataset mDataset;
         private BasicClient.Controls.ModelSelector mModelSelector;
         private List<IRankingModel> mRankingModels = new List<IRankingModel>();
@@ -25,7 +26,9 @@ namespace ViretTool.RankingModels {
             mRankingModels.AddRange(models);
         }
 
-        public void BuildEngine(BasicClient.Controls.ModelSelector selector) {
+        public void BuildEngine(BasicClient.ImageListController controller, BasicClient.Controls.ModelSelector selector) {
+            mImageController = controller;
+
             mModelSelector = selector;
             mModelSelector.Models = mRankingModels;
             mModelSelector.ModelSelectionChangedEvent += ModelSelector_ModelSelectionChanged; ;
@@ -47,7 +50,7 @@ namespace ViretTool.RankingModels {
 
                 double max = modelRanking.Select(x => x.Rank).Max();
                 Parallel.For(0, result.Count, i =>
-                    result[i].Rank += modelRanking[i].Rank / max);
+                    result[i] = new SimilarityModels.RankedFrame(modelRanking[i].Frame, modelRanking[i].Rank + result[i].Rank));// / max);
             }
 
             // TODO - use some parallel sorting
@@ -55,6 +58,7 @@ namespace ViretTool.RankingModels {
 
             // TODO - filter only top K or the most distinct frames from each video
 
+            mImageController.ShowResults(result);
             // TODO - update result in UI
         }
 
