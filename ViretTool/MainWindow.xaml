@@ -114,18 +114,22 @@
             <!-- add your user control here -->
         </StackPanel>
 
-        <DockPanel>
-            <Grid>
-
-                <ItemsControl x:Name="ImageList" ItemTemplate="{StaticResource ImageListItemTemplate}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="8" Margin="5" Rows="7"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-
-            </Grid>
+        <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <controls:Paging x:Name="ImageListPaging"
+                             DockPanel.Dock="Top">
+            </controls:Paging>
+            
+            <ItemsControl VerticalAlignment="Stretch"
+                          HorizontalAlignment="Stretch"
+                          x:Name="ImageList"
+                          ItemTemplate="{StaticResource ImageListItemTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="8" Margin="5" Rows="7"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            
         </DockPanel>
         
     </DockPanel>

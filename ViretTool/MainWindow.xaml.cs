@@ -41,7 +41,8 @@ namespace ViretTool
 
             // add your model init here
 
-            var imageController = new BasicClient.ImageListController((ItemsControl)FindName("ImageList"));
+            var imageController = new BasicClient.ImageListController((ItemsControl)FindName("ImageList"),
+                (BasicClient.Controls.Paging)FindName("ImageListPaging"));
 
             engine.BuildEngine(imageController, (BasicClient.Controls.ModelSelector)FindName("ModelSelector"));
         }

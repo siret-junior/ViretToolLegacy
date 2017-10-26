@@ -59,6 +59,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BasicClient\Controls\ModelSelector.cs" />
+    <Compile Include="BasicClient\Controls\Paging\Paging.cs" />
     <Compile Include="BasicClient\ImageListController.cs" />
     <Compile Include="BasicClient\KeywordSearchController.cs" />
     <Compile Include="SimilarityModels\DCNNKeywords\IIdentifiable.cs" />
@@ -83,6 +84,10 @@
     <Compile Include="SimilarityModels\DCNNFeatures\ByteVectorModel.cs" />
     <Compile Include="SimilarityModels\DCNNKeywords\KeywordModel.cs" />
     <Compile Include="SimilarityModels\RankedResult.cs" />
+    <Page Include="BasicClient\Controls\Paging\Themes\Paging.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="BasicClient\Controls\Suggestion\Themes\SuggestionPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
