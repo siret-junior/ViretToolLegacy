@@ -1,0 +1,45 @@
+﻿<Window x:Class="VitretTool.EvaluationServer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VitretTool.EvaluationServer"
+        xmlns:chart="clr-namespace:VitretTool.EvaluationServer.Controls"
+        mc:Ignorable="d"
+        Title="Evaluation Server"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized" WindowStyle="None">
+
+    <Grid Background="Black">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <Grid x:Name="InfoGrid"/>
+
+                <Grid x:Name="PresentationGrid" Grid.Row="0" Visibility="Hidden">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid x:Name="ContentBox" Grid.Column="0">
+                        <DockPanel VerticalAlignment="Bottom" Margin="10" Grid.ZIndex="1">
+                            <TextBlock x:Name="TaskInfo" Foreground="White" FontSize="26" DockPanel.Dock="Left" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock x:Name="TimeInfo" Text="0:04:37" Foreground="White" FontSize="34" FontWeight="Bold" DockPanel.Dock="Right" TextAlignment="Right"></TextBlock>
+                        </DockPanel>
+                        <MediaElement x:Name="MediaElement" Grid.ZIndex="0"/>
+                    </Grid>
+
+                    <chart:Chart x:Name="TeamsChart"  Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                </Grid>
+            </Grid>
+
+            <Grid x:Name="TeamsGrid" Grid.Row="1"/>
+        </Grid>
+
+        <Grid x:Name="MediaElementFullscreen" Visibility="Hidden" Background="Black"/>
+    </Grid>
+</Window>

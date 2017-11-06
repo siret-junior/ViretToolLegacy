@@ -1,0 +1,5 @@
+#TYPE		CORRECT VID ID		SOURCE					TIME TO SOLVE (s)
+VIDEO		3					Tasks/task1.mpg			90
+VIDEO		1					Tasks/task1.mpg			90
+VIDEO		3					Tasks/task1.mpg			90
+VIDEO		1					Tasks/task1.mpg			90
