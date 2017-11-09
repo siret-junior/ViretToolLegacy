@@ -58,7 +58,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BasicClient\Controls\ModelSelector.cs" />
     <Compile Include="BasicClient\Displays\ResultDisplay.xaml.cs">
       <DependentUpon>ResultDisplay.xaml</DependentUpon>
     </Compile>
@@ -66,11 +65,9 @@
       <DependentUpon>DisplayFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="BasicClient\FrameSelectionController.cs" />
-    <Compile Include="BasicClient\-obsolete\ImageListController.cs" />
     <Compile Include="BasicClient\KeywordSearchControl.xaml.cs">
       <DependentUpon>KeywordSearchControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BasicClient\KeywordSearchController.cs" />
     <Compile Include="BasicClient\Displays\SemanticModelDisplay.xaml.cs">
       <DependentUpon>SemanticModelDisplay.xaml</DependentUpon>
     </Compile>
@@ -86,8 +83,6 @@
     <Compile Include="RankingModel\RankingEngine.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\IIdentifiable.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\SuggestionResultItem.cs" />
-    <Compile Include="RankingModel\-obsolete\IRankingModel.cs" />
-    <Compile Include="RankingModel\-obsolete\RankingEngine-Obsolete.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\IQueryPart.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\QueryTextBlock.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Themes\StringHighlightingConverter.cs" />
