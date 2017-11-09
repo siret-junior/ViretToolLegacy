@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViretTool", "ViretTool\ViretTool.csproj", "{83A3AC99-C09A-4744-9364-00E7AC2941DB}"
 EndProject
@@ -10,6 +10,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ImageDataset", "ImageDataset", "{07C01CEE-9F09-48AF-BAAB-6D44BC424EA1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrameExtractor", "FrameExtractor\FrameExtractor.csproj", "{D4247128-C719-423E-BDF8-C285F8922FB0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{723C5402-FE70-4EFB-8893-C7A2B4F20E40} = {723C5402-FE70-4EFB-8893-C7A2B4F20E40}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrameMerge", "FrameMerge\FrameMerge.csproj", "{9E81E8E4-6AF5-480A-B7CC-4AE26D4DCB63}"
 EndProject
