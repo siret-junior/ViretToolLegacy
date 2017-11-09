@@ -4,134 +4,53 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ViretTool"
-        xmlns:controls="clr-namespace:ViretTool.BasicClient.Controls"
+        xmlns:control = "clr-namespace:ViretTool.BasicClient"
         mc:Ignorable="d"
         Title="ViretTool"
         WindowStartupLocation="CenterScreen" WindowState="Maximized">
-    <Window.Resources>
 
-        <!--#region Keyword Search Styles -->
-        
-        <Style TargetType="{x:Type controls:QueryTextBlock}">
-            <Setter Property="Background" Value="WhiteSmoke"/>
-            <Setter Property="Padding" Value="5,2,5,2" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="true">
-                    <Setter Property="Background" Value="LightGray"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="8*" />
+        </Grid.ColumnDefinitions>
 
-        <!-- Highlights searched phrase in suggestions -->
-        <controls:StringHighlightingConverter x:Key="StringHighlightingConverter"/>
-
-        <!-- Templates distinguishing various types of suggested items (red / green background) -->
-        <DataTemplate x:Key="SuggestionResultItemTemplate_OnlyChildren">
-            <Border Padding="5" Background="#44DD88DD">
-                <StackPanel Orientation="Vertical">
-                    <ContentControl FontWeight="Bold" Content="{Binding Path=Name, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
-                    <TextBlock Text="{Binding Path=Hyponyms, StringFormat=Being: \{0\}}" Margin="0,0,0,2" FontStyle="Italic" TextWrapping="Wrap"/>
-                    <ContentControl Content="{Binding Path=Description, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
-                </StackPanel>
-            </Border>
-        </DataTemplate>
-
-        <DataTemplate x:Key="SuggestionResultItemTemplate_WithChildren">
-            <Border Padding="5" Background="#4488DDDD">
-                <StackPanel Orientation="Vertical">
-                    <ContentControl FontWeight="Bold" Content="{Binding Path=Name, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
-                    <TextBlock Text="{Binding Path=Hyponyms, StringFormat=Including: \{0\}}" Margin="0,0,0,2" FontStyle="Italic" TextWrapping="Wrap"/>
-                    <ContentControl Content="{Binding Path=Description, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
-                </StackPanel>
-            </Border>
-        </DataTemplate>
-
-        <DataTemplate x:Key="SuggestionResultItemTemplate_Base">
-            <Border Padding="5">
-                <StackPanel Orientation="Vertical">
-                    <ContentControl FontWeight="Bold" Content="{Binding Path=Name, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
-                    <ContentControl Content="{Binding Path=Description, Converter={StaticResource ResourceKey=StringHighlightingConverter}, Mode=OneTime}"/>
-                </StackPanel>
-            </Border>
-        </DataTemplate>
-
-        <controls:SuggestionTemplateSelector x:Key="HypernymSelector"
-                                             OnlyChildren="{StaticResource SuggestionResultItemTemplate_OnlyChildren}"
-                                             WithChildren="{StaticResource SuggestionResultItemTemplate_WithChildren}"
-                                             Base="{StaticResource SuggestionResultItemTemplate_Base}"/>
-
-        <!--#endregion Keyword Search Styles -->
-
-
-
-
-        <Style x:Key="ImageAnnotationId" TargetType="TextBlock">
-            <Setter Property="Background" Value="#70FFFFFF" />
-            <Setter Property="Padding" Value="4,2" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="TextAlignment" Value="Center"/>
-            <Setter Property="TextWrapping" Value="Wrap"/>
-        </Style>
-        
-        <Style x:Key="ImageAnnotationProbability" TargetType="TextBlock">
-            <Setter Property="Padding" Value="4,2" />
-            <Setter Property="Background" Value="#70FFFFFF" />
-            <Setter Property="Foreground" Value="Red" />
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="TextAlignment" Value="Center"/>
-            <Setter Property="TextWrapping" Value="Wrap"/>
-        </Style>
-        
-        <DataTemplate x:Key="ImageListItemTemplate">
-            <Grid>
-                <Image Source="{Binding Path=Frame.Bitmap}" Stretch="Fill"/>
-                <TextBlock Text="{Binding Path=Frame.ID}" Style="{StaticResource ImageAnnotationId}"/>
-                <TextBlock Text="{Binding Path=Rank, StringFormat=N2}" Style="{StaticResource ImageAnnotationProbability}"/>
-            </Grid>
-        </DataTemplate>
-        
-    </Window.Resources>
-
-    <DockPanel>
-
-        <StackPanel Orientation="Vertical" Width="400" Margin="10, 0, 10, 0">
-
-            <controls:ModelSelector x:Name="ModelSelector"></controls:ModelSelector>
-
-            <!--#region Keyword Search -->
-            <controls:SuggestionTextBox x:Name="SuggestionTextBox"
-                                    ItemTemplateSelector="{StaticResource ResourceKey=HypernymSelector}">
-                <controls:SuggestionTextBox.LoadingPlaceholder>
-                    <TextBlock Text="Loading..."
-                               Margin="5"/>
-                </controls:SuggestionTextBox.LoadingPlaceholder>
-            </controls:SuggestionTextBox>
-            <!--#endregion Keyword Search -->
-
-            <!-- add your user control here -->
+        <StackPanel Grid.Column="0">
+            <Button Height="Auto">Keyword search TODO</Button>
+            <control:SketchCanvas x:Name="sketchCanvas"/>
+            <control:SemanticModelDisplay x:Name="semanticModelDisplay"/>
+            <Button Height="200">Basket</Button>
         </StackPanel>
 
-        <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-            <controls:Paging x:Name="ImageListPaging"
-                             DockPanel.Dock="Top">
-            </controls:Paging>
-            
-            <ItemsControl VerticalAlignment="Stretch"
-                          HorizontalAlignment="Stretch"
-                          x:Name="ImageList"
-                          ItemTemplate="{StaticResource ImageListItemTemplate}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="8" Margin="5" Rows="7"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-            
-        </DockPanel>
+        <GridSplitter Grid.Column="1" 
+                      Width="5" 
+                      HorizontalAlignment="Stretch" />
+
+
+        <Grid Grid.Column="2" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="4*" />
+                <RowDefinition Height="15" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+
+            <control:ResultDisplay 
+                x:Name="resultDisplay" 
+                Grid.Row="0" />
+            <GridSplitter 
+                Grid.Row="1" 
+                Height="15" 
+                Background="DarkGray"
+                VerticalAlignment="Stretch" 
+                HorizontalAlignment="Stretch"/>
+            <control:VideoDisplay 
+                x:Name="videoDisplay" 
+                Grid.Row="2" />
+        </Grid>
         
-    </DockPanel>
+    </Grid>
+
+
 
 </Window>

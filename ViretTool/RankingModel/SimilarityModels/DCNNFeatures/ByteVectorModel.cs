@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.SimilarityModels.DCNNFeatures
+namespace ViretTool.RankingModel.DCNNFeatures
 {
     class ByteVectorModel
     {
@@ -15,9 +15,10 @@ namespace ViretTool.SimilarityModels.DCNNFeatures
         /// </summary>
         private List<byte[]> mByteVectors;
 
-        private int mDimension = 4096;
+        private int mDimension;
 
         private readonly string mDescriptorsFilename;
+
 
         public ByteVectorModel(DataModel.Dataset dataset)
         {
@@ -25,7 +26,10 @@ namespace ViretTool.SimilarityModels.DCNNFeatures
             mByteVectors = new List<byte[]>();
 
             // TODO - name should be connected to the dataset name
-            mDescriptorsFilename = System.IO.Path.Combine(mDataset.AllExtractedFramesFilename, "ByteVectors.vt");
+            string stripFilename = System.IO.Path.GetFileNameWithoutExtension(mDataset.AllExtractedFramesFilename);
+            string modelFilename = stripFilename.Split('-')[0] + ".vector";    // TODO: find better solution
+            string parentDirectory = System.IO.Directory.GetParent(mDataset.AllExtractedFramesFilename).ToString();
+            mDescriptorsFilename = System.IO.Path.Combine(parentDirectory, modelFilename);
 
             LoadDescriptors();
         }
@@ -50,13 +54,14 @@ namespace ViretTool.SimilarityModels.DCNNFeatures
                 // compute sequentially distances to all database frames 
                 Parallel.For(0, result.Count(), i =>
                 {
-                    RankedFrame rf = result[i];
-                    rf.Rank += CosineDistance(mByteVectors[rf.Frame.ID], query, indexes);
+                    RankedFrame rankedFrame = result[i];
+                    rankedFrame.Rank += CosineDistance(mByteVectors[rankedFrame.Frame.ID], query, indexes);
                 });
             }
 
             return result;
         }
+
 
         /// <summary>
         /// Compares two vectors, where each dimension is quantized to one byte. Assumes normalized vectors.
@@ -86,9 +91,8 @@ namespace ViretTool.SimilarityModels.DCNNFeatures
                 if (mDataset.DatasetID != datasetID)
                     throw new Exception("Dataset/descriptor mismatch. Delete file " + mDescriptorsFilename);
 
-                // TODO - read also dimension
-
                 int count = BR.ReadInt32();
+                mDimension = BR.ReadInt32();
 
                 for (int i = 0; i < count; i++)
                     mByteVectors.Add(BR.ReadBytes(mDimension));

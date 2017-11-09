@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="ViretTool.BasicClient.DisplayFrame"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ViretTool.BasicClient"
+             mc:Ignorable="d" 
+             d:DesignHeight="75" d:DesignWidth="100">
+    <Viewbox
+        Name="viewBox"
+        Stretch="Fill">
+        <Grid 
+            Background="LightGray"
+            MouseDown="Grid_MouseDown"
+            MouseMove="Grid_MouseMove"
+            MouseLeave="Grid_MouseLeave">
+        
+            <Image Name="image" />
+            <Rectangle Name="rectangle"
+                Fill="Transparent"
+                Stroke="Transparent"
+                StrokeThickness="4" />
+
+            <Label Name="label" 
+                   FontSize="8"
+                   Padding="2"
+                   Background="white"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="top" />
+
+        </Grid>
+    </Viewbox>
+</UserControl>

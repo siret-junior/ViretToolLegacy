@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ViretTool.DataModel;
-using ViretTool.RankingModels;
+using ViretTool.RankingModel;
 using ViretTool.Utils;
 
-namespace ViretTool.SimilarityModels.DCNNKeywords {
+namespace ViretTool.RankingModel.DCNNKeywords {
     
     /// <summary>
     /// Searches an index file and displays results
@@ -51,6 +51,38 @@ namespace ViretTool.SimilarityModels.DCNNKeywords {
 
             mLoadTask = Task.Factory.StartNew(LoadFromFile);
         }
+
+        #region Rank Methods
+
+        public void RankFramesBasedOnQuery(IEnumerable<IQueryPart> query)
+        {
+            RankingInvalidatedEvent?.Invoke(this);
+
+            if (mLabelProvider.LoadTask.IsFaulted || mLoadTask.IsFaulted)
+            {
+                MessageReporterEvent?.Invoke(this, MessageType.Exception,
+                    mLabelProvider.LoadTask.IsFaulted ? mLabelProvider.LoadTask.Exception.InnerException.Message : mLoadTask.Exception.InnerException.Message);
+                return;
+            }
+            else if (!mLabelProvider.LoadTask.IsCompleted || !mLoadTask.IsCompleted)
+            {
+                MessageReporterEvent?.Invoke(this, MessageType.Information, "Index file or label file is not yet loaded.");
+                return;
+            }
+
+            // parse the search phrase
+            List<List<int>> ids = ExpandQuery(query);
+            if (ids == null)
+            {
+                LastResult = RankedFrame.InitializeResultList(mDataset);
+                return;
+            }
+
+            LastResult = GetRankedFrames(ids);
+        }
+
+        #endregion
+        
 
         #region (Private) Index File Loading
 
@@ -101,32 +133,6 @@ namespace ViretTool.SimilarityModels.DCNNKeywords {
             } finally {
                 stream.Dispose();
             }
-        }
-
-        #endregion
-
-        #region Rank Methods
-
-        public void RankFramesBasedOnQuery(IEnumerable<IQueryPart> query) {
-            RankingInvalidatedEvent?.Invoke(this);
-
-            if (mLabelProvider.LoadTask.IsFaulted || mLoadTask.IsFaulted) {
-                MessageReporterEvent?.Invoke(this, MessageType.Exception,
-                    mLabelProvider.LoadTask.IsFaulted ? mLabelProvider.LoadTask.Exception.InnerException.Message : mLoadTask.Exception.InnerException.Message);
-                return;
-            } else if (!mLabelProvider.LoadTask.IsCompleted || !mLoadTask.IsCompleted) {
-                MessageReporterEvent?.Invoke(this, MessageType.Information, "Index file or label file is not yet loaded.");
-                return;
-            }
-
-            // parse the search phrase
-            List<List<int>> ids = ExpandQuery(query);
-            if (ids == null) {
-                LastResult = RankedFrame.InitializeResultList(mDataset);
-                return;
-            }
-
-            LastResult = GetRankedFrames(ids);
         }
 
         #endregion

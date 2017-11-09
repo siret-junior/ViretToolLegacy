@@ -59,40 +59,75 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BasicClient\Controls\ModelSelector.cs" />
-    <Compile Include="BasicClient\Controls\Paging\Paging.cs" />
-    <Compile Include="BasicClient\ImageListController.cs" />
+    <Compile Include="BasicClient\Displays\ResultDisplay.xaml.cs">
+      <DependentUpon>ResultDisplay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BasicClient\Displays\DisplayFrame.xaml.cs">
+      <DependentUpon>DisplayFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BasicClient\FrameSelectionController.cs" />
+    <Compile Include="BasicClient\-obsolete\ImageListController.cs" />
     <Compile Include="BasicClient\KeywordSearchController.cs" />
-    <Compile Include="SimilarityModels\DCNNKeywords\IIdentifiable.cs" />
-    <Compile Include="SimilarityModels\DCNNKeywords\SuggestionResultItem.cs" />
-    <Compile Include="RankingModels\IRankingModel.cs" />
-    <Compile Include="RankingModels\RankingEngine.cs" />
-    <Compile Include="SimilarityModels\DCNNKeywords\IQueryPart.cs" />
+    <Compile Include="BasicClient\Displays\SemanticModelDisplay.xaml.cs">
+      <DependentUpon>SemanticModelDisplay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BasicClient\SketchCanvas.xaml.cs">
+      <DependentUpon>SketchCanvas.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BasicClient\Displays\VideoDisplay.xaml.cs">
+      <DependentUpon>VideoDisplay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RankingModel\FilterManager.cs" />
+    <Compile Include="RankingModel\FilterModels\FilterBase.cs" />
+    <Compile Include="RankingModel\FilterModels\VideoAggregateFilter.cs" />
+    <Compile Include="RankingModel\RankingEngine.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\IIdentifiable.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\SuggestionResultItem.cs" />
+    <Compile Include="RankingModel\-obsolete\IRankingModel.cs" />
+    <Compile Include="RankingModel\-obsolete\RankingEngine-Obsolete.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\IQueryPart.cs" />
     <Compile Include="BasicClient\Controls\Suggestion\QueryTextBlock.cs" />
     <Compile Include="BasicClient\Controls\Suggestion\Themes\StringHighlightingConverter.cs" />
     <Compile Include="BasicClient\Controls\Suggestion\Themes\SuggestionTemplateSelector.cs" />
     <Compile Include="BasicClient\Controls\Suggestion\SuggestionPopup.cs" />
     <Compile Include="BasicClient\Controls\Suggestion\SuggestionTextBox.cs" />
-    <Compile Include="BasicClient\SketchCanvasController.cs" />
-    <Compile Include="SimilarityModels\DCNNKeywords\Label.cs" />
-    <Compile Include="SimilarityModels\DCNNKeywords\LabelProvider.cs" />
+    <Compile Include="BasicClient\-obsolete\SketchCanvasController.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\Label.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\LabelProvider.cs" />
     <Compile Include="Utils\Streams\BufferedByteStream.cs" />
-    <Compile Include="SimilarityModels\DCNNKeywords\SuggestionProvider.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\SuggestionProvider.cs" />
     <Compile Include="Utils\TextSearch\AhoCorasick.cs" />
     <Compile Include="ImageHelper.cs" />
-    <Compile Include="RankingModels\RankingManager.cs" />
-    <Compile Include="SimilarityModels\ColorSignatureModel.cs" />
-    <Compile Include="SimilarityModels\DCNNFeatures\ByteVectorModel.cs" />
-    <Compile Include="SimilarityModels\DCNNKeywords\KeywordModel.cs" />
-    <Compile Include="SimilarityModels\RankedResult.cs" />
-    <Page Include="BasicClient\Controls\Paging\Themes\Paging.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
+    <Compile Include="RankingModel\SimilarityManager.cs" />
+    <Compile Include="RankingModel\SimilarityModels\ColorSignatureModel\ColorSignatureModel.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNFeatures\ByteVectorModel.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordModel.cs" />
+    <Compile Include="RankingModel\RankedResult.cs" />
     <Page Include="BasicClient\Controls\Suggestion\Themes\SuggestionPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BasicClient\Controls\Suggestion\Themes\SuggestionTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BasicClient\Displays\ResultDisplay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BasicClient\Displays\DisplayFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BasicClient\Displays\SemanticModelDisplay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BasicClient\SketchCanvas.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BasicClient\Displays\VideoDisplay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

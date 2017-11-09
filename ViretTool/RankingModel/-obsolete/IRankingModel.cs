@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.RankingModels {
+namespace ViretTool.RankingModel {
     interface IRankingModel {
         /// <summary>
         /// Fired when a model changes ranking.
@@ -17,7 +17,7 @@ namespace ViretTool.RankingModels {
         /// <summary>
         /// Return last result.
         /// </summary>
-        List<SimilarityModels.RankedFrame> LastResult { get; }
+        List<RankingModel.RankedFrame> LastResult { get; }
         /// <summary>
         /// Get user readable name of the model.
         /// </summary>

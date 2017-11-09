@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ViretTool.SimilarityModels.DCNNKeywords;
+using ViretTool.RankingModel.DCNNKeywords;
 
-namespace ViretTool.SimilarityModels.DCNNKeywords {
+namespace ViretTool.RankingModel.DCNNKeywords {
     class SuggestionResultItem : IIdentifiable, IComparable<SuggestionResultItem> {
 
         public Label Label { get; set; }
