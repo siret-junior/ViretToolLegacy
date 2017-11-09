@@ -28,13 +28,13 @@ namespace VitretTool.EvaluationServer {
         UIDrawer drawer;
 
         public MainWindow() {
-#error Read this, then comment out.
-#warning 'tasks.txt', 'Teams' and 'Tasks' folder must exist in a location of the exe file.
-#warning In those folders, there are saved runs - when present, program will just show results.
-#warning Move to next task by pressing key N; to start task, press P (Works only if a task run is not saved.)
-#warning Make sure, the location of dataset files a few lines below is correct.
-#warning Be sure FrameIO.dll of the main VitretTool is reachable.
-#warning User submissions are cropped only when shown from saved runs, normally only last few are displayed.
+//#error Read this, then comment out.
+//#warning 'tasks.txt', 'Teams' and 'Tasks' folder must exist in a location of the exe file.
+//#warning In those folders, there are saved runs - when present, program will just show results.
+//#warning Move to next task by pressing key N; to start task, press P (Works only if a task run is not saved.)
+//#warning Make sure, the location of dataset files a few lines below is correct.
+//#warning Be sure FrameIO.dll of the main VitretTool is reachable.
+//#warning User submissions are cropped only when shown from saved runs, normally only last few are displayed.
 
             InitializeComponent();
 
