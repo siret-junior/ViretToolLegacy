@@ -4,20 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.RankingModels {
-    class RankingEngine {
+namespace ViretTool.RankingModel {
+    class RankingEngineObsolete {
 
         private BasicClient.ImageListController mImageController;
         private readonly DataModel.Dataset mDataset;
         private BasicClient.Controls.ModelSelector mModelSelector;
         private List<IRankingModel> mRankingModels = new List<IRankingModel>();
         
-        public RankingEngine(DataModel.Dataset dataset) {
+        public RankingEngineObsolete(DataModel.Dataset dataset) {
             mDataset = dataset;
         }
 
         // only add here your init method
         // it should add your model(s) into mRankingModels list
+        // >> Why here? Each model should be initialized separately and pass just reference to an initialized instance.
 
         public void InitKeywordModel(BasicClient.Controls.SuggestionTextBox box, string[] datasets) {
             var controller = new BasicClient.KeywordSearchController(mDataset, box, datasets);
@@ -41,7 +42,7 @@ namespace ViretTool.RankingModels {
         }
 
         public void UpdateMaxNormalizedAndSortedFinalRanking() {
-            List<SimilarityModels.RankedFrame> result = SimilarityModels.RankedFrame.InitializeResultList(mDataset);
+            List<RankingModel.RankedFrame> result = RankingModel.RankedFrame.InitializeResultList(mDataset);
 
             foreach (KeyValuePair<IRankingModel, bool> pair in mModelSelector.ModelSelection) {
                 if (!pair.Value) continue;
@@ -50,7 +51,7 @@ namespace ViretTool.RankingModels {
 
                 double max = modelRanking.Select(x => x.Rank).Max();
                 Parallel.For(0, result.Count, i =>
-                    result[i] = new SimilarityModels.RankedFrame(modelRanking[i].Frame, modelRanking[i].Rank + result[i].Rank));// / max);
+                    result[i] = new RankingModel.RankedFrame(modelRanking[i].Frame, modelRanking[i].Rank + result[i].Rank));// / max);
             }
 
             // TODO - use some parallel sorting

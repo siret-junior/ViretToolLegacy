@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="ViretTool.BasicClient.VideoDisplay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ViretTool.BasicClient"
+             mc:Ignorable="d" 
+             d:DesignHeight="240" d:DesignWidth="320">
+    
+    <Grid>
+        <ScrollViewer
+            Name="scrollViewer"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Viewbox Name = "viewBox" 
+                 Grid.Row="1"
+                 Stretch = "Uniform">
+                    <UniformGrid Name="displayGrid" />
+                </Viewbox>
+            </StackPanel>
+
+        </ScrollViewer>
+    </Grid>
+</UserControl>

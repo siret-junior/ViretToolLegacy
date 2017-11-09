@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ViretTool.BasicClient.Controls;
-using ViretTool.SimilarityModels.DCNNKeywords;
+using ViretTool.RankingModel.DCNNKeywords;
 
 namespace ViretTool.BasicClient {
 
@@ -39,7 +39,7 @@ namespace ViretTool.BasicClient {
             mSuggestionTextBox.GetSuggestionSubtreeEvent += MSuggestionTextBox_GetSuggestionSubtreeEvent;
         }
 
-        public IEnumerable<RankingModels.IRankingModel> GetModels() {
+        public IEnumerable<RankingModel.IRankingModel> GetModels() {
             foreach (var item in mKeywordModels) {
                 yield return item.Value;
             }

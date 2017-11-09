@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ViretTool.SimilarityModels.DCNNKeywords {
+namespace ViretTool.RankingModel.DCNNKeywords {
 
     class LabelProvider {
 

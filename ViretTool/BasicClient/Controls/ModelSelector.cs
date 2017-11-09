@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using ViretTool.RankingModels;
+using ViretTool.RankingModel;
 
 namespace ViretTool.BasicClient.Controls {
     class ModelSelector : WrapPanel {

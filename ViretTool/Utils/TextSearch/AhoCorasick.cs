@@ -135,7 +135,8 @@ namespace ViretTool.Utils {
 
             public Node this[char letter] {
                 get {
-                    return Children.TryGetValue(letter, out Node node) ? node : null;
+                    Node node;
+                    return Children.TryGetValue(letter, out node) ? node : null;
                 }
                 set {
                     Children[letter] = value;

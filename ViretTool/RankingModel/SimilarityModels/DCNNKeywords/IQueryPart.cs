@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.SimilarityModels.DCNNKeywords {
+namespace ViretTool.RankingModel.DCNNKeywords {
     interface IQueryPart {
         int Id { get; }
         bool UseChildren { get; }

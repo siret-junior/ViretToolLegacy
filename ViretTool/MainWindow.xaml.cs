@@ -12,8 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
-using ViretTool.RankingModels;
+using ViretTool.BasicClient;
+using ViretTool.RankingModel;
+using ViretTool.RankingModel.FilterModels;
+using ViretTool.RankingModel.SimilarityModels;
 
 namespace ViretTool
 {
@@ -22,28 +24,77 @@ namespace ViretTool
     /// </summary>
     public partial class MainWindow : Window
     {
+        DataModel.Dataset mDataset;
+        RankingEngine mRankingEngine;
+        
         public MainWindow()
         {
             InitializeComponent();
 
-            var dataset = new DataModel.Dataset(
+            // prepare data model
+            mDataset = new DataModel.Dataset(
                 "..\\..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb",
                 "..\\..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
+            //mDataset = new DataModel.Dataset(
+            //    "..\\..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb",
+            //    "..\\..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
 
-            var engine = new RankingEngine(dataset);
+            // prepare ranking engine
+            SimilarityManager similarityManager = new SimilarityManager(mDataset);
+            FilterManager filterManager = new FilterManager(mDataset);
+            mRankingEngine = new RankingEngine(similarityManager, filterManager);
+            mRankingEngine.VideoAggregateFilterEnabled = true;
+            mRankingEngine.VideoAggregateFilterMaxFrames = 2;
 
-            engine.InitKeywordModel(
-                (BasicClient.Controls.SuggestionTextBox)FindName("SuggestionTextBox"),
-                new string[] {
-                    "..\\..\\..\\..\\TestData\\ITEC\\GoogLeNet",
-                    "..\\..\\..\\..\\TestData\\ITEC\\YFCC100M"
-                });
+            // initialize selection controller
+            FrameSelectionController frameSelectionController
+                = new FrameSelectionController(mRankingEngine, resultDisplay, videoDisplay, semanticModelDisplay);
 
-            // add your model init here
+            // initialize videoDisplay
+            ((System.ComponentModel.ISupportInitialize)(videoDisplay)).BeginInit();
+            videoDisplay.FrameSelectionController = frameSelectionController;
+            ((System.ComponentModel.ISupportInitialize)(videoDisplay)).EndInit();
 
-            var imageController = new BasicClient.ImageListController((ItemsControl)FindName("ImageList"));
+            // initialize resultDisplay
+            ((System.ComponentModel.ISupportInitialize)(resultDisplay)).BeginInit();
+            resultDisplay.Dataset = mDataset;
+            resultDisplay.RankingEngine = mRankingEngine;
+            resultDisplay.FrameSelectionController = frameSelectionController;
+            resultDisplay.VideoDisplay = videoDisplay;
+            ((System.ComponentModel.ISupportInitialize)(resultDisplay)).EndInit();
 
-            engine.BuildEngine(imageController, (BasicClient.Controls.ModelSelector)FindName("ModelSelector"));
+            // initialize semanticModelDisplay
+            ((System.ComponentModel.ISupportInitialize)(semanticModelDisplay)).BeginInit();
+            semanticModelDisplay.FrameSelectionController = frameSelectionController;
+            semanticModelDisplay.VideoDisplay = videoDisplay;
+            ((System.ComponentModel.ISupportInitialize)(semanticModelDisplay)).EndInit();
+
+            //engine.InitKeywordModel(
+            //    (BasicClient.Controls.SuggestionTextBox)FindName("SuggestionTextBox"),
+            //    new string[] {
+            //        "..\\..\\..\\..\\TestData\\ITEC\\GoogLeNet",
+            //        "..\\..\\..\\..\\TestData\\ITEC\\YFCC100M"
+            //    });
+
+
+            //var imageController = new BasicClient.ImageListController((ItemsControl)FindName("ImageList"));
+            //engine.BuildEngine(imageController, (BasicClient.Controls.ModelSelector)FindName("ModelSelector"));
+
+            // TODO: debug
+            sketchCanvas.SketchChangedEvent += Sketch;
+
+            List<RankedFrame> debugRankedFrames = new List<RankedFrame>();
+            for (int i = 0; i < 500; i++)
+            {
+                debugRankedFrames.Add(new RankedFrame(mDataset.Frames[i], 0));
+            }
+            resultDisplay.ResultFrames = debugRankedFrames;
+        }
+
+        private void Sketch(List<Tuple<Point, Color>> colorSketch)
+        {
+            List<RankedFrame> result = mRankingEngine.UpdateColorModelRanking(colorSketch);
+            resultDisplay.ResultFrames = result;
         }
     }
 }

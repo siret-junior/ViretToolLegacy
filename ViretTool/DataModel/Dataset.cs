@@ -19,7 +19,8 @@ namespace ViretTool.DataModel
         /// The directory, where the dataset file is stored.
         /// </summary>
         public readonly string DatasetDirectory;
-        public readonly string AllExtractedFramesFilename;
+        public readonly string AllExtractedFramesFilename;  // TODO: rename
+        public readonly string SelectedFramesFilename;
 
         /// <summary>
         /// DatasetID represents a unique timestamp associated with the actual set of selected videos and frames.
@@ -39,6 +40,7 @@ namespace ViretTool.DataModel
         public Dataset(string selectedFramesFilename, string allExtractedFramesFilename)
         {
             DatasetDirectory = System.IO.Path.GetDirectoryName(selectedFramesFilename);
+            SelectedFramesFilename = selectedFramesFilename;
             AllExtractedFramesFilename = allExtractedFramesFilename;
             AllExtractedFramesReader = new FrameReader(allExtractedFramesFilename);
 

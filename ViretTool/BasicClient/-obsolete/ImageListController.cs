@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using ViretTool.SimilarityModels;
+using ViretTool.RankingModel;
 
 namespace ViretTool.BasicClient {
     class ImageListController {

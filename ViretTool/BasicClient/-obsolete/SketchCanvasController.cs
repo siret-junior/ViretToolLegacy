@@ -16,12 +16,12 @@ namespace ViretTool.BasicClient
     /// </summary>
     class SketchCanvasController
     {
-        private Canvas mCanvas;
+        private Canvas sketchCanvas;
         private List<ColorPoint> mColorPoints;
         private ColorPoint mSelectedColorPoint;
 
         public delegate void SketchChangedHandler(List<Tuple<Point, Color>> colorSketch);
-
+        
         /// <summary>
         /// SketchChangedEvent is raised whenever users create, move or delete a colored circle.
         /// </summary>
@@ -33,12 +33,12 @@ namespace ViretTool.BasicClient
         /// <param name="canvas">Canvas represents the area, where users place the colored circles.</param>
         public SketchCanvasController(Canvas canvas)
         {
-            mCanvas = canvas;
-            mCanvas.Background = Brushes.White;
+            sketchCanvas = canvas;
+            sketchCanvas.Background = Brushes.White;
 
-            mCanvas.MouseDown += Canvas_MouseDown;
-            mCanvas.MouseUp += Canvas_MouseUp;
-            mCanvas.MouseMove += Canvas_MouseMove;
+            sketchCanvas.MouseDown += Canvas_MouseDown;
+            sketchCanvas.MouseUp += Canvas_MouseUp;
+            sketchCanvas.MouseMove += Canvas_MouseMove;
 
             mColorPoints = new List<ColorPoint>();
             mSelectedColorPoint = null;
@@ -52,7 +52,7 @@ namespace ViretTool.BasicClient
         public void Clear()
         {
             foreach (ColorPoint CP in mColorPoints)
-                CP.RemoveFromCanvas(mCanvas);
+                CP.RemoveFromCanvas(sketchCanvas);
 
             mColorPoints.Clear();
             mSelectedColorPoint = null;
@@ -66,7 +66,7 @@ namespace ViretTool.BasicClient
 
                 foreach (ColorPoint CP in mColorPoints)
                 {
-                    Point p = new Point(CP.Position.X / mCanvas.Width, CP.Position.Y / mCanvas.Height);
+                    Point p = new Point(CP.Position.X / sketchCanvas.Width, CP.Position.Y / sketchCanvas.Height);
                     colorSketch.Add(new Tuple<Point, Color>(p, CP.FillColor));
                 }
 
@@ -77,32 +77,32 @@ namespace ViretTool.BasicClient
         private void DrawGrid()
         {
             double WX = 20, WY = 15;
-            double wx = mCanvas.Width / WX, wy = mCanvas.Height / WY;
+            double wx = sketchCanvas.Width / WX, wy = sketchCanvas.Height / WY;
 
             for (int i = 0; i <= WX; i++)
             {
                 Line l = new Line();
                 l.X1 = i * wx; l.X2 = l.X1;
-                l.Y1 = 0; l.Y2 = mCanvas.Height;
+                l.Y1 = 0; l.Y2 = sketchCanvas.Height;
                 l.Stroke = Brushes.Lavender;
                 if (i % 5 != 0) l.StrokeDashArray = new DoubleCollection() { 3 };
-                mCanvas.Children.Add(l);
+                sketchCanvas.Children.Add(l);
             }
 
             for (int j = 0; j <= WY; j++)
             {
                 Line l = new Line();
-                l.X1 = 0; l.X2 = mCanvas.Width;
+                l.X1 = 0; l.X2 = sketchCanvas.Width;
                 l.Y1 = j * wy; l.Y2 = j * wy;
                 l.Stroke = Brushes.Lavender;
                 if (j % 5 != 0) l.StrokeDashArray = new DoubleCollection() { 3 };
-                mCanvas.Children.Add(l);
+                sketchCanvas.Children.Add(l);
             }
         }
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Point p = e.GetPosition(mCanvas);
+            Point p = e.GetPosition(sketchCanvas);
 
             mSelectedColorPoint = ColorPoint.IsSelected(mColorPoints, p);
 
@@ -110,7 +110,7 @@ namespace ViretTool.BasicClient
             if (e.RightButton == MouseButtonState.Pressed && mSelectedColorPoint != null)
             {
                 mColorPoints.Remove(mSelectedColorPoint);
-                mSelectedColorPoint.RemoveFromCanvas(mCanvas);
+                mSelectedColorPoint.RemoveFromCanvas(sketchCanvas);
 
                 RaiseSketchChangedEvent();
 
@@ -127,7 +127,7 @@ namespace ViretTool.BasicClient
 
                 if (CP.Show(Mouse.GetPosition(Application.Current.MainWindow)))
                 {
-                    mSelectedColorPoint = new ColorPoint(p, CP.SelectedColor, mCanvas);
+                    mSelectedColorPoint = new ColorPoint(p, CP.SelectedColor, sketchCanvas);
                     mColorPoints.Add(mSelectedColorPoint);
                     mSelectedColorPoint = null;
                     RaiseSketchChangedEvent();
@@ -147,9 +147,9 @@ namespace ViretTool.BasicClient
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            Point p = e.GetPosition(mCanvas);
-            if (p.X < ColorPoint.Radius || p.X > mCanvas.Width - ColorPoint.Radius) return;
-            if (p.Y < ColorPoint.Radius || p.Y > mCanvas.Height - ColorPoint.Radius) return;
+            Point p = e.GetPosition(sketchCanvas);
+            if (p.X < ColorPoint.Radius || p.X > sketchCanvas.Width - ColorPoint.Radius) return;
+            if (p.Y < ColorPoint.Radius || p.Y > sketchCanvas.Height - ColorPoint.Radius) return;
 
             if (mSelectedColorPoint != null)
             {

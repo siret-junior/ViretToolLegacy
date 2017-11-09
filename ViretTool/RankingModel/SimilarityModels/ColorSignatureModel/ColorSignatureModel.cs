@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
 
-namespace ViretTool.SimilarityModels
+namespace ViretTool.RankingModel
 {
     class ColorSignatureModel
     {
@@ -17,8 +17,8 @@ namespace ViretTool.SimilarityModels
         /// </summary>
         private List<byte[]> mColorSignatures;
 
-        private const int mSignatureWidth = 20;
-        private const int mSignatureHeight = 15;
+        private int mSignatureWidth = 20;     // TODO: load dynamically from provided initializer file
+        private int mSignatureHeight = 15;
         private const int mGridRadius = 2;
 
         private readonly string mDescriptorsFilename;
@@ -29,10 +29,15 @@ namespace ViretTool.SimilarityModels
             mColorSignatures = new List<byte[]>();
 
             // TODO - name should be connected to the dataset name or ID
-            mDescriptorsFilename = System.IO.Path.Combine(mDataset.AllExtractedFramesFilename, "ColorSignatures.vt");
+            //mDescriptorsFilename = System.IO.Path.Combine(mDataset.AllExtractedFramesFilename, "ColorSignatures.vt");
+            string stripFilename = System.IO.Path.GetFileNameWithoutExtension(mDataset.AllExtractedFramesFilename);
+            string modelFilename = stripFilename.Split('-')[0] + ".color";    // TODO: find better solution
+            string parentDirectory = System.IO.Directory.GetParent(mDataset.AllExtractedFramesFilename).ToString();
+            mDescriptorsFilename = System.IO.Path.Combine(parentDirectory, modelFilename);
 
             LoadDescriptors();
         }
+
 
         public List<RankedFrame> RankFramesBasedOnSketch(List<Tuple<Point, Color>> queryCentroids)
         {
@@ -55,12 +60,27 @@ namespace ViretTool.SimilarityModels
                     foreach (int offset in t.Item1)
                         minRank = Math.Min(minRank, L2SquareDistance(R, signature[offset], G, signature[offset + 1], B, signature[offset + 2]));
 
-                    rf.Rank += Math.Sqrt(minRank);
+                    rf.Rank += 1 / (1 + Math.Sqrt(minRank));
                 }
             });
 
             return result;
         }
+        
+        public List<RankedFrame> RankFramesBasedOnExampleFrames(List<DataModel.Frame> queryFrames)
+        {
+            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset);
+
+            Parallel.For(0, result.Count(), i =>
+            {
+                RankedFrame rf = result[i];
+                foreach (DataModel.Frame queryFrame in queryFrames)
+                    rf.Rank +=  1 / (1 + L2Distance(mColorSignatures[rf.Frame.ID], mColorSignatures[queryFrame.ID]));
+            });
+
+            return result;
+        }
+
 
         /// <summary>
         /// Precompute a set of 2D grid cells (represented as offsets in 1D array) that should be investigated for the most similar query color.
@@ -91,21 +111,6 @@ namespace ViretTool.SimilarityModels
             return (r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2);
         }
 
-
-        public List<RankedFrame> RankFramesBasedOnExampleFrames(List<DataModel.Frame> queryFrames)
-        {
-            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset);
-
-            Parallel.For(0, result.Count(), i =>
-            {
-                RankedFrame rf = result[i];
-                foreach (DataModel.Frame queryFrame in queryFrames)
-                    rf.Rank += L2Distance(mColorSignatures[rf.Frame.ID], mColorSignatures[queryFrame.ID]);
-            });
-
-            return result;
-        }
-
         private double L2Distance(byte[] x, byte[] y)
         {
             double result = 0, r;
@@ -129,6 +134,8 @@ namespace ViretTool.SimilarityModels
                     throw new Exception("Dataset/descriptor mismatch. Delete file " + mDescriptorsFilename);
 
                 int count = BR.ReadInt32();
+                mSignatureWidth = BR.ReadInt32();
+                mSignatureHeight = BR.ReadInt32();
                 int size = mSignatureWidth * mSignatureHeight * 3;
 
                 for (int i = 0; i < count; i++)
