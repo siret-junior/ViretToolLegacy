@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Xml;
-using ViretTool.RankingModel.DCNNKeywords;
 
 namespace ViretTool.BasicClient.Controls {
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using ViretTool.Utils;
 
-namespace ViretTool.RankingModel.DCNNKeywords {
+namespace ViretTool.BasicClient.Controls {
 
     class SuggestionProvider {
 

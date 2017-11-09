@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using ViretTool.RankingModel.DCNNKeywords;
 
 namespace ViretTool.BasicClient.Controls {
     class SuggestionTextBox : Control {
@@ -59,7 +58,7 @@ namespace ViretTool.BasicClient.Controls {
             for (int i = 0; i < AnnotationSources.Length; i++) {
                 RadioButton r = new RadioButton();
                 r.Tag = AnnotationSources[i];
-                r.Content = Path.GetFileName(AnnotationSources[i]);
+                r.Content = AnnotationSources[i];
                 r.GroupName = "AnnotationSources";
                 r.Checked += AnnotationSourceButton_Checked;
                 r.Margin = new Thickness(0, 0, 10, 0);
@@ -301,14 +300,14 @@ namespace ViretTool.BasicClient.Controls {
             RadioButton rb = sender as RadioButton;
             if (rb == null) return;
 
-            AnnotationSource = rb.Tag.ToString();
-
             ClearQuery();
+
+            AnnotationSource = rb.Tag.ToString();
         }
 
         #endregion
 
-        private void ClearQuery() {
+        public void ClearQuery() {
             RasultStack_.Children.Clear();
             Query_.Clear();
             QueryChangedEvent?.Invoke(Query_, AnnotationSource);

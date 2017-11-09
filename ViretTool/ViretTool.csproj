@@ -67,6 +67,9 @@
     </Compile>
     <Compile Include="BasicClient\FrameSelectionController.cs" />
     <Compile Include="BasicClient\-obsolete\ImageListController.cs" />
+    <Compile Include="BasicClient\KeywordSearchControl.xaml.cs">
+      <DependentUpon>KeywordSearchControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BasicClient\KeywordSearchController.cs" />
     <Compile Include="BasicClient\Displays\SemanticModelDisplay.xaml.cs">
       <DependentUpon>SemanticModelDisplay.xaml</DependentUpon>
@@ -81,33 +84,33 @@
     <Compile Include="RankingModel\FilterModels\FilterBase.cs" />
     <Compile Include="RankingModel\FilterModels\VideoAggregateFilter.cs" />
     <Compile Include="RankingModel\RankingEngine.cs" />
-    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\IIdentifiable.cs" />
-    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\SuggestionResultItem.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\IIdentifiable.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\SuggestionResultItem.cs" />
     <Compile Include="RankingModel\-obsolete\IRankingModel.cs" />
     <Compile Include="RankingModel\-obsolete\RankingEngine-Obsolete.cs" />
-    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\IQueryPart.cs" />
-    <Compile Include="BasicClient\Controls\Suggestion\QueryTextBlock.cs" />
-    <Compile Include="BasicClient\Controls\Suggestion\Themes\StringHighlightingConverter.cs" />
-    <Compile Include="BasicClient\Controls\Suggestion\Themes\SuggestionTemplateSelector.cs" />
-    <Compile Include="BasicClient\Controls\Suggestion\SuggestionPopup.cs" />
-    <Compile Include="BasicClient\Controls\Suggestion\SuggestionTextBox.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\IQueryPart.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\QueryTextBlock.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\Themes\StringHighlightingConverter.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\Themes\SuggestionTemplateSelector.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\SuggestionPopup.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\SuggestionTextBox.cs" />
     <Compile Include="BasicClient\-obsolete\SketchCanvasController.cs" />
-    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\Label.cs" />
-    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\LabelProvider.cs" />
-    <Compile Include="Utils\Streams\BufferedByteStream.cs" />
-    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\SuggestionProvider.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\Label.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\LabelProvider.cs" />
+    <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\SuggestionProvider.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordModel.cs" />
     <Compile Include="Utils\TextSearch\AhoCorasick.cs" />
     <Compile Include="ImageHelper.cs" />
     <Compile Include="RankingModel\SimilarityManager.cs" />
     <Compile Include="RankingModel\SimilarityModels\ColorSignatureModel\ColorSignatureModel.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNFeatures\ByteVectorModel.cs" />
-    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordModel.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordSubModel.cs" />
     <Compile Include="RankingModel\RankedResult.cs" />
-    <Page Include="BasicClient\Controls\Suggestion\Themes\SuggestionPopup.xaml">
+    <Page Include="BasicClient\Controls\KeywordSearch\Themes\SuggestionPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="BasicClient\Controls\Suggestion\Themes\SuggestionTextBox.xaml">
+    <Page Include="BasicClient\Controls\KeywordSearch\Themes\SuggestionTextBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -120,6 +123,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BasicClient\Displays\SemanticModelDisplay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BasicClient\KeywordSearchControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

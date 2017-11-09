@@ -33,8 +33,9 @@ namespace ViretTool.RankingModel.SimilarityModels
 
             mColorSignatureModel = new RankingModel.ColorSignatureModel(mDataset);
             mVectorModel = new RankingModel.DCNNFeatures.ByteVectorModel(mDataset);
-            // TODO - keyword based ranking
-            // mKeywordModel = ...
+            mKeywordModel = new RankingModel.DCNNKeywords.KeywordModel(mDataset, new string[] {
+                "GoogLeNet", "YFCC100M"
+            });
 
             Reset();
         }
@@ -79,19 +80,11 @@ namespace ViretTool.RankingModel.SimilarityModels
             }
         }
 
-        public void UpdateKeywordModelRanking(string queryString)
+        public void UpdateKeywordModelRanking(List<List<int>> queryKeyword, string source)
         {
-            if (queryString != null && queryString.Length > 0)
-            {
-                // TODO:
-                //mKeywordBasedRanking = mKeywordModel.RankFramesBasedOnQuery(queryString);
-                //MaxNormalizeRanking(mKeywordBasedRanking);
-                throw new NotImplementedException();
-            }
-            else
-            {
-                mKeywordBasedRanking = null;
-            }
+                mKeywordBasedRanking = mKeywordModel.RankFramesBasedOnQuery(queryKeyword, source);
+                if (mKeywordBasedRanking != null)
+                    MaxNormalizeRanking(mKeywordBasedRanking);
         }
         
 

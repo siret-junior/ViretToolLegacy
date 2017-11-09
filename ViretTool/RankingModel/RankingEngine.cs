@@ -107,10 +107,10 @@ namespace ViretTool.RankingModel
             return result;
         }
 
-        public List<RankedFrame> UpdateKeywordModelRanking(string queryKeyword)
+        public List<RankedFrame> UpdateKeywordModelRanking(List<List<int>> queryKeyword, string source)
         {
             // update model ranking
-            mSimilarityManager.UpdateKeywordModelRanking(queryKeyword);
+            mSimilarityManager.UpdateKeywordModelRanking(queryKeyword, source);
             // recompute aggregation, filtering and sorting
             List<RankedFrame> result = GetRankedFilteredSortedResult();
             return result;

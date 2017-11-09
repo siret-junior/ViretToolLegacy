@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ViretTool.RankingModel.DCNNKeywords;
 
-namespace ViretTool.RankingModel.DCNNKeywords {
+namespace ViretTool.BasicClient.Controls {
     class SuggestionResultItem : IIdentifiable, IComparable<SuggestionResultItem> {
 
         public Label Label { get; set; }

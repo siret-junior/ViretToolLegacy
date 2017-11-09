@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.RankingModel.DCNNKeywords {
+namespace ViretTool.BasicClient.Controls {
 
     /// <summary>
     /// Representation of a WordNet synset in this tool

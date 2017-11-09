@@ -69,17 +69,12 @@ namespace ViretTool
             semanticModelDisplay.VideoDisplay = videoDisplay;
             ((System.ComponentModel.ISupportInitialize)(semanticModelDisplay)).EndInit();
 
-            //engine.InitKeywordModel(
-            //    (BasicClient.Controls.SuggestionTextBox)FindName("SuggestionTextBox"),
-            //    new string[] {
-            //        "..\\..\\..\\..\\TestData\\ITEC\\GoogLeNet",
-            //        "..\\..\\..\\..\\TestData\\ITEC\\YFCC100M"
-            //    });
 
+            keywordSearchTextBox.Init(mDataset, new string[] {
+                "GoogLeNet", "YFCC100M"
+            });
 
-            //var imageController = new BasicClient.ImageListController((ItemsControl)FindName("ImageList"));
-            //engine.BuildEngine(imageController, (BasicClient.Controls.ModelSelector)FindName("ModelSelector"));
-
+            keywordSearchTextBox.KeywordChangedEvent += Keyword;
             // TODO: debug
             sketchCanvas.SketchChangedEvent += Sketch;
 
@@ -89,6 +84,11 @@ namespace ViretTool
                 debugRankedFrames.Add(new RankedFrame(mDataset.Frames[i], 0));
             }
             resultDisplay.ResultFrames = debugRankedFrames;
+        }
+
+        private void Keyword(List<List<int>> query, string annotationSource) {
+            List<RankedFrame> result = mRankingEngine.UpdateKeywordModelRanking(query, annotationSource);
+            resultDisplay.ResultFrames = result;
         }
 
         private void Sketch(List<Tuple<Point, Color>> colorSketch)

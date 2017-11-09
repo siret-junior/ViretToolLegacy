@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.RankingModel.DCNNKeywords {
-    interface IQueryPart {
+namespace ViretTool.BasicClient.Controls {
+    public interface IQueryPart {
         int Id { get; }
         bool UseChildren { get; }
         TextBlockType Type { get; }
     }
-    enum TextBlockType { Class, OR, AND }
+    public enum TextBlockType { Class, OR, AND }
 }

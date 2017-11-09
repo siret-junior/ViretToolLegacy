@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
-using ViretTool.RankingModel.DCNNKeywords;
 
 namespace ViretTool.BasicClient.Controls {
     class QueryTextBlock : TextBlock, IQueryPart {

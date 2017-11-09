@@ -17,7 +17,7 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0">
-            <Button Height="Auto">Keyword search TODO</Button>
+            <control:KeywordSearchControl x:Name="keywordSearchTextBox"/>
             <control:SketchCanvas x:Name="sketchCanvas"/>
             <control:SemanticModelDisplay x:Name="semanticModelDisplay"/>
             <Button Height="200">Basket</Button>

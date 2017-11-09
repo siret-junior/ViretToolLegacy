@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ViretTool.RankingModel.DCNNKeywords {
+namespace ViretTool.BasicClient.Controls {
 
     class LabelProvider {
 

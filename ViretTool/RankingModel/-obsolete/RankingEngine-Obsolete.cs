@@ -21,10 +21,10 @@ namespace ViretTool.RankingModel {
         // >> Why here? Each model should be initialized separately and pass just reference to an initialized instance.
 
         public void InitKeywordModel(BasicClient.Controls.SuggestionTextBox box, string[] datasets) {
-            var controller = new BasicClient.KeywordSearchController(mDataset, box, datasets);
+            //var controller = new BasicClient.KeywordSearchController(mDataset, box, datasets);
 
-            var models = controller.GetModels();
-            mRankingModels.AddRange(models);
+            //var models = controller.GetModels();
+            //mRankingModels.AddRange(models);
         }
 
         public void BuildEngine(BasicClient.ImageListController controller, BasicClient.Controls.ModelSelector selector) {

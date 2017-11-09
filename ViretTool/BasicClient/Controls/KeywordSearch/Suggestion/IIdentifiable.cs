@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.RankingModel.DCNNKeywords {
+namespace ViretTool.BasicClient.Controls {
 
     /// <summary>
     /// Interface for each suggestion item, providing the actual text to write in a seach box
