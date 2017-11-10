@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace ViretTool
 {
-    class ImageHelper
+    public class ImageHelper
     {
         public static BitmapSource StreamToImage(byte[] JPGThumbnail)
         {

@@ -64,6 +64,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataModel\DataModel.csproj">
+      <Project>{0189fda1-9435-4cc6-87b3-f42ecb27b668}</Project>
+      <Name>DataModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FrameExtractor\FrameExtractor.csproj">
       <Project>{d4247128-c719-423e-bdf8-c285f8922fb0}</Project>
       <Name>FrameExtractor</Name>

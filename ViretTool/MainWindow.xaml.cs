@@ -33,11 +33,11 @@ namespace ViretTool
 
             // prepare data model
             mDataset = new DataModel.Dataset(
-                "..\\..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb",
-                "..\\..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
+                "..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb",
+                "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
             //mDataset = new DataModel.Dataset(
-            //    "..\\..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb",
-            //    "..\\..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
+            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb",
+            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
 
             // prepare ranking engine
             SimilarityManager similarityManager = new SimilarityManager(mDataset);

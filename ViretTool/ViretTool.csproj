@@ -16,7 +16,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
+    <OutputPath>..\Build\x64\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -26,7 +26,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
+    <OutputPath>..\Build\x64\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -95,7 +95,6 @@
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\SuggestionProvider.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordModel.cs" />
     <Compile Include="Utils\TextSearch\AhoCorasick.cs" />
-    <Compile Include="ImageHelper.cs" />
     <Compile Include="RankingModel\SimilarityManager.cs" />
     <Compile Include="RankingModel\SimilarityModels\ColorSignatureModel\ColorSignatureModel.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNFeatures\ByteVectorModel.cs" />
@@ -141,9 +140,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DataModel\Dataset.cs" />
-    <Compile Include="DataModel\Frame.cs" />
-    <Compile Include="DataModel\Video.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -176,6 +172,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataModel\DataModel.csproj">
+      <Project>{0189fda1-9435-4cc6-87b3-f42ecb27b668}</Project>
+      <Name>DataModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FrameIO\FrameIO.csproj">
       <Project>{723c5402-fe70-4efb-8893-c7a2b4f20e40}</Project>
       <Name>FrameIO</Name>
