@@ -11,11 +11,13 @@ namespace ViretTool.RankingModel.FilterModels
         private DataModel.Dataset mDataset;
 
         private VideoAggregateFilter mVideoAggregateFilter;
+        private AspectRatioFilter mAspectRatioFilter;
 
         public FilterManager(DataModel.Dataset dataset)
         {
             mDataset = dataset;
             mVideoAggregateFilter = new VideoAggregateFilter(mDataset);
+            //mAspectRatioFilter = new AspectRatioFilter(mDataset);
         }
 
 
@@ -23,18 +25,15 @@ namespace ViretTool.RankingModel.FilterModels
         {
             List<RankedFrame> filteredFrames = null;
 
-            // TODO: unsorted mask filters
+            // mask filters
+            // TODO:
 
-            // skip filtering if no filters are applied
-            if (!mVideoAggregateFilter.Enabled /* TODO other filters */)
-            {
-                return unfilteredFrames;
-            }
+            // sort mask filtered result
+            unfilteredFrames.Sort();
+            filteredFrames = unfilteredFrames;
 
-            // now flow filters (filtering on sorted ranking) 
-            // (currently sorted inside VideoAggregateFilter)
-            // unfilteredFrames.Sort();
-
+            // Flow filters (filtering on sorted ranking) 
+            // TODO: parallel pipeline
             if (mVideoAggregateFilter.Enabled)
             {
                 filteredFrames = mVideoAggregateFilter.ApplyFilter(unfilteredFrames);

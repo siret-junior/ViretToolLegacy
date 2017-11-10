@@ -6,19 +6,17 @@ using System.Threading.Tasks;
 
 namespace ViretTool.RankingModel.FilterModels
 {
-    abstract class FilterBase
+    abstract class Filter
     {
         protected DataModel.Dataset mDataset;
 
         public bool Enabled { get; set; }
 
-        public FilterBase(DataModel.Dataset dataset)
+
+        public Filter(DataModel.Dataset dataset)
         {
             mDataset = dataset;
             Enabled = false;
         }
-
-        //public abstract bool[] GetFilterMask(List<RankedFrame> rankedFrames);
-        public abstract List<RankedFrame> ApplyFilter(List<RankedFrame> rankedFrames);
     }
 }

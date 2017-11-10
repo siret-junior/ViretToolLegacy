@@ -57,7 +57,6 @@ namespace ViretTool.RankingModel
             mRankedFilteredSortedResult = mFilterManager.ApplyFilters(mRankedSimilarityResult);
 
             // TODO parallel?
-            mRankedFilteredSortedResult.Sort();
 
             return mRankedFilteredSortedResult;
         }

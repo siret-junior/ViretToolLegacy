@@ -78,8 +78,11 @@
       <DependentUpon>VideoDisplay.xaml</DependentUpon>
     </Compile>
     <Compile Include="RankingModel\FilterManager.cs" />
-    <Compile Include="RankingModel\FilterModels\FilterBase.cs" />
-    <Compile Include="RankingModel\FilterModels\VideoAggregateFilter.cs" />
+    <Compile Include="RankingModel\FilterModels\Filter.cs" />
+    <Compile Include="RankingModel\FilterModels\FlowFilter.cs" />
+    <Compile Include="RankingModel\FilterModels\FlowFilters\VideoAggregateFilter.cs" />
+    <Compile Include="RankingModel\FilterModels\MaskFilter.cs" />
+    <Compile Include="RankingModel\FilterModels\MaskFilters\AspectRatioFilter.cs" />
     <Compile Include="RankingModel\RankingEngine.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\IIdentifiable.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\SuggestionResultItem.cs" />

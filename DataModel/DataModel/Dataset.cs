@@ -55,6 +55,24 @@ namespace ViretTool.DataModel
                 LoadVideosAndFrames(selectedFramesReader);
             }
         }
+        
+        /// <summary>
+        /// Dataset accessor providing direct access to the selected frames.
+        /// </summary>
+        /// <param name="frameId"></param>
+        /// <returns></returns>
+        public Frame this[int frameId]
+        {
+            get
+            {
+                return Frames[frameId];
+            }
+
+            set
+            {
+                Frames[frameId] = value;
+            }
+        }
 
         /// <summary>
         /// Populates the Video and Frame collections of the dataset.
