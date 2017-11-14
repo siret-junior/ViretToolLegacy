@@ -226,9 +226,9 @@ namespace VitretTool.EvaluationServer {
                 var sp = mStackPanel.Children[1] as StackPanel;
 
                 if (sp.Children.Count > 0) {
-                    if (((Border)sp.Children[0]).ActualHeight + sp.ActualHeight + 100 > g.ActualHeight) {
+                    if (((Border)sp.Children[0]).ActualHeight + sp.ActualHeight + 100 > g.ActualHeight || ((Border)sp.Children[0]).ActualHeight == 0) {
                         sp.Children.RemoveAt(0);
-                    }
+                    } 
                 }
 
                 var b = new Border();
@@ -245,8 +245,9 @@ namespace VitretTool.EvaluationServer {
                 tb.VerticalAlignment = VerticalAlignment.Bottom;
                 tb.TextAlignment = TextAlignment.Right;
                 tb.Foreground = Brushes.White;
+                tb.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
                 tb.FontSize = 24;
-                tb.Margin = new Thickness(0, 0, 5, 0);
+                tb.Padding = new Thickness(5, 0, 5, 0);
                 tb.FontWeight = FontWeights.Bold;
 
                 gr.Children.Add(tb);

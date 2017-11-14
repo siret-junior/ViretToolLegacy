@@ -26,9 +26,9 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid x:Name="ContentBox" Grid.Column="0">
-                        <DockPanel VerticalAlignment="Bottom" Margin="10" Grid.ZIndex="1">
-                            <TextBlock x:Name="TaskInfo" Foreground="White" FontSize="26" DockPanel.Dock="Left" VerticalAlignment="Center"></TextBlock>
-                            <TextBlock x:Name="TimeInfo" Text="0:04:37" Foreground="White" FontSize="34" FontWeight="Bold" DockPanel.Dock="Right" TextAlignment="Right"></TextBlock>
+                        <DockPanel VerticalAlignment="Bottom" Grid.ZIndex="1" Background="#80000000">
+                            <TextBlock x:Name="TaskInfo" Margin="10" Foreground="White" FontSize="26" DockPanel.Dock="Left" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock x:Name="TimeInfo" Margin="10" Text="00:00:00" Foreground="White" FontSize="34" FontWeight="Bold" DockPanel.Dock="Right" TextAlignment="Right"></TextBlock>
                         </DockPanel>
                         <MediaElement x:Name="MediaElement" Grid.ZIndex="0"/>
                     </Grid>

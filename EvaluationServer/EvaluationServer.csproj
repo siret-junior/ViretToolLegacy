@@ -58,10 +58,6 @@
     <Compile Include="Net\ClientHandler.cs" />
     <Compile Include="Controls\Chart.cs" />
     <Compile Include="Controls\IChartLine.cs" />
-    <Compile Include="DataModel\Dataset.cs" />
-    <Compile Include="DataModel\Frame.cs" />
-    <Compile Include="DataModel\ImageHelper.cs" />
-    <Compile Include="DataModel\Video.cs" />
     <Compile Include="ColorHelper.cs" />
     <Compile Include="Net\Server.cs" />
     <Compile Include="UIDrawer.cs" />
@@ -114,9 +110,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FrameIO\FrameIO.csproj">
-      <Project>{723c5402-fe70-4efb-8893-c7a2b4f20e40}</Project>
-      <Name>FrameIO</Name>
+    <ProjectReference Include="..\DataModel\DataModel.csproj">
+      <Project>{0189fda1-9435-4cc6-87b3-f42ecb27b668}</Project>
+      <Name>DataModel</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
