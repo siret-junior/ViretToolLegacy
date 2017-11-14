@@ -44,5 +44,11 @@ namespace ViretTool.DataModel {
                 return ImageHelper.StreamToImage(mJPGThumbnail);
             }
         }
+
+        public System.Drawing.Bitmap ActualBitmap {
+            get {
+                return new System.Drawing.Bitmap(new System.IO.MemoryStream(mJPGThumbnail));
+            }
+        }
     }
 }
