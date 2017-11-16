@@ -10,7 +10,7 @@ namespace VitretTool.EvaluationServer {
     class Teams {
 
         private StreamWriter mStreamWriter;
-        private Dictionary<long, Team> mTeams;
+        private Dictionary<string, Team> mTeams;
         private VBSTasks.KeyframeEvaluator mEvaluator;
 
         public delegate void NewTeamAddedHandler(Team team);
@@ -18,7 +18,7 @@ namespace VitretTool.EvaluationServer {
 
         public Teams(VBSTasks.KeyframeEvaluator evaluator, NewTeamAddedHandler ntaHandler) {
             mEvaluator = evaluator;
-            mTeams = new Dictionary<long, Team>();
+            mTeams = new Dictionary<string, Team>();
             NewTeamAdded += ntaHandler;
 
             if (File.Exists("Teams/registered.txt")) {
@@ -28,7 +28,7 @@ namespace VitretTool.EvaluationServer {
             mStreamWriter.AutoFlush = true;
         }
 
-        public Team this[long index] {
+        public Team this[string index] {
             get {
                 lock(mTeams) {
                     if (!mTeams.ContainsKey(index)) return null;
@@ -42,12 +42,10 @@ namespace VitretTool.EvaluationServer {
             Team t;
 
             lock (mTeams) {
-                foreach (KeyValuePair<long, Team> pair in mTeams) {
-                    if (pair.Value.Name == name) return pair.Value;
-                }
+                if (mTeams.ContainsKey(name)) return null;
 
                 t = new Team(id, name, mEvaluator, ColorHelper.GetPredefiniedColor(mTeams.Count));
-                mTeams.Add(id, t);
+                mTeams.Add(name, t);
 
                 mStreamWriter.WriteLine("{0}\t{1,20}\t{2}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), id, name);
             }
@@ -70,7 +68,7 @@ namespace VitretTool.EvaluationServer {
                         string name = parts[2];
 
                         Team t = new Team(id, name, mEvaluator, ColorHelper.GetPredefiniedColor(mTeams.Count));
-                        mTeams.Add(id, t);
+                        mTeams.Add(name, t);
                         NewTeamAdded?.Invoke(t);
                     }
                 }

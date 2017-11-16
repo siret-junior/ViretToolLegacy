@@ -15,22 +15,29 @@ namespace VitretTool.EvaluationServer {
         public IPAddress IP { get; private set; }
 
         private Teams mTeams;
-        private TcpListener mListener;
+        private HttpListener mListener;
 
         public Server(IPAddress ip, int port, Teams teams) {
             IP = ip;
             Port = port;
             mTeams = teams;
-            mListener = new TcpListener(IP, Port);
+            mListener = new HttpListener();
+            mListener.Prefixes.Add(string.Format("http://+:{1}/", IP, Port));
         }
 
         public async void Listen() {
+            // netsh http add urlacl url=http://+:9999/ user=Tom
+            // netsh http show urlacl
+            //https://stackoverflow.com/questions/14962334/httplistenerexception-access-denied-for-non-admins
             mListener.Start();
 
             while (true) {
-                TcpClient client = await mListener.AcceptTcpClientAsync();
+                var context = await mListener.GetContextAsync();
 
-                ClientHandler.Listen(client, mTeams);
+                HttpListenerRequest request = context.Request;
+                HttpListenerResponse response = context.Response;
+
+                ClientHandler.Respond(request, response, mTeams);
             }
         }
         

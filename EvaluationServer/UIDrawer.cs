@@ -41,9 +41,19 @@ namespace VitretTool.EvaluationServer {
             mDataset = dataset;
         }
 
-        public void DrawNewKeyframe(long teamId, int frameId, int value, int taskId) {
+        public void DrawNewKeyframe(long teamId, int videoId, int frameId, int value, int taskId) {
             Application.Current.Dispatcher.BeginInvoke((Action)delegate {
-                mTeams[teamId].InsertNewResult(mTeamsGrid, mDataset.Frames[frameId].Bitmap, value, taskId);
+                BitmapSource b = null;
+                if (videoId < mDataset.Videos.Count && videoId >= 0) {
+                    foreach (var item in mDataset.Videos[videoId].Frames) {
+                        if (item.FrameNumber >= frameId) {
+                            b = item.Bitmap;
+                            break;
+                        }
+                    }
+                }
+
+                mTeams[teamId].InsertNewResult(mTeamsGrid, b, value, taskId);
                 if (value > 0) UpdateChart();
             });
         }
@@ -236,7 +246,12 @@ namespace VitretTool.EvaluationServer {
                 b.Background = value > 0 ? Brushes.Green : Brushes.Red;
                 var gr = new Grid();
                 var i = new Image();
-                i.Source = bitmap;
+                if (bitmap == null) {
+                    System.Drawing.Bitmap bmp = System.Drawing.Bitmap.FromHicon(System.Drawing.SystemIcons.Error.Handle);
+                    i.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(bmp.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                } else {
+                    i.Source = bitmap;
+                }
                 i.Stretch = Stretch.Fill;
                 b.Child = gr;
                 gr.Children.Add(i);

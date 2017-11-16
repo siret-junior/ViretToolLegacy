@@ -20,8 +20,8 @@ namespace VitretTool.EvaluationServer {
             Color = c; //Helper.StringToColor(Name);
         }
 
-        public void SubmitKeyframeId(int frameId) {
-            mEvaluator(Id, frameId);
+        public void SubmitVideoFrame(int videoId, int frameId) {
+            mEvaluator(Id, videoId, frameId);
         }
     }
 }

@@ -11,6 +11,8 @@ namespace VitretTool.EvaluationServer {
     class VBSTask {
         public int TaskId { get; private set; }
         public int VideoId { get; private set; }
+        public int StartFrame { get; private set; }
+        public int EndFrame { get; private set; }
         public string Source { get; private set; }
         public TimeSpan Duration { get; private set; }
         public TimeSpan Remaining { get; private set; }
@@ -19,9 +21,8 @@ namespace VitretTool.EvaluationServer {
         public bool Finished { get; private set; }
 
         private Timer mTimer;
-        private Dataset mDataset;
         private StreamWriter mStreamWriter;
-        private Dictionary<long, int> mSubmissions;
+        private Dictionary<long, Result> mSubmissions;
 
         private VBSTasks.OnTaskLoadedHandler OnTaskLoaded;
         private VBSTasks.OnTaskStartedHandler OnTaskStarted;
@@ -30,30 +31,31 @@ namespace VitretTool.EvaluationServer {
         private VBSTasks.OnNewKeyframeSubmittedHandler OnNewKeyframeSubmitted;
 
         private VBSTask() {
-            mSubmissions = new Dictionary<long, int>();
+            mSubmissions = new Dictionary<long, Result>();
         }
 
-        public static VBSTask LoadFromString(int id, string line, Dataset dataset) {
+        public static VBSTask LoadFromString(int id, string line) {
             var parts = line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 4 || parts[0] != "VIDEO") throw new Exception();
+            if (parts.Length != 6 || parts[0] != "VIDEO") throw new Exception();
 
             var t = new VBSTask();
             t.VideoId = int.Parse(parts[1]);
-            t.Source = parts[2];
-            t.Duration = TimeSpan.FromSeconds(int.Parse(parts[3]));
-            t.mDataset = dataset;
+            t.StartFrame = int.Parse(parts[2]);
+            t.EndFrame = int.Parse(parts[3]);
+            t.Source = parts[4];
+            t.Duration = TimeSpan.FromSeconds(int.Parse(parts[5]));
             t.TaskId = id;
 
             t.Started = false;
             t.Finished = false;
 
-            if (File.Exists("Tasks/finished" + t.TaskId + ".txt")) {
-                t.Started = true;
-                t.Finished = true;
-            } else {
+            //if (File.Exists("Tasks/finished" + t.TaskId + ".txt")) {
+            //    t.Started = true;
+            //    t.Finished = true;
+            //} else {
                 t.mStreamWriter = new StreamWriter("Tasks/finished" + t.TaskId + ".txt", false);
                 t.mStreamWriter.AutoFlush = true;
-            }
+            //}
 
             return t;
         }
@@ -113,29 +115,30 @@ namespace VitretTool.EvaluationServer {
             OnTaskTimeUpdated?.Invoke(Remaining);
         }
 
-        public void EvaluateKeyframe(long teamId, int frameId) {
+        public void EvaluateKeyframe(long teamId, int videoId, int frameId) {
             if (!Started || Finished) return;
 
-            int val = 0;
-            if (frameId < mDataset.Frames.Count && frameId >= 0) {
+            Result res;
 
-                lock (mSubmissions) {
-                    if (mSubmissions.ContainsKey(teamId)) return;
-                }
-
-                if (mDataset.Frames[frameId].FrameVideo.VideoID == VideoId) {
-                    val = (int)Remaining.TotalSeconds;
-
-                    lock (mSubmissions) {
-                        mSubmissions.Add(teamId, val);
-                    }
-                }
-                OnNewKeyframeSubmitted?.Invoke(teamId, frameId, val, TaskId);
-
-                lock (mStreamWriter) {
-                    mStreamWriter.WriteLine("{0}\t{1,20}\t{2,10}\t{3,5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), teamId, frameId, val);
+            lock (mSubmissions) {
+                if (!mSubmissions.TryGetValue(teamId, out res)) {
+                    res = new Result() { Value = 0, Tries = 0 };
+                    mSubmissions.Add(teamId, res);
                 }
             }
+            
+            if (videoId == VideoId && frameId <= EndFrame && frameId >= StartFrame) {
+                res.Value = (int)(50 + 50 * (1 - Remaining.TotalSeconds / Duration.TotalSeconds) - res.Tries * 10);
+            }
+
+            res.Tries++;
+
+            lock (mSubmissions) {
+                mSubmissions[teamId] = res;
+                mStreamWriter.WriteLine("{0}\t{1,20}\t{2,10}\t{3,10}\t{4,5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), teamId, videoId, frameId, res.Value);
+            }
+
+            OnNewKeyframeSubmitted?.Invoke(teamId, videoId, frameId, res.Value, TaskId);
         }
 
         private void RestoreResults() {
@@ -152,18 +155,30 @@ namespace VitretTool.EvaluationServer {
                         var parts = line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
                         long teamId = long.Parse(parts[1]);
-                        int frameId = int.Parse(parts[2]);
-                        int val = int.Parse(parts[3]);
+                        int videoId = int.Parse(parts[2]);
+                        int frameId = int.Parse(parts[3]);
+                        int val = int.Parse(parts[4]);
 
-                        if (val > 0) {
-                            mSubmissions.Add(teamId, val);
+                        if (mSubmissions.ContainsKey(teamId)) {
+                            var res = mSubmissions[teamId];
+                            res.Tries++;
+                            res.Value = val;
+                            mSubmissions[teamId] = res;
+                        } else {
+                            mSubmissions.Add(teamId, new Result() { Value = val, Tries = 1 });
                         }
-                        OnNewKeyframeSubmitted?.Invoke(teamId, frameId, val, TaskId);
+
+                        OnNewKeyframeSubmitted?.Invoke(teamId, videoId, frameId, val, TaskId);
                     }
                 }
             } catch (IOException) { }
 
             OnTaskFinished?.Invoke(TaskId);
+        }
+
+        struct Result {
+            public int Value;
+            public int Tries;
         }
     }
 }

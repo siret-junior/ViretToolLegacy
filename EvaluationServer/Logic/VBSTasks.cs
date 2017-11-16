@@ -39,10 +39,10 @@ namespace VitretTool.EvaluationServer {
             if (CurrentTask != null) CurrentTask.Start();
         }
 
-        public delegate void KeyframeEvaluator(long teamId, int frameId);
+        public delegate void KeyframeEvaluator(long teamId, int videoId, int frameId);
 
-        public void EvaluateKeyframe(long teamId, int frameId) {
-            if (CurrentTask != null) CurrentTask.EvaluateKeyframe(teamId, frameId);
+        public void EvaluateKeyframe(long teamId, int videoId, int frameId) {
+            if (CurrentTask != null) CurrentTask.EvaluateKeyframe(teamId, videoId, frameId);
         }
 
         public static VBSTasks LoadFromFile(string filename, Dataset dataset) {
@@ -55,7 +55,7 @@ namespace VitretTool.EvaluationServer {
             while ((line = file.ReadLine()) != null) {
                 if (line == string.Empty || line[0] == '#') continue;
 
-                var t = VBSTask.LoadFromString(count++, line, dataset);
+                var t = VBSTask.LoadFromString(count++, line);
                 t.RegisterEvents(tasks.mOnTaskLoaded, tasks.mOnTaskStarted,
                     tasks.mOnTaskFinished, tasks.mOnTaskTimeUpdated, tasks.mOnNewKeyframeSubmitted);
                 tasks.mTasks.Add(t);
@@ -77,8 +77,8 @@ namespace VitretTool.EvaluationServer {
         private void mOnTaskFinished(int taskId) {
             OnTaskFinished?.Invoke(taskId);
         }
-        private void mOnNewKeyframeSubmitted(long teamId, int frameId, int value, int taskId) {
-            OnNewKeyframeSubmitted?.Invoke(teamId, frameId, value, taskId);
+        private void mOnNewKeyframeSubmitted(long teamId, int videoId, int frameId, int value, int taskId) {
+            OnNewKeyframeSubmitted?.Invoke(teamId, videoId, frameId, value, taskId);
         }
 
         public delegate void OnTaskTimeUpdatedHandler(TimeSpan time);
@@ -93,7 +93,7 @@ namespace VitretTool.EvaluationServer {
         public delegate void OnTaskFinishedHandler(int taskId);
         public event OnTaskFinishedHandler OnTaskFinished;
 
-        public delegate void OnNewKeyframeSubmittedHandler(long teamId, int frameId, int value, int taskId);
+        public delegate void OnNewKeyframeSubmittedHandler(long teamId, int videoId, int frameId, int value, int taskId);
         public event OnNewKeyframeSubmittedHandler OnNewKeyframeSubmitted;
 
     }

@@ -98,6 +98,7 @@
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\LabelProvider.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\SuggestionProvider.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordModel.cs" />
+    <Compile Include="Utils\Submission.cs" />
     <Compile Include="Utils\TextSearch\AhoCorasick.cs" />
     <Compile Include="RankingModel\SimilarityManager.cs" />
     <Compile Include="RankingModel\SimilarityModels\ColorSignatureModel\ColorSignatureModel.cs" />

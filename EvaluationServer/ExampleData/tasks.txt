@@ -1,5 +1,5 @@
-#TYPE		CORRECT VID ID		SOURCE					TIME TO SOLVE (s)
-VIDEO		3					Tasks/task1.mpg			90
-VIDEO		1					Tasks/task1.mpg			90
-VIDEO		3					Tasks/task1.mpg			90
-VIDEO		1					Tasks/task1.mpg			90
+#TYPE		CORRECT VID ID		START TIMESTAMP		END TIMESTAMP		SOURCE					TIME TO SOLVE (s)
+VIDEO		3					1					100					Tasks/task1.mpg			90
+VIDEO		1					0					100					Tasks/task1.mpg			90
+VIDEO		3					0					500					Tasks/task1.mpg			90
+VIDEO		1					0					500					Tasks/task1.mpg			90
