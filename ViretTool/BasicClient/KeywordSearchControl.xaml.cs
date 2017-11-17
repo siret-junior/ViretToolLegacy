@@ -23,7 +23,7 @@ namespace ViretTool.BasicClient {
         public delegate void KeywordChangedHandler(List<List<int>> query, string annotationSource);
 
         /// <summary>
-        /// SketchChangedEvent is raised whenever users create, move or delete a colored circle.
+        /// KeywordChangedEvent is raised whenever users changes the input textbox.
         /// </summary>
         public event KeywordChangedHandler KeywordChangedEvent;
 
