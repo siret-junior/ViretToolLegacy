@@ -110,22 +110,37 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         private void MaxNormalizeRanking(List<RankingModel.RankedFrame> ranking)
         {
-            double maxRank = ranking.Select(x => x.Rank).Max();
+            double maxRank;
+            double minRank;
 
-            if (maxRank > 0)
+            FindMinimumAndMaximum(ranking, out maxRank, out minRank);
+
+            // prepare offset and normalizer
+            double offset = -minRank;
+            double normalizer = (maxRank != minRank) 
+                ? 1.0 / (maxRank - minRank) 
+                : 0;
+
+            // normalize to range [0..1]
+            Parallel.For(0, ranking.Count, index =>
             {
-                Parallel.ForEach(ranking, rankedFrame =>
-                {
-                    rankedFrame.Rank /= maxRank;
-                });
-            }
-            else if (maxRank == 0)
+                RankedFrame rankedFrame = ranking[index];
+
+                rankedFrame.Rank += offset;
+                rankedFrame.Rank *= normalizer;
+            });
+        }
+
+        private static void FindMinimumAndMaximum(List<RankedFrame> list, out double maximum, out double minimum)
+        {
+            maximum = list[0].Rank;
+            minimum = list[0].Rank;
+
+            for (int i = 0; i < list.Count; i++)
             {
-                // TODO: not usual, log warning?
-            }
-            else // maxRank < 0
-            {
-                throw new ArithmeticException("Max rank is negative!");
+                double rank = list[i].Rank;
+                maximum = (rank > maximum) ? rank : maximum;
+                minimum = (rank < minimum) ? rank : minimum; 
             }
         }
 

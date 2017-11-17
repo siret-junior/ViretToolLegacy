@@ -60,7 +60,7 @@ namespace ViretTool.RankingModel
                     foreach (int offset in t.Item1)
                         minRank = Math.Min(minRank, L2SquareDistance(R, signature[offset], G, signature[offset + 1], B, signature[offset + 2]));
 
-                    rf.Rank += 1 / (1 + Math.Sqrt(minRank));
+                    rf.Rank -= Math.Sqrt(minRank);
                 }
             });
 
@@ -75,7 +75,7 @@ namespace ViretTool.RankingModel
             {
                 RankedFrame rf = result[i];
                 foreach (DataModel.Frame queryFrame in queryFrames)
-                    rf.Rank +=  1 / (1 + L2Distance(mColorSignatures[rf.Frame.ID], mColorSignatures[queryFrame.ID]));
+                    rf.Rank -= L2Distance(mColorSignatures[rf.Frame.ID], mColorSignatures[queryFrame.ID]);
             });
 
             return result;
@@ -100,7 +100,8 @@ namespace ViretTool.RankingModel
                         if (mGridRadius * mGridRadius >= (x - i - 0.5) * (x - i - 0.5) + (y - j - 0.5) * (y - j - 0.5))
                             offsets.Add(j * mSignatureWidth * 3 + i * 3);
 
-                queries.Add(new Tuple<int[], Color>(offsets.ToArray(), t.Item2));
+                //queries.Add(new Tuple<int[], Color>(offsets.ToArray(), t.Item2));
+                queries.Add(new Tuple<int[], Color>(offsets.ToArray(), ImageHelper.RGBtoLabByte(t.Item2.R, t.Item2.G, t.Item2.B)));
             }
 
             return queries;
