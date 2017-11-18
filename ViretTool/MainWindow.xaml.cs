@@ -24,9 +24,10 @@ namespace ViretTool
     /// </summary>
     public partial class MainWindow : Window
     {
-        DataModel.Dataset mDataset;
-        RankingEngine mRankingEngine;
-        
+        private DataModel.Dataset mDataset;
+        private RankingEngine mRankingEngine;
+        private Cursor mPreviousCursor;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -39,62 +40,139 @@ namespace ViretTool
             //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb",
             //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
 
-            // prepare ranking engine
+
+            // initialize ranking engine
             SimilarityManager similarityManager = new SimilarityManager(mDataset);
             FilterManager filterManager = new FilterManager(mDataset);
             mRankingEngine = new RankingEngine(similarityManager, filterManager);
+
+            // TODO filter GUI
             mRankingEngine.VideoAggregateFilterEnabled = true;
             mRankingEngine.VideoAggregateFilterMaxFrames = 2;
-
-            // initialize selection controller
-            FrameSelectionController frameSelectionController
-                = new FrameSelectionController(mRankingEngine, resultDisplay, videoDisplay, semanticModelDisplay);
-
-            // initialize videoDisplay
-            ((System.ComponentModel.ISupportInitialize)(videoDisplay)).BeginInit();
-            videoDisplay.FrameSelectionController = frameSelectionController;
-            ((System.ComponentModel.ISupportInitialize)(videoDisplay)).EndInit();
-
-            // initialize resultDisplay
-            ((System.ComponentModel.ISupportInitialize)(resultDisplay)).BeginInit();
-            resultDisplay.Dataset = mDataset;
-            resultDisplay.RankingEngine = mRankingEngine;
-            resultDisplay.FrameSelectionController = frameSelectionController;
-            resultDisplay.VideoDisplay = videoDisplay;
-            ((System.ComponentModel.ISupportInitialize)(resultDisplay)).EndInit();
-
-            // initialize semanticModelDisplay
-            ((System.ComponentModel.ISupportInitialize)(semanticModelDisplay)).BeginInit();
-            semanticModelDisplay.FrameSelectionController = frameSelectionController;
-            semanticModelDisplay.VideoDisplay = videoDisplay;
-            ((System.ComponentModel.ISupportInitialize)(semanticModelDisplay)).EndInit();
-
 
             keywordSearchTextBox.Init(mDataset, new string[] {
                 "GoogLeNet", "YFCC100M"
             });
 
-            keywordSearchTextBox.KeywordChangedEvent += Keyword;
-            // TODO: debug
-            sketchCanvas.SketchChangedEvent += Sketch;
+            // initialize selection controller
+            FrameSelectionController frameSelectionController
+                = new FrameSelectionController();
 
-            List<RankedFrame> debugRankedFrames = new List<RankedFrame>();
-            for (int i = 0; i < 500; i++)
-            {
-                debugRankedFrames.Add(new RankedFrame(mDataset.Frames[i], 0));
-            }
-            resultDisplay.ResultFrames = debugRankedFrames;
+            // ranking model input
+            keywordSearchTextBox.KeywordChangedEvent +=
+                (query, annotationSource) =>
+                {
+                    DisableInput();
+                    mRankingEngine.UpdateKeywordModelRanking(query, annotationSource);
+                    EnableInput();
+                };
+            sketchCanvas.SketchChangedEvent += 
+                (sketch) => 
+                {
+                    DisableInput();
+                    mRankingEngine.UpdateColorModelRanking(sketch);
+                    EnableInput();
+                };
+            frameSelectionController.SelectionSubmittedEvent +=
+                (frameSelection) =>
+                {
+                    DisableInput();
+                    semanticModelDisplay.DisplayFrames(frameSelection);
+                    mRankingEngine.UpdateVectorModelRanking(frameSelection);
+                    EnableInput();
+                };
+
+            resultDisplay.DisplayRandomItemsEvent += 
+                () =>
+                {
+                    DisableInput();
+                    mRankingEngine.GenerateRandomRanking();
+                    EnableInput();
+                };
+            resultDisplay.DisplaySequentialItemsEvent +=
+                () =>
+                {
+                    DisableInput();
+                    mRankingEngine.GenerateSequentialRanking();
+                    EnableInput();
+                };
+
+
+            // ranking model output visualization
+            mRankingEngine.RankingChangedEvent += 
+                (rankedResult) =>
+                {
+                    resultDisplay.ResultFrames = rankedResult;
+                    frameSelectionController.ResetSelection();
+                };
+
+
+            // frame selection
+            resultDisplay.AddingToSelectionEvent += frameSelectionController.AddToSelection;
+            resultDisplay.RemovingFromSelectionEvent += frameSelectionController.RemoveFromSelection;
+            resultDisplay.ResettingSelectionEvent += frameSelectionController.ResetSelection;
+            resultDisplay.SubmittingSelectionEvent += frameSelectionController.SubmitSelection;
+
+            videoDisplay.AddingToSelectionEvent += frameSelectionController.AddToSelection;
+            videoDisplay.RemovingFromSelectionEvent += frameSelectionController.RemoveFromSelection;
+            videoDisplay.ResettingSelectionEvent += frameSelectionController.ResetSelection;
+            videoDisplay.SubmittingSelectionEvent += frameSelectionController.SubmitSelection;
+
+            semanticModelDisplay.AddingToSelectionEvent += frameSelectionController.AddToSelection;
+            semanticModelDisplay.RemovingFromSelectionEvent += frameSelectionController.RemoveFromSelection;
+            semanticModelDisplay.ResettingSelectionEvent += frameSelectionController.ResetSelection;
+            semanticModelDisplay.SubmittingSelectionEvent += frameSelectionController.SubmitSelection;
+
+            frameSelectionController.SelectionChangedEvent +=
+                (selectedFrames) =>
+                {
+                    resultDisplay.SelectedFrames = selectedFrames;
+                    videoDisplay.SelectedFrames = selectedFrames;
+                    semanticModelDisplay.SelectedFrames = selectedFrames;
+                };
+
+            // show frame video on video display
+            resultDisplay.DisplayingFrameVideoEvent += videoDisplay.DisplayFrameVideo;
+            videoDisplay.DisplayingFrameVideoEvent += videoDisplay.DisplayFrameVideo;
+            semanticModelDisplay.DisplayingFrameVideoEvent += videoDisplay.DisplayFrameVideo;
+
+            // set first display
+            mRankingEngine.GenerateSequentialRanking();
         }
 
-        private void Keyword(List<List<int>> query, string annotationSource) {
-            List<RankedFrame> result = mRankingEngine.UpdateKeywordModelRanking(query, annotationSource);
-            resultDisplay.ResultFrames = result;
-        }
-
-        private void Sketch(List<Tuple<Point, Color>> colorSketch)
+        private void DisableInput()
         {
-            List<RankedFrame> result = mRankingEngine.UpdateColorModelRanking(colorSketch);
-            resultDisplay.ResultFrames = result;
+            // set wait cursor
+            mPreviousCursor = Mouse.OverrideCursor;
+            Mouse.OverrideCursor = Cursors.Wait;
+
+            // disable form input
+            mainWindow.IsEnabled = false;
+
+            // TODO
+            //keywordSearchTextBox.IsEnabled = false;
+            //sketchCanvas.IsEnabled = false;
+            //semanticModelDisplay.IsEnabled = false;
+
+            //resultDisplay.IsEnabled = false;
+            //videoDisplay.IsEnabled = false;
+        }
+
+        private void EnableInput()
+        {
+            // restore previous cursor
+            Mouse.OverrideCursor = mPreviousCursor;
+
+            // enable form input
+            mainWindow.IsEnabled = true;
+            
+            // TODO
+            //keywordSearchTextBox.IsEnabled = true;
+            //sketchCanvas.IsEnabled = true;
+            //semanticModelDisplay.IsEnabled = true;
+
+            //resultDisplay.IsEnabled = true;
+            //videoDisplay.IsEnabled = true;
         }
     }
 }

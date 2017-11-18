@@ -20,47 +20,12 @@ namespace ViretTool.BasicClient
     /// <summary>
     /// Interaction logic for Display.xaml
     /// </summary>
-    public partial class ResultDisplay : UserControl, INotifyPropertyChanged
+    public partial class ResultDisplay : DisplayControl, INotifyPropertyChanged
     {
         const double DESIRED_ASPECT_RATIO = 3.0 / 4.0;
-
-        public DataModel.Dataset Dataset { get; set; }
-        public RankingEngine RankingEngine { get; set; }
-
-        private FrameSelectionController mFrameSelectionController;
-        public FrameSelectionController FrameSelectionController
-        {
-            set
-            {
-                mFrameSelectionController = value;
-                
-                // pass the controller instance to all displayed frame controls
-                for (int i = 0; i < mDisplayFrames.Length; i++)
-                {
-                    mDisplayFrames[i].FrameSelectionController = mFrameSelectionController;
-                }
-
-                // update display after every selection change
-                mFrameSelectionController.SelectionChangedEvent += UpdateSelection;
-            }
-        }
-
-        private VideoDisplay mVideoDisplay;
-        public VideoDisplay VideoDisplay
-        {
-            get
-            { return mVideoDisplay; }
-            set
-            {
-                mVideoDisplay = value;
-                
-                // pass the video display instance to all displayed frame controls
-                for (int i = 0; i < mDisplayFrames.Length; i++)
-                {
-                    mDisplayFrames[i].VideoDisplay = VideoDisplay;
-                }
-            }
-        }
+        
+        // TODO: result changed event and log
+        // TODO: display changed method -> update visualization
 
         private List<RankedFrame> mResultFrames = null;
         public List<RankedFrame> ResultFrames
@@ -75,17 +40,15 @@ namespace ViretTool.BasicClient
                 }
                 mResultFrames = value;
                 DisplayPage(0);
-                UpdateSelection();
+                UpdateSelectionVisualization();
             }
         }
 
-        private DisplayFrame[]/*[]*/ mDisplayFrames = null;
-        
-        private int mDisplayCols;
-        private int mDisplayRows;
+        public delegate void DisplayRandomItemsEventHandler();
+        public event DisplayRandomItemsEventHandler DisplayRandomItemsEvent;
+        public event DisplayRandomItemsEventHandler DisplaySequentialItemsEvent;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         private void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -101,16 +64,15 @@ namespace ViretTool.BasicClient
                 NotifyPropertyChanged("PageNumberLabel");
             }
         }
-
-        Random random = new Random();
-
+        
 
         public ResultDisplay()
         {
             InitializeComponent();
             DataContext = this;
-            ResizeDisplay(1, 1);
+            ResizeDisplay(1, 1, displayGrid);
         }
+
 
         private void RecomputeDisplaySize()
         {
@@ -119,63 +81,28 @@ namespace ViretTool.BasicClient
             double desiredFrameHeight = displayGrid.ActualWidth / nColumns * DESIRED_ASPECT_RATIO;
             int nRows = (int)((displayGrid.ActualHeight + desiredFrameHeight / 2) / desiredFrameHeight);
 
-            ResizeDisplay(nRows, nColumns);
+            ResizeDisplay(nRows, nColumns, displayGrid);
 
             // TODO: recompute correct page
             DisplayPage(0);
         }
 
+        
 
-        private void ResizeDisplay(int nRows, int nCols)
-        {
-            // setup display grid
-            mDisplayRows = nRows;
-            mDisplayCols = nCols;
-            int displaySize = nRows * nCols;
-            
-            displayGrid.Columns = mDisplayCols;
-            displayGrid.Rows = mDisplayRows;
 
-            // create and fill new displayed frames
-            mDisplayFrames = new DisplayFrame[displaySize];
-            displayGrid.Children.Clear();
-            for (int i = 0; i < displaySize; i++)
-            {
-                DisplayFrame displayedFrame = new DisplayFrame();
-                mDisplayFrames[i] = displayedFrame;
-                displayedFrame.FrameSelectionController = mFrameSelectionController;
-                displayedFrame.VideoDisplay = VideoDisplay;
-                displayGrid.Children.Add(displayedFrame);
-            }
-        }
-
-        private void UpdateSelection()
-        {
-            foreach (DisplayFrame displayedFrame in mDisplayFrames)
-            {
-                if (mFrameSelectionController.SelectedFrames.Contains(displayedFrame.Frame))
-                {
-                    displayedFrame.IsSelected = true;
-                }
-                else
-                {
-                    displayedFrame.IsSelected = false;
-                }
-            }
-        }
 
         private void EmptyDisplay()
         {
-            for (int i = 0; i < mDisplayFrames.Length; i++)
+            for (int i = 0; i < DisplayedFrames.Length; i++)
             {
-                mDisplayFrames[i].Frame = null;
+                DisplayedFrames[i].Frame = null;
             }
         }
 
         private void DisplayPage(int page)
         {
             // display check
-            int displaySize = mDisplayFrames.Length;
+            int displaySize = DisplayedFrames.Length;
             if (displaySize == 0)
             {
                 return;
@@ -217,22 +144,20 @@ namespace ViretTool.BasicClient
             // display frames
             for (int i = 0; i < count; i++)
             {
-                mDisplayFrames[i].Frame = framesToDisplay[i].Frame;
+                DisplayedFrames[i].Frame = framesToDisplay[i].Frame;
             }
         }
 
-        private void DisplayRandomItems()
+        private void RaiseDisplayRandomItems()
         {
-            mResultFrames.Clear();
-
-            for (int i = 0; i < mDisplayFrames.Length; i++)
-            {
-                DataModel.Frame randomFrame = Dataset.Frames[random.Next(Dataset.Frames.Count - 1)];
-                mResultFrames.Add(new RankedFrame(randomFrame, 0));
-            }
-
-            DisplayPage(0);
+            DisplayRandomItemsEvent?.Invoke();
         }
+
+        private void RaiseDisplaySequentialItems()
+        {
+            DisplaySequentialItemsEvent?.Invoke();
+        }
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -243,11 +168,17 @@ namespace ViretTool.BasicClient
         private void displayGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             RecomputeDisplaySize();
+            UpdateSelectionVisualization();
+        }
+
+        private void sequentialDisplayButton_Click(object sender, RoutedEventArgs e)
+        {
+            RaiseDisplaySequentialItems();
         }
 
         private void randomDisplayButton_Click(object sender, RoutedEventArgs e)
         {
-            DisplayRandomItems();
+            RaiseDisplayRandomItems();
         }
 
         private void firstPageButton_Click(object sender, RoutedEventArgs e)
@@ -267,7 +198,19 @@ namespace ViretTool.BasicClient
 
         private void lastPageButton_Click(object sender, RoutedEventArgs e)
         {
-            DisplayPage(mResultFrames.Count / mDisplayFrames.Length);
+            DisplayPage(mResultFrames.Count / DisplayedFrames.Length);
+        }
+
+        private void displayGrid_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                DisplayPage(mPage - 1);
+            }
+            else
+            {
+                DisplayPage(mPage + 1);
+            }
         }
     }
 }

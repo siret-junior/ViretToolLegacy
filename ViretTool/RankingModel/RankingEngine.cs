@@ -21,7 +21,10 @@ namespace ViretTool.RankingModel
 
         private List<RankedFrame> mRankedSimilarityResult;
         private List<RankedFrame> mRankedFilteredSortedResult;
-        
+
+        public delegate void RankedResultEventHandler(List<RankedFrame> rankedResult);
+        public event RankedResultEventHandler RankingChangedEvent;
+
         // TODO: removed, no need to cache inputs, results are cached instead
         //private List<Tuple<Point, Color>> mColorModelSketchQuery;
         //private string mKeywordModelQuery;
@@ -34,14 +37,6 @@ namespace ViretTool.RankingModel
         }
 
 
-        /*public*/ private List<RankedFrame> GetRankedFilteredSortedResult()
-        {
-            ComputeSimilarityRanking();
-            ComputeFilteringAndSorting();
-
-            return mRankedFilteredSortedResult;
-        }
-
         private List<RankedFrame> ComputeSimilarityRanking()
         {
             // cache intermediate ranking result for reusing when changing just filtering
@@ -53,10 +48,17 @@ namespace ViretTool.RankingModel
         {
             // TODO: mask filters vs. flow filters
 
-            // ranked result is reused
+            // ranked result is reused, only filtering is applied
             mRankedFilteredSortedResult = mFilterManager.ApplyFilters(mRankedSimilarityResult);
 
-            // TODO parallel?
+            RankingChangedEvent?.Invoke(mRankedFilteredSortedResult);
+            return mRankedFilteredSortedResult;
+        }
+
+        private List<RankedFrame> ComputeRankingFilteringAndSorting()
+        {
+            ComputeSimilarityRanking();
+            ComputeFilteringAndSorting();
 
             return mRankedFilteredSortedResult;
         }
@@ -64,7 +66,7 @@ namespace ViretTool.RankingModel
 
         #region --[ Similarity model facade ]--
 
-        // TODO: removed
+        // TODO: removed (will be reimplemented in GUI?)
         // toggle "use model" switches are implemented using properties
         //public bool UseColorModel { get; set; }
         //public bool UseVectorModel { get; set; }
@@ -78,7 +80,7 @@ namespace ViretTool.RankingModel
             // update model ranking
             mSimilarityManager.UpdateColorModelRanking(colorModelSketchQuery);
             // recompute aggregation, filtering and sorting
-            List<RankedFrame> result = GetRankedFilteredSortedResult();
+            List<RankedFrame> result = ComputeRankingFilteringAndSorting();
             return result;
         }
 
@@ -102,7 +104,7 @@ namespace ViretTool.RankingModel
             // update model ranking
             mSimilarityManager.UpdateVectorModelRanking(queryFrames);
             // recompute aggregation, filtering and sorting
-            List<RankedFrame> result = GetRankedFilteredSortedResult();
+            List<RankedFrame> result = ComputeRankingFilteringAndSorting();
             return result;
         }
 
@@ -111,7 +113,21 @@ namespace ViretTool.RankingModel
             // update model ranking
             mSimilarityManager.UpdateKeywordModelRanking(queryKeyword, source);
             // recompute aggregation, filtering and sorting
-            List<RankedFrame> result = GetRankedFilteredSortedResult();
+            List<RankedFrame> result = ComputeRankingFilteringAndSorting();
+            return result;
+        }
+
+        public List<RankedFrame> GenerateRandomRanking()
+        {
+            mRankedSimilarityResult = mSimilarityManager.GenerateRandomRanking();
+            List<RankedFrame> result = ComputeFilteringAndSorting();
+            return result;
+        }
+
+        public List<RankedFrame> GenerateSequentialRanking()
+        {
+            mRankedSimilarityResult = mSimilarityManager.GenerateSequentialRanking();
+            List<RankedFrame> result = ComputeFilteringAndSorting();
             return result;
         }
 

@@ -19,105 +19,51 @@ namespace ViretTool.BasicClient
     /// <summary>
     /// Interaction logic for VideoDisplay.xaml
     /// </summary>
-    public partial class VideoDisplay : UserControl
+    public partial class VideoDisplay : DisplayControl
     {
-        private int mDisplayCols;
-        private int mDisplayRows;
-
+        
         private int mDisplayWidth;
 
-        private DisplayFrame[] mDisplayFrames = null;
-
-        private FrameSelectionController mFrameSelectionController;
-        public FrameSelectionController FrameSelectionController
-        {
-            set
-            {
-                mFrameSelectionController = value;
-
-                // pass the controller instance to all displayed frame controls
-                if (mDisplayFrames != null)
-                {
-                    foreach (DisplayFrame displayFrame in mDisplayFrames)
-                    {
-                        displayFrame.FrameSelectionController = value;
-                    }
-                }
-
-                // update display after every selection change
-                mFrameSelectionController.SelectionChangedEvent += UpdateSelection;
-            }
-        }
-
+        
         public VideoDisplay()
         {
             InitializeComponent();
             mDisplayWidth = 8;
-            ResizeDisplay(1, 1);
+            ResizeDisplay(1, 1, displayGrid);
         }
 
 
-        public void DisplayFrames(DataModel.Video video)
+        public void DisplayFrameVideo(DataModel.Frame frame)
         {
-            // TODO move to separate method
-            // clear display
-            for (int i = 0; i < mDisplayFrames.Length; i++)
-            {
-                mDisplayFrames[i].Frame = null;
-            }
-
             // skip if nothing to show
-            if (video == null)
+            if (frame == null)
             {
                 return;
             }
+            DataModel.Video video = frame.FrameVideo;
+            // TODO move to separate method
+            // clear display
+            for (int i = 0; i < DisplayedFrames.Length; i++)
+            {
+                DisplayedFrames[i].Frame = null;
+            }
 
-            ResizeDisplay(((video.Frames.Count - 1) / mDisplayWidth) + 1, mDisplayWidth);
+            // resize display
+            int nRows = ((video.Frames.Count - 1) / mDisplayWidth) + 1;
+            int nCols = mDisplayWidth;
+            ResizeDisplay(nRows, nCols, displayGrid);
 
             // display frames
             for (int i = 0; i < video.Frames.Count; i++)
             {
-                mDisplayFrames[i].Frame = video.Frames[i];
+                DisplayedFrames[i].Frame = video.Frames[i];
             }
+
+            UpdateSelectionVisualization();
         }
 
 
-        private void ResizeDisplay(int nRows, int nCols)
-        {
-            // setup display grid
-            mDisplayRows = nRows;
-            mDisplayCols = nCols;
-            int displaySize = nRows * nCols;
+        
 
-            displayGrid.Columns = mDisplayCols;
-            displayGrid.Rows = mDisplayRows;
-
-            // create and fill new displayed frames
-            mDisplayFrames = new DisplayFrame[displaySize];
-            displayGrid.Children.Clear();
-            for (int i = 0; i < displaySize; i++)
-            {
-                DisplayFrame displayedFrame = new DisplayFrame();
-                displayedFrame.FrameSelectionController = mFrameSelectionController;
-                mDisplayFrames[i] = displayedFrame;
-                displayGrid.Children.Add(displayedFrame);
-            }
-        }
-
-
-        private void UpdateSelection()
-        {
-            foreach (DisplayFrame displayedFrame in mDisplayFrames)
-            {
-                if (mFrameSelectionController.SelectedFrames.Contains(displayedFrame.Frame))
-                {
-                    displayedFrame.IsSelected = true;
-                }
-                else
-                {
-                    displayedFrame.IsSelected = false;
-                }
-            }
-        }
     }
 }

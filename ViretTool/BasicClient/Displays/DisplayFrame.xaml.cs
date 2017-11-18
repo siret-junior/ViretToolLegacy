@@ -12,7 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using static ViretTool.BasicClient.FrameSelectionController;
 
 namespace ViretTool.BasicClient
 {
@@ -21,6 +20,8 @@ namespace ViretTool.BasicClient
     /// </summary>
     public partial class DisplayFrame : UserControl
     {
+        public DisplayControl ParentDisplay { get; private set; }
+
         private DataModel.Frame mFrame = null;
         public DataModel.Frame Frame
         {
@@ -57,16 +58,13 @@ namespace ViretTool.BasicClient
                 }
             }
         }
-
-        // TODO: consider event handlers
-        public FrameSelectionController FrameSelectionController { get; set; }
         
-        public VideoDisplay VideoDisplay { get; set; }
-
-        public DisplayFrame()
+        public DisplayFrame(DisplayControl parentDisplay)
         {
             InitializeComponent();
+            ParentDisplay = parentDisplay;
         }
+
 
         private void UpdateSelectionVisualization()
         {
@@ -94,36 +92,38 @@ namespace ViretTool.BasicClient
             }
         }
 
+
         private void Select()
         {
-            IsSelected = true;
-            FrameSelectionController.AddToSelection(Frame);
+            ParentDisplay.RaiseAddingToSelectionEvent(Frame);
         }
 
         private void Deselect()
         {
-            IsSelected = false;
-            FrameSelectionController.RemoveFromSelection(Frame);
+            ParentDisplay.RaiseRemovingFromSelectionEvent(Frame);
         }
+
 
         private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
         {
             // TODO: reconfigurable buttons
             if (Frame != null)
             {
-                if (VideoDisplay != null)
-                {
-                    VideoDisplay.DisplayFrames(Frame.FrameVideo);
-                }
-
                 if (e.RightButton == MouseButtonState.Pressed)
                 {
+                    // select
                     ToggleSelection();
                 }
                 else if (e.LeftButton == MouseButtonState.Pressed)
                 {
+                    // submit selection
                     Select();
-                    FrameSelectionController.SubmitSelection();
+                    ParentDisplay.RaiseSubmittingSelectionEvent();
+                }
+                else if (e.MiddleButton == MouseButtonState.Pressed)
+                {
+                    // show video in video display
+                    ParentDisplay.RaiseDisplayingFrameVideoEvent(Frame);
                 }
             }
         }
@@ -150,6 +150,7 @@ namespace ViretTool.BasicClient
 
         private void Grid_MouseLeave(object sender, MouseEventArgs e)
         {
+            // restore the selected frame image
             if (Frame != null && image.Source != Frame.Bitmap)
             {
                 image.Source = Frame.Bitmap;

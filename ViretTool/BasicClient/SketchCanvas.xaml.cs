@@ -23,14 +23,13 @@ namespace ViretTool.BasicClient
         private List<ColorPoint> mColorPoints;
         private ColorPoint mSelectedColorPoint;
 
-        public delegate void SketchChangedHandler(List<Tuple<Point, Color>> colorSketch);
+        public delegate void SketchChangedEventHandler(List<Tuple<Point, Color>> colorSketch);
 
         /// <summary>
         /// SketchChangedEvent is raised whenever users create, move or delete a colored circle.
         /// </summary>
-        public event SketchChangedHandler SketchChangedEvent;
-
-
+        public event SketchChangedEventHandler SketchChangedEvent;
+        
         public SketchCanvas()
         {
             InitializeComponent();

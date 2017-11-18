@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BasicClient\Displays\DisplayControl.cs" />
     <Compile Include="BasicClient\Displays\ResultDisplay.xaml.cs">
       <DependentUpon>ResultDisplay.xaml</DependentUpon>
     </Compile>

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ViretTool.BasicClient.ResultDisplay"
+﻿<local:DisplayControl x:Class="ViretTool.BasicClient.ResultDisplay"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -15,7 +15,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="450" />
+                <ColumnDefinition Width="550" />
             </Grid.ColumnDefinitions>
 
 
@@ -33,29 +33,34 @@
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
-                
+
+                <Button
+                    Name="sequentialDisplayButton"
+                    Grid.Column="0"
+                    Click="sequentialDisplayButton_Click"
+                    Content="/ Sequential /" />
                 <Button
                     Name="randomDisplayButton"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Click="randomDisplayButton_Click"
                     Content="# Random #" />
                 
                 <Button
                     Name="firstPageButton"
-                    Grid.Column="1"
+                    Grid.Column="2"
                     Click="firstPageButton_Click"
                     Content="&lt;&lt; First" />
                 <Button
                     Name="previousPageButton"
-                    Grid.Column="2"
+                    Grid.Column="3"
                     Click="previousPageButton_Click"
                     Content="&lt; Previous" />
 
                 <Label
                     Name="currentPageNumber" 
-                    Grid.Column="3"
+                    Grid.Column="4"
                     Background="White"
                     VerticalContentAlignment="Center"
                     HorizontalContentAlignment="Left"
@@ -63,12 +68,12 @@
 
                 <Button
                     Name="nextPageButton"
-                    Grid.Column="4"
+                    Grid.Column="5"
                     Click="nextPageButton_Click"
                     Content="Next &gt;" />
                 <Button
                     Name="lastPageButton"
-                    Grid.Column="5"
+                    Grid.Column="6"
                     Click="lastPageButton_Click"
                     Content="Last &gt;&gt;" />
 
@@ -77,6 +82,7 @@
 
         <UniformGrid x:Name="displayGrid" 
                      Grid.Row="1" 
-                     SizeChanged="displayGrid_SizeChanged"/>
+                     SizeChanged="displayGrid_SizeChanged"
+                     MouseWheel="displayGrid_MouseWheel"/>
     </Grid>
-</UserControl>
+</local:DisplayControl>
