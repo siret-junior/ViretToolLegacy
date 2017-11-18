@@ -23,6 +23,8 @@ namespace ViretTool.BasicClient
         private List<ColorPoint> mColorPoints;
         private ColorPoint mSelectedColorPoint;
 
+        private SolidColorBrush[] mColorPickerBrushes;
+
         public delegate void SketchChangedEventHandler(List<Tuple<Point, Color>> colorSketch);
 
         /// <summary>
@@ -34,6 +36,7 @@ namespace ViretTool.BasicClient
         {
             InitializeComponent();
 
+            // create sketch canvas
             sketchCanvas.Background = Brushes.White;
 
             sketchCanvas.MouseDown += Canvas_MouseDown;
@@ -44,6 +47,12 @@ namespace ViretTool.BasicClient
             mSelectedColorPoint = null;
 
             DrawGrid();
+
+            // TODO - load palette from file
+            mColorPickerBrushes = typeof(Brushes).GetProperties()
+                .Select(b => b.GetValue(null) as SolidColorBrush)
+                .OrderBy(x => x.Color.ToString())
+                .ToArray();
         }
 
 
@@ -122,13 +131,12 @@ namespace ViretTool.BasicClient
             // add new circle
             if (mSelectedColorPoint == null)
             {
-                // TODO - load palette from file
-                SolidColorBrush[] brushes = typeof(Brushes).GetProperties().Select(b => b.GetValue(null) as SolidColorBrush).OrderBy(x => x.Color.ToString()).ToArray();
-                ColorPicker CP = new ColorPicker(brushes);
-
-                if (CP.Show(Mouse.GetPosition(Application.Current.MainWindow)))
+                // once the window is closed it cannot be reopened (consider visibility = hidden)
+                ColorPicker colorPicker = new ColorPicker(mColorPickerBrushes);
+        
+                if (colorPicker.Show(Mouse.GetPosition(Application.Current.MainWindow)))
                 {
-                    mSelectedColorPoint = new ColorPoint(p, CP.SelectedColor, sketchCanvas);
+                    mSelectedColorPoint = new ColorPoint(p, colorPicker.SelectedColor, sketchCanvas);
                     mColorPoints.Add(mSelectedColorPoint);
                     mSelectedColorPoint = null;
                     RaiseSketchChangedEvent();
@@ -215,55 +223,137 @@ namespace ViretTool.BasicClient
             }
         }
 
+        
         private class ColorPicker : Window
         {
             private Canvas mColorPickerPanel;
             private int mColorButtonWidth = 20;
             public Color SelectedColor = Colors.White;
 
+
             public ColorPicker(SolidColorBrush[] brushes)
             {
-                //brushes = CreateBrushes();
+                brushes = CreateBrushes();
                 mColorPickerPanel = new Canvas();
 
                 Content = mColorPickerPanel;
 
-                int ColorsOnLine = 15;
+                int nColorsInRow = 20;
+                int nColorsInColumn = ((brushes.Length - 1) / nColorsInRow) + 1;    // assumes brushes are not empty
                 for (int i = 0; i < brushes.Length; i++)
                 {
-                    Button b = new Button();
-                    b.Width = mColorButtonWidth;
-                    b.Height = b.Width;
-                    b.Background = brushes[i];
-                    b.Click += LeftClick;
+                    int nthRow = i / nColorsInRow;
+                    int nthColumn = i % nColorsInRow;
+
+                    double cellBorderLightness = (i > nColorsInRow - 1)
+                        ? 1 - (nthRow / (double)(nColorsInColumn))
+                        : 1 - (nthColumn / (double)(nColorsInRow));
+                    cellBorderLightness *= cellBorderLightness;
+                    Canvas b = CreateColorCellCanvas(brushes[i], cellBorderLightness);
+                    b.MouseDown += LeftClick;
 
                     mColorPickerPanel.Children.Add(b);
-                    Canvas.SetLeft(b, (i % ColorsOnLine) * mColorButtonWidth);
-                    Canvas.SetTop(b, 10 + (int)Math.Floor(i / (double)ColorsOnLine) * mColorButtonWidth);
+                    Canvas.SetLeft(b, nthColumn * mColorButtonWidth);
+                    if (i > nColorsInRow - 1)
+                        Canvas.SetTop(b, 20 + (int)Math.Floor(i / (double)nColorsInRow) * mColorButtonWidth);
+                    else
+                        Canvas.SetTop(b, 10 + (int)Math.Floor(i / (double)nColorsInRow) * mColorButtonWidth);
                 }
 
-                Width = ColorsOnLine * mColorButtonWidth + 15;
-                Height = (brushes.Length / ColorsOnLine) * mColorButtonWidth + 70;
+                this.Width = nColorsInRow * mColorButtonWidth + 15;
+                this.Height = (brushes.Length / nColorsInRow) * mColorButtonWidth + 70;
             }
 
             private SolidColorBrush[] CreateBrushes()
             {
                 List<SolidColorBrush> brushes = new List<SolidColorBrush>();
 
-                for (int r = 0; r < 256; r += 63)
-                    for (int g = 0; g < 256; g += 63)
-                        for (int b = 0; b < 256; b += 63)
-                            brushes.Add(new SolidColorBrush(Color.FromRgb((byte)r, (byte)g, (byte)b)));
+                for (int x = 0; x < 255; x += 13)
+                    brushes.Add(new SolidColorBrush(Color.FromRgb((byte)x, (byte)x, (byte)x)));
 
-                //brushes.Add(new SolidColorBrush(Color.FromRgb(255, 255, 255)));
+                for (float lightness = 0.1f; lightness <= 1; lightness += 0.1f)
+                    for (float hue = 0; hue <= 1; hue += 0.05f)
+                        brushes.Add(new SolidColorBrush(HSLToRGB(hue, 1, lightness)));
+
                 return brushes.ToArray();
             }
 
-            private bool mColorSelected = false;
+            private Canvas CreateColorCellCanvas(SolidColorBrush color, double borderLightness)
+            {
+                Canvas canvas = new Canvas();
+                canvas.Width = mColorButtonWidth;
+                canvas.Height = canvas.Width;
+                canvas.Background = color;
+
+                double minLightness = 0.2;
+                double maxLightness = 0.5;
+                double offset = minLightness;
+                double denormalizer = maxLightness - minLightness;
+                borderLightness *= denormalizer;
+                borderLightness += offset;
+                
+                byte borderGray = (byte)(borderLightness * 255);
+
+
+                Color borderColor = Color.FromRgb(borderGray, borderGray, borderGray);
+
+                Rectangle rectangle = new Rectangle
+                {
+                    Width = canvas.Width,
+                    Height = canvas.Height,
+                    Stroke = new SolidColorBrush(borderColor),
+                    StrokeThickness = 0.5,
+                    //Fill = new SolidColorBrush(Colors.Black),
+                };
+
+                Canvas.SetLeft(rectangle, 0);
+                Canvas.SetTop(rectangle, 0);
+                canvas.Children.Add(rectangle);
+
+                return canvas;
+            }
+
+            public static Color HSLToRGB(float h, float s, float l)
+            {
+                float r, g, b;
+
+                if (s == 0f)
+                {
+                    r = g = b = l;
+                }
+                else
+                {
+                    float q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+                    float p = 2 * l - q;
+                    r = HueToRgb(p, q, h + 1f / 3f);
+                    g = HueToRgb(p, q, h);
+                    b = HueToRgb(p, q, h - 1f / 3f);
+                }
+
+                return Color.FromRgb(Convert.ToByte(r * 255), Convert.ToByte(g * 255), Convert.ToByte(b * 255));
+            }
+
+            private static float HueToRgb(float p, float q, float t)
+            {
+                if (t < 0f)
+                    t += 1f;
+                if (t > 1f)
+                    t -= 1f;
+                if (t < 1f / 6f)
+                    return p + (q - p) * 6f * t;
+                if (t < 1f / 2f)
+                    return q;
+                if (t < 2f / 3f)
+                    return p + (q - p) * (2f / 3f - t) * 6f;
+                return p;
+            }
+            
+            private bool mIsColorSelected = false;
             private void LeftClick(object sender, RoutedEventArgs e)
             {
-                SelectedColor = ((SolidColorBrush)((Button)sender).Background).Color;
-                mColorSelected = true;
+                //SelectedColor = ((SolidColorBrush)((Button)sender).Background).Color;
+                SelectedColor = ((SolidColorBrush)((Canvas)sender).Background).Color;
+                mIsColorSelected = true;
                 Close();
             }
 
@@ -272,7 +362,7 @@ namespace ViretTool.BasicClient
                 Left = p.X - 20;
                 Top = p.Y - 20;
                 ShowDialog();
-                return mColorSelected;
+                return mIsColorSelected;
             }
         }
 
