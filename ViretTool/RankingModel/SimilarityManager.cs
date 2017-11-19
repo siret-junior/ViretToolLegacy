@@ -17,24 +17,24 @@ namespace ViretTool.RankingModel.SimilarityModels
         private readonly DataModel.Dataset mDataset;
         private Random random = new Random();
 
-        private readonly RankingModel.ColorSignatureModel mColorSignatureModel;
-        private List<RankingModel.RankedFrame> mColorSignatureBasedRanking;
+        private readonly ColorSignatureModel mColorSignatureModel;
+        private List<RankedFrame> mColorSignatureBasedRanking;
 
-        private readonly RankingModel.DCNNFeatures.ByteVectorModel mVectorModel;
-        private List<RankingModel.RankedFrame> mVectorBasedRanking;
+        private readonly ByteVectorModel mVectorModel;
+        private List<RankedFrame> mVectorBasedRanking;
 
         // TODO - keyword based ranking model
-        private readonly RankingModel.DCNNKeywords.KeywordModel mKeywordModel;
-        private List<RankingModel.RankedFrame> mKeywordBasedRanking;
+        private readonly KeywordModel mKeywordModel;
+        private List<RankedFrame> mKeywordBasedRanking;
 
 
         public SimilarityManager(DataModel.Dataset dataset)
         {
             mDataset = dataset;
 
-            mColorSignatureModel = new RankingModel.ColorSignatureModel(mDataset);
-            mVectorModel = new RankingModel.DCNNFeatures.ByteVectorModel(mDataset);
-            mKeywordModel = new RankingModel.DCNNKeywords.KeywordModel(mDataset, new string[] {
+            mColorSignatureModel = new ColorSignatureModel(mDataset);
+            mVectorModel = new RankingModel.SimilarityModels.ByteVectorModel(mDataset);
+            mKeywordModel = new RankingModel.SimilarityModels.KeywordModel(mDataset, new string[] {
                 "GoogLeNet", "YFCC100M"
             });
 
@@ -132,6 +132,15 @@ namespace ViretTool.RankingModel.SimilarityModels
             mKeywordBasedRanking = null;
         }
 
+
+        public void FillSimilarityDescriptors(List<RankedFrame> rankedFrames)
+        {
+            Parallel.For(0, rankedFrames.Count, i =>
+            {
+                rankedFrames[i].ColorSignature = mColorSignatureModel.GetFrameColorSignature(rankedFrames[i].Frame);
+                rankedFrames[i].SemanticDescriptor = mVectorModel.GetFrameSemanticVector(rankedFrames[i].Frame);
+            });
+        }
 
         private void MaxNormalizeRanking(List<RankingModel.RankedFrame> ranking)
         {

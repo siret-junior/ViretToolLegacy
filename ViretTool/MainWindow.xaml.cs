@@ -174,5 +174,10 @@ namespace ViretTool
             //resultDisplay.IsEnabled = true;
             //videoDisplay.IsEnabled = true;
         }
+
+        private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            resultDisplay.UpdateDisplayGrid();
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ViretTool.DataModel;
 
-namespace ViretTool.RankingModel.DCNNKeywords {
+namespace ViretTool.RankingModel.SimilarityModels {
     class KeywordModel {
         private Dictionary<string, KeywordSubModel> mKeywordModels = new Dictionary<string, KeywordSubModel>();
 

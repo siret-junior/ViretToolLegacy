@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
 
-namespace ViretTool.RankingModel
+namespace ViretTool.RankingModel.SimilarityModels
 {
     class ColorSignatureModel
     {
@@ -81,6 +81,15 @@ namespace ViretTool.RankingModel
             return result;
         }
 
+        public byte[] GetFrameColorSignature(DataModel.Frame frame)
+        {
+            return mColorSignatures[frame.ID];
+        }
+
+        public static double ComputeDistance(byte[] vectorA, byte[] vectorB)
+        {
+            return L2Distance(vectorA, vectorB);
+        }
 
         /// <summary>
         /// Precompute a set of 2D grid cells (represented as offsets in 1D array) that should be investigated for the most similar query color.
@@ -107,12 +116,12 @@ namespace ViretTool.RankingModel
             return queries;
         }
 
-        private int L2SquareDistance(int r1, int r2, int g1, int g2, int b1, int b2)
+        private static int L2SquareDistance(int r1, int r2, int g1, int g2, int b1, int b2)
         {
             return (r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2);
         }
 
-        private double L2Distance(byte[] x, byte[] y)
+        private static double L2Distance(byte[] x, byte[] y)
         {
             double result = 0, r;
             for (int i = 0; i < x.Length; i++)

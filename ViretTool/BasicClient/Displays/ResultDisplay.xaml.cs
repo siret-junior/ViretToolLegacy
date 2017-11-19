@@ -23,9 +23,10 @@ namespace ViretTool.BasicClient
     public partial class ResultDisplay : DisplayControl, INotifyPropertyChanged
     {
         const double DESIRED_ASPECT_RATIO = 3.0 / 4.0;
+
+        int nColumns = 10;
         
-        // TODO: result changed event and log
-        // TODO: display changed method -> update visualization
+        // TODO: add context frames
 
         private List<RankedFrame> mResultFrames = null;
         public List<RankedFrame> ResultFrames
@@ -73,25 +74,28 @@ namespace ViretTool.BasicClient
             ResizeDisplay(1, 1, displayGrid);
         }
 
+        public void UpdateDisplayGrid()
+        {
+            FitDisplayToGridDimensions();
+            UpdateSelectionVisualization();
+        }
 
-        private void RecomputeDisplaySize()
+        private void FitDisplayToGridDimensions()
         {
             // TODO: custom nColumns from the GUI
-            int nColumns = 8;
             double desiredFrameHeight = displayGrid.ActualWidth / nColumns * DESIRED_ASPECT_RATIO;
             int nRows = (int)((displayGrid.ActualHeight + desiredFrameHeight / 2) / desiredFrameHeight);
 
-            ResizeDisplay(nRows, nColumns, displayGrid);
+            if (nRows != mDisplayRows || nColumns != mDisplayCols)
+            {
+                ResizeDisplay(nRows, nColumns, displayGrid);
 
-            // TODO: recompute correct page
-            DisplayPage(0);
+                // TODO: recompute correct page
+                DisplayPage(0);
+            }
         }
-
         
-
-
-
-        private void EmptyDisplay()
+        private void ClearDisplay()
         {
             for (int i = 0; i < DisplayedFrames.Length; i++)
             {
@@ -108,7 +112,7 @@ namespace ViretTool.BasicClient
                 return;
             }
 
-            EmptyDisplay();
+            ClearDisplay();
 
             // result check
             if (mResultFrames == null || mResultFrames.Count == 0)
@@ -131,23 +135,36 @@ namespace ViretTool.BasicClient
             }
 
             // update page label
+            // TODO
             PageNumberLabel = "Page: " + (mPage + 1).ToString();
 
             // extract frame subset
             int offset = mPage * displaySize;
             int count = (mResultFrames.Count - offset < displaySize) ? mResultFrames.Count - offset : displaySize;
             count = (count > 0) ? count : 0;
-            List <RankedFrame> framesToDisplay = mResultFrames.GetRange(offset, count);
-            
+            List<RankedFrame> framesToDisplay = mResultFrames.GetRange(offset, count);
+
             // TODO: semantic/color sorting of displayed items on a page
+            RankedFrame[,] arrangedDisplay 
+                = DisplayArranger.ArrangeDisplay(framesToDisplay, mDisplayRows, mDisplayCols, DisplayArrangement.Color);
 
             // display frames
-            for (int i = 0; i < count; i++)
+            int iterator = 0;
+            for (int iRow = 0; iRow < mDisplayRows; iRow++)
             {
-                DisplayedFrames[i].Frame = framesToDisplay[i].Frame;
+                for (int iCol = 0; iCol < mDisplayCols; iCol++)
+                {
+                    if (arrangedDisplay[iRow, iCol] == null) continue; // TODO
+                    DisplayedFrames[iterator++].Frame = arrangedDisplay[iRow, iCol].Frame;
+                    if (iterator > framesToDisplay.Count)
+                    {
+                        break;
+                    }
+                }
             }
         }
 
+        
         private void RaiseDisplayRandomItems()
         {
             DisplayRandomItemsEvent?.Invoke();
@@ -165,9 +182,9 @@ namespace ViretTool.BasicClient
             DisplayPage(mPage);
         }
 
-        private void displayGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void displayGrid_Loaded(object sender, RoutedEventArgs e)
         {
-            RecomputeDisplaySize();
+            FitDisplayToGridDimensions();
             UpdateSelectionVisualization();
         }
 

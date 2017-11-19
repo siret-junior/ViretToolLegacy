@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BasicClient\Displays\DisplayArranger.cs" />
     <Compile Include="BasicClient\Displays\DisplayControl.cs" />
     <Compile Include="BasicClient\Displays\ResultDisplay.xaml.cs">
       <DependentUpon>ResultDisplay.xaml</DependentUpon>
@@ -105,7 +106,7 @@
     <Compile Include="RankingModel\SimilarityModels\ColorSignatureModel\ColorSignatureModel.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNFeatures\ByteVectorModel.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordSubModel.cs" />
-    <Compile Include="RankingModel\RankedResult.cs" />
+    <Compile Include="RankingModel\RankedFrame.cs" />
     <Page Include="BasicClient\Controls\KeywordSearch\Themes\SuggestionPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

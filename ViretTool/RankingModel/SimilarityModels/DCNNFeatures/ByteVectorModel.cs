@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.RankingModel.DCNNFeatures
+namespace ViretTool.RankingModel.SimilarityModels
 {
     class ByteVectorModel
     {
@@ -62,7 +62,16 @@ namespace ViretTool.RankingModel.DCNNFeatures
             return result;
         }
 
+        public byte[] GetFrameSemanticVector(DataModel.Frame frame)
+        {
+            return mByteVectors[frame.ID];
+        }
 
+        public static double ComputeDistance(byte[] vectorA, byte[] vectorB)
+        {
+            return CosineDistance(vectorA, vectorB);
+        }
+        
         /// <summary>
         /// Compares two vectors, where each dimension is quantized to one byte. Assumes normalized vectors.
         /// </summary>
@@ -70,12 +79,26 @@ namespace ViretTool.RankingModel.DCNNFeatures
         /// <param name="y">Second byte vector.</param>
         /// <param name="indexes">Optimization focusing only on nonzero query dimensions.</param>
         /// <returns></returns>
-        private double CosineDistance(byte[] x, byte[] y, int[] indexes)
+        private static double CosineDistance(byte[] x, byte[] y, int[] indexes)
         {
             double result = 0.0;
 
-            foreach(int i in indexes)
+            foreach (int i in indexes)
+            {
                 result += x[i] * y[i];
+            }
+
+            return result;
+        }
+
+        private static double CosineDistance(byte[] x, byte[] y)
+        {
+            double result = 0.0;
+
+            for (int i = 0; i < x.Length; i++)
+            {
+                result += x[i] * y[i];
+            }
 
             return result;
         }

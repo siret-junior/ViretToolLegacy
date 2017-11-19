@@ -24,12 +24,7 @@ namespace ViretTool.RankingModel
 
         public delegate void RankedResultEventHandler(List<RankedFrame> rankedResult);
         public event RankedResultEventHandler RankingChangedEvent;
-
-        // TODO: removed, no need to cache inputs, results are cached instead
-        //private List<Tuple<Point, Color>> mColorModelSketchQuery;
-        //private string mKeywordModelQuery;
-        // vector model query (and color model by example) are extracted from mSelectedFrames
-
+        
         public RankingEngine(SimilarityManager similarityManager, FilterManager filterManager)
         {
             mSimilarityManager = similarityManager;
@@ -50,6 +45,9 @@ namespace ViretTool.RankingModel
 
             // ranked result is reused, only filtering is applied
             mRankedFilteredSortedResult = mFilterManager.ApplyFilters(mRankedSimilarityResult);
+
+            // fill similarity descriptors
+            mSimilarityManager.FillSimilarityDescriptors(mRankedFilteredSortedResult);
 
             RankingChangedEvent?.Invoke(mRankedFilteredSortedResult);
             return mRankedFilteredSortedResult;

@@ -82,7 +82,7 @@
 
         <UniformGrid x:Name="displayGrid" 
                      Grid.Row="1" 
-                     SizeChanged="displayGrid_SizeChanged"
+                     Loaded="displayGrid_Loaded"
                      MouseWheel="displayGrid_MouseWheel"/>
     </Grid>
 </local:DisplayControl>

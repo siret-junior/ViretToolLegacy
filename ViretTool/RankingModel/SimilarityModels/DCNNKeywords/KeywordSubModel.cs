@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ViretTool.DataModel;
 
-namespace ViretTool.RankingModel.DCNNKeywords {
+namespace ViretTool.RankingModel.SimilarityModels {
 
     /// <summary>
     /// Searches an index file and displays results
