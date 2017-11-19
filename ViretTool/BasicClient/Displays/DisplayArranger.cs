@@ -91,14 +91,14 @@ namespace ViretTool.BasicClient
             int nCols = distanceMatrix.GetLength(1);
 
             // compute matrix values
-            for (int iRow = 0; iRow < nRows; iRow++)
+            Parallel.For(0, nRows, iRow =>
             {
                 // matrix is symmetric, compute upper triangle only
                 for (int iCol = iRow + 1; iCol < nCols; iCol++)
                 {
                     distanceMatrix[iRow, iCol] = distanceFunction(frames[iRow], frames[iCol]);
                 }
-            }
+            });
 
             return distanceMatrix;
         }

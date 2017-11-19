@@ -146,7 +146,8 @@ namespace ViretTool.BasicClient
 
             // TODO: semantic/color sorting of displayed items on a page
             RankedFrame[,] arrangedDisplay 
-                = DisplayArranger.ArrangeDisplay(framesToDisplay, mDisplayRows, mDisplayCols, DisplayArrangement.Color);
+                = DisplayArranger.ArrangeDisplay(framesToDisplay, mDisplayRows, mDisplayCols, 
+                DisplayArrangement.Semantic);
 
             // display frames
             int iterator = 0;
@@ -154,7 +155,7 @@ namespace ViretTool.BasicClient
             {
                 for (int iCol = 0; iCol < mDisplayCols; iCol++)
                 {
-                    if (arrangedDisplay[iRow, iCol] == null) continue; // TODO
+                    if (arrangedDisplay[iRow, iCol] == null) continue; // TODO rewrite
                     DisplayedFrames[iterator++].Frame = arrangedDisplay[iRow, iCol].Frame;
                     if (iterator > framesToDisplay.Count)
                     {
