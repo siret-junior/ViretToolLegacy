@@ -55,7 +55,7 @@ namespace ViretTool.RankingModel.SimilarityModels
                 Parallel.For(0, result.Count(), i =>
                 {
                     RankedFrame rankedFrame = result[i];
-                    rankedFrame.Rank += CosineDistance(mByteVectors[rankedFrame.Frame.ID], query, indexes);
+                    rankedFrame.Rank += CosineSimilarity(mByteVectors[rankedFrame.Frame.ID], query, indexes);
                 });
             }
 
@@ -69,7 +69,7 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         public static double ComputeDistance(byte[] vectorA, byte[] vectorB)
         {
-            return CosineDistance(vectorA, vectorB);
+            return L2Distance(vectorA, vectorB);
         }
         
         /// <summary>
@@ -79,7 +79,7 @@ namespace ViretTool.RankingModel.SimilarityModels
         /// <param name="y">Second byte vector.</param>
         /// <param name="indexes">Optimization focusing only on nonzero query dimensions.</param>
         /// <returns></returns>
-        private static double CosineDistance(byte[] x, byte[] y, int[] indexes)
+        private static double CosineSimilarity(byte[] x, byte[] y, int[] indexes)
         {
             double result = 0.0;
 
@@ -91,7 +91,7 @@ namespace ViretTool.RankingModel.SimilarityModels
             return result;
         }
 
-        private static double CosineDistance(byte[] x, byte[] y)
+        private static double CosineSimilarity(byte[] x, byte[] y)
         {
             double result = 0.0;
 
@@ -101,6 +101,19 @@ namespace ViretTool.RankingModel.SimilarityModels
             }
 
             return result;
+        }
+
+        private static double L2Distance(byte[] x, byte[] y)
+        {
+            double result = 0.0;
+
+            for (int i = 0; i < x.Length; i++)
+            {
+                double difference = x[i] - y[i];
+                result += difference * difference;
+            }
+
+            return Math.Sqrt(result);
         }
 
         private void LoadDescriptors()
