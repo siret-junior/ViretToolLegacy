@@ -58,7 +58,10 @@ namespace ViretTool.BasicClient
                 }
             }
         }
-        
+
+        // TODO: check memory leaking (dangling pointers, events, etc...)
+        private DataModel.Frame[] mVideoFrames = null;
+
         public DisplayFrame(DisplayControl parentDisplay)
         {
             InitializeComponent();
@@ -136,9 +139,18 @@ namespace ViretTool.BasicClient
                 if (e.MiddleButton == MouseButtonState.Pressed)
                 {
                     Point point = Mouse.GetPosition(this);
-                    DataModel.Video video = Frame.FrameVideo;
-                    int frameNumber = (int)((point.X / ActualWidth) * (video.Frames.Count - 1));
-                    image.Source = video.Frames[frameNumber].Bitmap;
+
+                    // read selected keyframes (obsolete)
+                    //DataModel.Video video = Frame.FrameVideo;
+
+                    // read all video frames (lazy)
+                    if (mVideoFrames == null)
+                    {
+                        mVideoFrames = Frame.FrameVideo.VideoDataset.ReadAllVideoFrames(Frame.FrameVideo);
+                    }
+
+                    int frameIndex = (int)((point.X / ActualWidth) * (mVideoFrames.Length - 1));
+                    image.Source = mVideoFrames[frameIndex].Bitmap;
                 }
                 // the original frame image otherwise
                 else if (image.Source != Frame.Bitmap)

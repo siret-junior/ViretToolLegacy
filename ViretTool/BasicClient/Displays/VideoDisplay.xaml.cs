@@ -22,13 +22,12 @@ namespace ViretTool.BasicClient
     public partial class VideoDisplay : DisplayControl
     {
         
-        private int mDisplayWidth;
+        private int mDisplayWidth = 16;
 
         
         public VideoDisplay()
         {
             InitializeComponent();
-            mDisplayWidth = 8;
             ResizeDisplay(1, 1, displayGrid);
         }
 

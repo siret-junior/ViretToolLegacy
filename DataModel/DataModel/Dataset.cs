@@ -74,6 +74,30 @@ namespace ViretTool.DataModel
             }
         }
 
+
+        /// <summary>
+        /// Reads all extracted frames for a selected video.
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        public Frame[] ReadAllVideoFrames(Video video)
+        {
+            Tuple<int, int, byte[]>[] allFramesRaw = AllExtractedFramesReader.ReadVideoFrames(video.VideoID);
+            Frame[] result = new Frame[allFramesRaw.Length];
+
+            for (int i = 0; i < allFramesRaw.Length; i++)
+            {
+                int videoId = allFramesRaw[i].Item1;
+                int frameNumber = allFramesRaw[i].Item2;
+                byte[] jpgThumbnail = allFramesRaw[i].Item3;
+
+                result[i] = new Frame(video, -1, frameNumber, jpgThumbnail);
+            }
+
+            return result;
+        }
+
+
         /// <summary>
         /// Populates the Video and Frame collections of the dataset.
         /// </summary>

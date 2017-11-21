@@ -147,7 +147,7 @@ namespace ViretTool.BasicClient
             // TODO: semantic/color sorting of displayed items on a page
             RankedFrame[,] arrangedDisplay 
                 = DisplayArranger.ArrangeDisplay(framesToDisplay, mDisplayRows, mDisplayCols, 
-                DisplayArrangement.Semantic);
+                DisplayArrangement.Ranking);
 
             // display frames
             int iterator = 0;
