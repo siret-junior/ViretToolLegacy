@@ -87,14 +87,14 @@ namespace ViretTool
                     EnableInput();
                 };
 
-            resultDisplay.DisplayRandomItemsEvent += 
+            resultDisplay.DisplayRandomItemsRequestedEvent += 
                 () =>
                 {
                     DisableInput();
                     mRankingEngine.GenerateRandomRanking();
                     EnableInput();
                 };
-            resultDisplay.DisplaySequentialItemsEvent +=
+            resultDisplay.DisplaySequentialItemsRequestedEvent +=
                 () =>
                 {
                     DisableInput();
