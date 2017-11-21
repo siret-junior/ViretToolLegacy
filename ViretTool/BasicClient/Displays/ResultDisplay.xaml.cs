@@ -45,16 +45,7 @@ namespace ViretTool.BasicClient
             }
         }
 
-        public delegate void DisplayRandomItemsEventHandler();
-        public event DisplayRandomItemsEventHandler DisplayRandomItemsEvent;
-        public event DisplayRandomItemsEventHandler DisplaySequentialItemsEvent;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
+        
         private int mPage = 0;
         public string PageNumberLabel
         {
@@ -73,6 +64,9 @@ namespace ViretTool.BasicClient
             DataContext = this;
             ResizeDisplay(1, 1, displayGrid);
         }
+
+
+        #region --[ Display control ]--
 
         public void UpdateDisplayGrid()
         {
@@ -163,25 +157,47 @@ namespace ViretTool.BasicClient
                     }
                 }
             }
+
+            UpdateSelectionVisualization();
+            RaiseDisplayChangedEvent();
         }
 
-        
-        private void RaiseDisplayRandomItems()
+        #endregion
+
+
+        #region --[ Events ]--
+
+        public delegate void DisplayEventHandler();
+        public event DisplayEventHandler DisplayRandomItemsRequestedEvent;
+        public event DisplayEventHandler DisplaySequentialItemsRequestedEvent;
+        public event DisplayEventHandler DisplayChangedEvent;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string propertyName)
         {
-            DisplayRandomItemsEvent?.Invoke();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void RaiseDisplaySequentialItems()
+
+        private void RaiseDisplayRandomItemsEvent()
         {
-            DisplaySequentialItemsEvent?.Invoke();
+            DisplayRandomItemsRequestedEvent?.Invoke();
         }
 
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void RaiseDisplaySequentialItemsEvent()
         {
-            mPage++;
-            DisplayPage(mPage);
+            DisplaySequentialItemsRequestedEvent?.Invoke();
         }
+
+        private void RaiseDisplayChangedEvent()
+        {
+            DisplayChangedEvent?.Invoke();
+        }
+
+        #endregion
+
+
+        #region --[ GUI interaction ]--
 
         private void displayGrid_Loaded(object sender, RoutedEventArgs e)
         {
@@ -191,12 +207,12 @@ namespace ViretTool.BasicClient
 
         private void sequentialDisplayButton_Click(object sender, RoutedEventArgs e)
         {
-            RaiseDisplaySequentialItems();
+            RaiseDisplaySequentialItemsEvent();
         }
 
         private void randomDisplayButton_Click(object sender, RoutedEventArgs e)
         {
-            RaiseDisplayRandomItems();
+            RaiseDisplayRandomItemsEvent();
         }
 
         private void firstPageButton_Click(object sender, RoutedEventArgs e)
@@ -230,5 +246,7 @@ namespace ViretTool.BasicClient
                 DisplayPage(mPage + 1);
             }
         }
+
+        #endregion
     }
 }
