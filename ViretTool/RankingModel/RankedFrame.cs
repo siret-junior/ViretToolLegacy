@@ -55,5 +55,9 @@ namespace ViretTool.RankingModel
                 + ", video: " + Frame.FrameVideo.VideoID.ToString("00000")
                 + ", frame: " + Frame.FrameNumber.ToString("000000");
         }
+
+        public RankedFrame Clone() {
+            return new RankedFrame(Frame, Rank);
+        }
     }
 }

@@ -145,17 +145,21 @@ namespace ViretTool.RankingModel.SimilarityModels {
                     list.Add(new Dictionary<int, RankedFrame>());
                     continue;
                 }
-                Dictionary<int, RankedFrame> dict = mClasses[listOfIds[i]].ToDictionary(f => f.Frame.ID);
+
+                Dictionary<int, RankedFrame> dict = new Dictionary<int, RankedFrame>(); //= mClasses[listOfIds[i]].ToDictionary(f => f.Frame.ID);
+                foreach (var item in mClasses[listOfIds[i]]) {
+                    dict.Add(item.Frame.ID, item.Clone());
+                }
+                i++;
 
                 for (; i < listOfIds.Count; i++) {
                     if (!mClasses.ContainsKey(listOfIds[i])) continue;
 
                     foreach (RankedFrame f in mClasses[listOfIds[i]]) {
-                        if (dict.TryGetValue(f.Frame.ID, out fIn)) {
-                            fIn.Rank += f.Rank;
-                            dict[f.Frame.ID] = fIn;
+                        if (dict.ContainsKey(f.Frame.ID)) {
+                            dict[f.Frame.ID].Rank += f.Rank;
                         } else {
-                            dict.Add(f.Frame.ID, f);
+                            dict.Add(f.Frame.ID, f.Clone());
                         }
                     }
                 }

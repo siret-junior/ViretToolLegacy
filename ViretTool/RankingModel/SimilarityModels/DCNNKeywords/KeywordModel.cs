@@ -19,6 +19,7 @@ namespace ViretTool.RankingModel.SimilarityModels {
         }
 
         public List<RankedFrame> RankFramesBasedOnQuery(List<List<int>> queryKeyword, string source) {
+            if (queryKeyword == null) return null;
             return mKeywordModels[source].RankFramesBasedOnQuery(queryKeyword);
         }
     }
