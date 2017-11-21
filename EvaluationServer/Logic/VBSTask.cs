@@ -49,13 +49,13 @@ namespace VitretTool.EvaluationServer {
             t.Started = false;
             t.Finished = false;
 
-            //if (File.Exists("Tasks/finished" + t.TaskId + ".txt")) {
-            //    t.Started = true;
-            //    t.Finished = true;
-            //} else {
+            if (File.Exists("Tasks/finished" + t.TaskId + ".txt")) {
+                t.Started = true;
+                t.Finished = true;
+            } else {
                 t.mStreamWriter = new StreamWriter("Tasks/finished" + t.TaskId + ".txt", false);
                 t.mStreamWriter.AutoFlush = true;
-            //}
+            }
 
             return t;
         }
@@ -93,6 +93,7 @@ namespace VitretTool.EvaluationServer {
             if (Started == true) return;
             Started = true;
             mTimer.Enabled = true;
+            mStreamWriter.WriteLine("#TASK_STARTED: {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
             OnTaskStarted?.Invoke(TaskId);
         }
@@ -102,6 +103,7 @@ namespace VitretTool.EvaluationServer {
 
             Finished = true;
             mTimer.Enabled = false;
+            mStreamWriter.WriteLine("#TASK_ENDED: {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
             mStreamWriter.Close();
             OnTaskFinished?.Invoke(TaskId);
@@ -122,23 +124,24 @@ namespace VitretTool.EvaluationServer {
 
             lock (mSubmissions) {
                 if (!mSubmissions.TryGetValue(teamId, out res)) {
-                    res = new Result() { Value = 0, Tries = 0 };
+                    res = new Result() { Value = 0, Tries = 0, Successful = false };
                     mSubmissions.Add(teamId, res);
-                }
+                } else if (res.Successful) return;
             }
             
             if (videoId == VideoId && frameId <= EndFrame && frameId >= StartFrame) {
-                res.Value = (int)(50 + 50 * (1 - Remaining.TotalSeconds / Duration.TotalSeconds) - res.Tries * 10);
+                res.Value = (int)Math.Max(0, (50 + 50 * (1 - Remaining.TotalSeconds / Duration.TotalSeconds) - res.Tries * 10));
+                res.Successful = true;
             }
 
             res.Tries++;
 
             lock (mSubmissions) {
                 mSubmissions[teamId] = res;
-                mStreamWriter.WriteLine("{0}\t{1,20}\t{2,10}\t{3,10}\t{4,5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), teamId, videoId, frameId, res.Value);
+                mStreamWriter.WriteLine("{0}\t{1,20}\t{2,10}\t{3,10}\t{4,5}\t{5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), teamId, videoId, frameId, res.Value, res.Successful ? "true" : "false");
             }
 
-            OnNewKeyframeSubmitted?.Invoke(teamId, videoId, frameId, res.Value, TaskId);
+            OnNewKeyframeSubmitted?.Invoke(teamId, videoId, frameId, res.Value, TaskId, res.Successful);
         }
 
         private void RestoreResults() {
@@ -158,17 +161,19 @@ namespace VitretTool.EvaluationServer {
                         int videoId = int.Parse(parts[2]);
                         int frameId = int.Parse(parts[3]);
                         int val = int.Parse(parts[4]);
+                        bool success = parts[5] == "true";
 
                         if (mSubmissions.ContainsKey(teamId)) {
                             var res = mSubmissions[teamId];
                             res.Tries++;
                             res.Value = val;
+                            res.Successful = success;
                             mSubmissions[teamId] = res;
                         } else {
-                            mSubmissions.Add(teamId, new Result() { Value = val, Tries = 1 });
+                            mSubmissions.Add(teamId, new Result() { Value = val, Tries = 1, Successful = success });
                         }
 
-                        OnNewKeyframeSubmitted?.Invoke(teamId, videoId, frameId, val, TaskId);
+                        OnNewKeyframeSubmitted?.Invoke(teamId, videoId, frameId, val, TaskId, success);
                     }
                 }
             } catch (IOException) { }
@@ -179,6 +184,7 @@ namespace VitretTool.EvaluationServer {
         struct Result {
             public int Value;
             public int Tries;
+            public bool Successful;
         }
     }
 }

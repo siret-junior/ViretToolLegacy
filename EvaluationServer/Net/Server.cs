@@ -15,11 +15,13 @@ namespace VitretTool.EvaluationServer {
         public IPAddress IP { get; private set; }
 
         private Teams mTeams;
+        private VBSTasks mTasks;
         private HttpListener mListener;
 
-        public Server(IPAddress ip, int port, Teams teams) {
+        public Server(IPAddress ip, int port, Teams teams, VBSTasks tasks) {
             IP = ip;
             Port = port;
+            mTasks = tasks;
             mTeams = teams;
             mListener = new HttpListener();
             mListener.Prefixes.Add(string.Format("http://+:{1}/", IP, Port));
@@ -37,7 +39,7 @@ namespace VitretTool.EvaluationServer {
                 HttpListenerRequest request = context.Request;
                 HttpListenerResponse response = context.Response;
 
-                ClientHandler.Respond(request, response, mTeams);
+                ClientHandler.Respond(request, response, mTeams, mTasks);
             }
         }
         

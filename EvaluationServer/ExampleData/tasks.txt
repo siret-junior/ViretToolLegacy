@@ -1,5 +1,21 @@
 #TYPE		CORRECT VID ID		START TIMESTAMP		END TIMESTAMP		SOURCE					TIME TO SOLVE (s)
-VIDEO		3					1					100					Tasks/task1.mpg			90
-VIDEO		1					0					100					Tasks/task1.mpg			90
-VIDEO		3					0					500					Tasks/task1.mpg			90
-VIDEO		1					0					500					Tasks/task1.mpg			90
+VIDEO		52					10785				11083				10s/10s-00052.mp4		300
+VIDEO		60					3601				4097				10s/10s-00060.mp4		300
+VIDEO		72					861					1097				10s/10s-00072.mp4		300
+VIDEO		92					514					6455				10s/10s-00092.mp4		300
+VIDEO		99					6806				9024				10s/10s-00099.mp4		300
+VIDEO		100					2246				3705				10s/10s-00100.mp4		300
+VIDEO		137					223					1281				10s/10s-00137.mp4		300
+VIDEO		142					4142				4366				10s/10s-00142.mp4		300
+VIDEO		180					0					435					10s/10s-00180.mp4		300
+VIDEO		253					2773				3578				10s/10s-00253.mp4		300
+VIDEO		275					0					1443				10s/10s-00275.mp4		300
+VIDEO		289					1804				2437				10s/10s-00289.mp4		300
+VIDEO		305					845					3753				10s/10s-00305.mp4		300
+VIDEO		324					4246				8252				10s/10s-00324.mp4		300
+VIDEO		345					5764				6250				10s/10s-00345.mp4		300
+VIDEO		383					89					1098				10s/10s-00383.mp4		300
+VIDEO		386					0					5461				10s/10s-00386.mp4		300
+VIDEO		475					0					6097				10s/10s-00475.mp4		300
+VIDEO		492					118					1203				10s/10s-00492.mp4		300
+VIDEO		566					3657				6050				10s/10s-00566.mp4		300

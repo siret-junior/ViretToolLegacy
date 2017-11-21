@@ -50,6 +50,24 @@ namespace ViretTool.Utils {
             }
         }
 
+        /// <returns>TaskId as int or -1 if error or no task available</returns>
+        public async Task<int> GetCurrentTaskId() {
+            if (mClient == null) return -1;
+            try {
+                var list = new string[] { "Type=VBSt", "Name=" + TeamName };
+                var content = new StringContent(string.Join("&", list));
+
+                var response = await mClient.PostAsync(string.Format("http://{0}:{1}/", IP, Port), content);
+                var responseBytes = await response.Content.ReadAsByteArrayAsync();
+
+                if (responseBytes.Length != 10) return -1;
+                return BitConverter.ToInt32(responseBytes, 0);
+            } catch (Exception) {
+                IsConnected = false;
+                return -1;
+            }
+        }
+
         public async void Send(int trecvidVideoId, int trecvidFrameId) {
             if (mClient == null) return;
             try {

@@ -41,7 +41,7 @@ namespace VitretTool.EvaluationServer {
             mDataset = dataset;
         }
 
-        public void DrawNewKeyframe(long teamId, int videoId, int frameId, int value, int taskId) {
+        public void DrawNewKeyframe(long teamId, int videoId, int frameId, int value, int taskId, bool success) {
             Application.Current.Dispatcher.BeginInvoke((Action)delegate {
                 BitmapSource b = null;
                 if (videoId < mDataset.Videos.Count && videoId >= 0) {
@@ -53,7 +53,7 @@ namespace VitretTool.EvaluationServer {
                     }
                 }
 
-                mTeams[teamId].InsertNewResult(mTeamsGrid, b, value, taskId);
+                mTeams[teamId].InsertNewResult(mTeamsGrid, b, value, taskId, success);
                 if (value > 0) UpdateChart();
             });
         }
@@ -217,7 +217,7 @@ namespace VitretTool.EvaluationServer {
                 sp.Children.Clear();
             }
 
-            public void InsertNewResult(Grid g, BitmapSource bitmap, int value, int taskId) {
+            public void InsertNewResult(Grid g, BitmapSource bitmap, int value, int taskId, bool success) {
                 int newVal = value;
                 if (ChartLine.Points[ChartLine.Points.Count - 1].X == taskId) {
                     if (ChartLine.Points.Count > 1) {
@@ -243,7 +243,7 @@ namespace VitretTool.EvaluationServer {
 
                 var b = new Border();
                 b.Padding = new Thickness(10);
-                b.Background = value > 0 ? Brushes.Green : Brushes.Red;
+                b.Background = success ? Brushes.Green : Brushes.Red;
                 var gr = new Grid();
                 var i = new Image();
                 if (bitmap == null) {

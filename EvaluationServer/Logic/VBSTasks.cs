@@ -77,8 +77,8 @@ namespace VitretTool.EvaluationServer {
         private void mOnTaskFinished(int taskId) {
             OnTaskFinished?.Invoke(taskId);
         }
-        private void mOnNewKeyframeSubmitted(long teamId, int videoId, int frameId, int value, int taskId) {
-            OnNewKeyframeSubmitted?.Invoke(teamId, videoId, frameId, value, taskId);
+        private void mOnNewKeyframeSubmitted(long teamId, int videoId, int frameId, int value, int taskId, bool success) {
+            OnNewKeyframeSubmitted?.Invoke(teamId, videoId, frameId, value, taskId, success);
         }
 
         public delegate void OnTaskTimeUpdatedHandler(TimeSpan time);
@@ -93,7 +93,7 @@ namespace VitretTool.EvaluationServer {
         public delegate void OnTaskFinishedHandler(int taskId);
         public event OnTaskFinishedHandler OnTaskFinished;
 
-        public delegate void OnNewKeyframeSubmittedHandler(long teamId, int videoId, int frameId, int value, int taskId);
+        public delegate void OnNewKeyframeSubmittedHandler(long teamId, int videoId, int frameId, int value, int taskId, bool success);
         public event OnNewKeyframeSubmittedHandler OnNewKeyframeSubmitted;
 
     }

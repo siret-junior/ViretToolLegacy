@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EvaluationServer.Support;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -38,9 +39,14 @@ namespace VitretTool.EvaluationServer {
 
             InitializeComponent();
 
+            //var dataset = new ViretTool.DataModel.Dataset(
+            //    "..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb",
+            //    "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
             var dataset = new ViretTool.DataModel.Dataset(
-                "..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb",
-                "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
+                "..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb",
+                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
+
+            //ConvertFrameIdsToTimestamps.Convert(dataset, "E:\\TRECVidselected\\10s\\task_timing.for_generation_only", "E:\\TRECVidselected\\10s\\tasks.txt");
 
             int port = 9999;
             IPAddress ip = GetIPAddress();
@@ -70,7 +76,7 @@ namespace VitretTool.EvaluationServer {
             
             KeyUp += OnKeyPressed;
             
-            Server server = new Server(ip, port, teams);
+            Server server = new Server(ip, port, teams, tasks);
             Task.Run(action: server.Listen);
         }
 

@@ -61,6 +61,7 @@
     <Compile Include="Controls\IChartLine.cs" />
     <Compile Include="ColorHelper.cs" />
     <Compile Include="Net\Server.cs" />
+    <Compile Include="Support\ConvertFrameIdsToTimestamps.cs" />
     <Compile Include="UIDrawer.cs" />
     <Compile Include="Logic\VBSTask.cs" />
     <Compile Include="Logic\VBSTasks.cs" />

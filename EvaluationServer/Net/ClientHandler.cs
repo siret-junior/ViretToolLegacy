@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace VitretTool.EvaluationServer {
     class ClientHandler {
 
-        public static void Respond(HttpListenerRequest request, HttpListenerResponse response, Teams teams) {
+        public static void Respond(HttpListenerRequest request, HttpListenerResponse response, Teams teams, VBSTasks tasks) {
             string postData;
 
             using (var stream = new StreamReader(request.InputStream, request.ContentEncoding)) {
@@ -36,6 +36,12 @@ namespace VitretTool.EvaluationServer {
             Team team;
 
             switch (post["Type"]) {
+                case "VBSt":
+                    response.ContentLength64 = 10;
+                    response.ContentEncoding = Encoding.ASCII;
+                    response.OutputStream.Write(BitConverter.GetBytes(tasks.CurrentTask != null ? tasks.CurrentTask.TaskId : -1), 0, 4);
+                    response.OutputStream.Write(new byte[] { 0x56, 0x42, 0x53, 0x74, 0x4f, 0x4b }, 0, 6);
+                    break;
                 case "VBSn":
                     team = teams.CreateNewTeam(post["Name"]);
                     if (team == null) {
