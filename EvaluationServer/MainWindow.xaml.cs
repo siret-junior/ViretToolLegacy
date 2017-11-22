@@ -42,9 +42,16 @@ namespace VitretTool.EvaluationServer {
             //var dataset = new ViretTool.DataModel.Dataset(
             //    "..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb",
             //    "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
+            //var dataset = new ViretTool.DataModel.Dataset(
+            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb",
+            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
+            //var dataset = new ViretTool.DataModel.Dataset(
+            //    "..\\..\\..\\TestData\\TRECVid700v\\TRECVid700v-KF-100x75.thumb",
+            //    "..\\..\\..\\TestData\\TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
+
             var dataset = new ViretTool.DataModel.Dataset(
-                "..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb",
-                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
+                "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
+                "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
 
             //ConvertFrameIdsToTimestamps.Convert(dataset, "E:\\TRECVidselected\\10s\\task_timing.for_generation_only", "E:\\TRECVidselected\\10s\\tasks.txt");
 

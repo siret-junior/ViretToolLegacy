@@ -45,7 +45,11 @@ namespace VitretTool.EvaluationServer {
             Application.Current.Dispatcher.BeginInvoke((Action)delegate {
                 BitmapSource b = null;
                 if (videoId < mDataset.Videos.Count && videoId >= 0) {
-                    foreach (var item in mDataset.Videos[videoId].Frames) {
+                    List<ViretTool.DataModel.Frame> allVideoFrames 
+                    = mDataset.Videos[videoId].GetAllExtractedFrames();
+
+                    //foreach (var item in mDataset.Videos[videoId].Frames) {
+                    foreach (var item in allVideoFrames){
                         if (item.FrameNumber >= frameId) {
                             b = item.Bitmap;
                             break;
