@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ViretTool.BasicClient"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="800">
-    <Grid>
+    <Grid Background="DarkGray">
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
             <RowDefinition Height="*" />
@@ -20,8 +20,14 @@
 
 
 
-            <Button>Menu</Button>
-           
+            
+            <Label 
+                Grid.Column="0" 
+                Background="DarkGray"
+                FontWeight="Bold"
+                FontSize="14"
+                Content="Search results:" 
+                VerticalAlignment="Center"/>
 
 
             <Grid

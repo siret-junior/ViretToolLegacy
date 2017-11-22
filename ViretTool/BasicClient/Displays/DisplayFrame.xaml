@@ -23,19 +23,20 @@
                 Stroke="Transparent"
                 StrokeThickness="4" />
 
+            <!--
             <Label Name="label" 
                    FontSize="8"
                    Padding="1"
-                   Background="LightCoral"
+                   Background="Transparent"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top" />
-
             <Label Name="labelFrame" 
                    FontSize="8"
                    Padding="1"
                    Background="LightSkyBlue"
                    HorizontalAlignment="Right"
                    VerticalAlignment="Top" />
+            -->
 
 
             <Grid Name="displayButtons"
@@ -43,6 +44,7 @@
                   Height="16"
                   HorizontalAlignment="Left"
                   VerticalAlignment="Bottom"
+                  Opacity="1"
                   Visibility="Hidden">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />

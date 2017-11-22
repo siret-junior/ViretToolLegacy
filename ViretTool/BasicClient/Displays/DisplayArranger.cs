@@ -28,10 +28,8 @@ namespace ViretTool.BasicClient
                     return SortBySemantics(frames, nRows, nCols);
                 case DisplayArrangement.Color:
                     return SortByColor(frames, nRows, nCols);
-                    break;
                 default:
                     throw new NotImplementedException("Unknown display arrangement!");
-                    break;
 
             }
         }

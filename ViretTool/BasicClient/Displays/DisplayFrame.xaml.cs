@@ -34,13 +34,13 @@ namespace ViretTool.BasicClient
                 {
                     image.Source = mFrame.Bitmap;
                     //label.Content = mFrame.ID.ToString();
-                    label.Content = mFrame.FrameVideo.VideoID;
-                    labelFrame.Content = mFrame.FrameNumber;
+                    //label.Content = mFrame.FrameVideo.VideoID;
+                    //labelFrame.Content = mFrame.FrameNumber;
                 }
                 else
                 {
                     image.Source = null;
-                    label.Content = null;
+                    //label.Content = null;
                 }
                 mVideoFrames = null;
             }
