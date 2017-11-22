@@ -95,10 +95,16 @@ namespace ViretTool.BasicClient
             ResettingSelectionEvent?.Invoke();
         }
 
-        public event SubmitSelectionEventHandler SubmittingSelectionEvent;
-        public void RaiseSubmittingSelectionEvent()
+        public event SubmitSelectionEventHandler SelectionColorSearchEvent;
+        public void RaiseSelectionColorSearchEvent()
         {
-            SubmittingSelectionEvent?.Invoke();
+            SelectionColorSearchEvent?.Invoke();
+        }
+
+        public event SubmitSelectionEventHandler SelectionSemanticSearchEvent;
+        public void RaiseSelectionSemanticSearchEvent()
+        {
+            SelectionSemanticSearchEvent?.Invoke();
         }
 
         public event FrameSelectionEventHandler DisplayingFrameVideoEvent;
@@ -106,6 +112,14 @@ namespace ViretTool.BasicClient
         {
             DisplayingFrameVideoEvent?.Invoke(selectedFrame);
         }
+
+
+        public event FrameSelectionEventHandler SubmittingToServerEvent;
+        public void RaiseSubmittingToServerEvent(DataModel.Frame submittedFrame)
+        {
+            SubmittingToServerEvent?.Invoke(submittedFrame);
+        }
+
 
         #endregion
 

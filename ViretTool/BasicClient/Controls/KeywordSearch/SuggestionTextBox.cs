@@ -306,7 +306,7 @@ namespace ViretTool.BasicClient.Controls {
         }
 
         #endregion
-
+        
         public void ClearQuery() {
             RasultStack_.Children.Clear();
             Query_.Clear();

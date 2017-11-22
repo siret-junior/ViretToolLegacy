@@ -10,12 +10,14 @@
         Name="viewBox"
         Stretch="Fill">
         <Grid 
-            Background="LightGray"
+            Background="White"
             MouseDown="Grid_MouseDown"
             MouseMove="Grid_MouseMove"
-            MouseLeave="Grid_MouseLeave">
+            MouseLeave="Grid_MouseLeave"
+            MouseWheel="Grid_MouseWheel">
         
-            <Image Name="image" />
+            <Image Name="image" 
+                   Width="100" Height="75"/>
             <Rectangle Name="rectangle"
                 Fill="Transparent"
                 Stroke="Transparent"
@@ -23,11 +25,44 @@
 
             <Label Name="label" 
                    FontSize="8"
-                   Padding="2"
+                   Padding="1"
                    Background="white"
                    HorizontalAlignment="Left"
-                   VerticalAlignment="top" />
+                   VerticalAlignment="Top" />
 
+            
+            <Grid Name="displayButtons"
+                  Width="100"
+                  Height="16"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Bottom"
+                  Visibility="Hidden">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Name="colorSearchButton"
+                        Grid.Column="0"
+                        FontSize="7"
+                        Background="LightCoral"
+                        Content="Color" 
+                        Click="colorSearchButton_Click"/>
+                <Button Name="semanticSearchButton"
+                        Grid.Column="1"
+                        FontSize="7"
+                        Background="DeepSkyBlue"
+                        Content="Semantic" 
+                        Click="semanticSearchButton_Click"/>
+                <Button Name="submitButton"
+                        Grid.Column="2"
+                        FontSize="7"
+                        Background="DarkSeaGreen"
+                        Content="Submit" 
+                        Click="submitButton_Click"/>
+            </Grid>
+            
         </Grid>
     </Viewbox>
 </UserControl>

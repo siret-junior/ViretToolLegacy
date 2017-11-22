@@ -16,13 +16,15 @@ namespace ViretTool.BasicClient
         // used to redraw displays
         public delegate void SelectionEventHandler(List<Frame> selectedFrames);
         public event SelectionEventHandler SelectionChangedEvent;
-        public event SelectionEventHandler SelectionSubmittedEvent;
-        
+        public event SelectionEventHandler SelectionSubmittedColorModelEvent;
+        public event SelectionEventHandler SelectionSubmittedSemanticModelEvent;
+
         public FrameSelectionController()
         {
             mSelectedFrames = new List<Frame>();
         }
 
+        
         public void AddToSelection(Frame selectedFrame)
         {
             if (selectedFrame == null)
@@ -63,9 +65,14 @@ namespace ViretTool.BasicClient
             SelectionChangedEvent?.Invoke(mSelectedFrames);
         }
 
-        public void SubmitSelection()
+        public void SubmitSelectionColorModel()
         {
-            SelectionSubmittedEvent?.Invoke(mSelectedFrames);
+            SelectionSubmittedColorModelEvent?.Invoke(mSelectedFrames);
+        }
+
+        public void SubmitSelectionSemanticModel()
+        {
+            SelectionSubmittedSemanticModelEvent?.Invoke(mSelectedFrames);
         }
     }
 }

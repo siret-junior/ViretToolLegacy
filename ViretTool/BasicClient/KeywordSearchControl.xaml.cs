@@ -35,6 +35,11 @@ namespace ViretTool.BasicClient {
             InitializeComponent();
         }
 
+        public void Clear()
+        {
+            suggestionTextBox.ClearQuery();
+        }
+
         private void textClearButton_Click(object sender, RoutedEventArgs e) {
             suggestionTextBox.ClearQuery();
         }

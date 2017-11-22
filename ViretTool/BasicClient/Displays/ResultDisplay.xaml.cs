@@ -97,7 +97,7 @@ namespace ViretTool.BasicClient
             }
         }
 
-        private void DisplayPage(int page)
+        public void DisplayPage(int page)
         {
             // display check
             int displaySize = DisplayedFrames.Length;
@@ -160,6 +160,11 @@ namespace ViretTool.BasicClient
 
             UpdateSelectionVisualization();
             RaiseDisplayChangedEvent();
+        }
+
+        public void IncrementDisplay(int nPages)
+        {
+            DisplayPage(mPage + nPages);
         }
 
         #endregion
@@ -235,18 +240,31 @@ namespace ViretTool.BasicClient
             DisplayPage(mResultFrames.Count / DisplayedFrames.Length);
         }
 
-        private void displayGrid_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (e.Delta > 0)
-            {
-                DisplayPage(mPage - 1);
-            }
-            else
-            {
-                DisplayPage(mPage + 1);
-            }
-        }
+        //private void displayGrid_MouseWheel(object sender, MouseWheelEventArgs e)
+        //{
+        //    if (e.Delta > 0)
+        //    {
+        //        DisplayPage(mPage - 1);
+        //    }
+        //    else
+        //    {
+        //        DisplayPage(mPage + 1);
+        //    }
+        //}
 
         #endregion
+
+        //private void displayGrid_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    switch (e.Key)
+        //    {
+        //        case Key.Left:
+        //            DisplayPage(mPage - 1);
+        //            break;
+        //        case Key.Right:
+        //            DisplayPage(mPage + 1);
+        //            break;
+        //    }
+        //}
     }
 }

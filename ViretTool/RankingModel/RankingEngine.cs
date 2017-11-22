@@ -82,18 +82,17 @@ namespace ViretTool.RankingModel
             return result;
         }
 
+        
+        public List<RankedFrame> UpdateColorModelRanking(List<DataModel.Frame> queryFrames)
+        {
+            // TODO: clone selected frames?
 
-        // TODO: disabled for now
-        //public List<RankedFrame> UpdateColorModelRanking(List<DataModel.Frame> queryFrames)
-        //{
-        //    // TODO: clone selected frames?
-
-        //    // update model ranking
-        //    mSimilarityManager.UpdateColorModelRanking(queryFrames);
-        //    // recompute aggregation, filtering and sorting
-        //    List<RankedFrame> result = GetRankedFilteredSortedResult();
-        //    return result;
-        //}
+            // update model ranking
+            mSimilarityManager.UpdateColorModelRanking(queryFrames);
+            // recompute aggregation, filtering and sorting
+            List<RankedFrame> result = ComputeRankingFilteringAndSorting();
+            return result;
+        }
 
         public List<RankedFrame> UpdateVectorModelRanking(List<DataModel.Frame> queryFrames)
         {

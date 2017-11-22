@@ -8,7 +8,10 @@
         xmlns:control = "clr-namespace:ViretTool.BasicClient"
         mc:Ignorable="d"
         Title="ViretTool"
-        WindowStartupLocation="CenterScreen" WindowState="Maximized">
+        WindowStartupLocation="CenterScreen" 
+        WindowState="Maximized"
+        WindowStyle="None"
+        KeyDown="mainWindow_KeyDown">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -18,10 +21,30 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                
+                <Button x:Name="settingsButton"
+                        Grid.Column="0"
+                        Height="32"
+                        Content="Settings"
+                        Click="settingsButton_Click"/>
+                <Button x:Name="clearAllButton"
+                        Grid.Column="1"
+                        Height="32"
+                        Background="LightCoral"
+                        Content="Clear all"
+                        Click="clearAllButton_Click"/>
+            </Grid>
+
+
             <control:KeywordSearchControl x:Name="keywordSearchTextBox"/>
             <control:SketchCanvas x:Name="sketchCanvas"/>
             <control:SemanticModelDisplay x:Name="semanticModelDisplay"/>
-            <Button Height="200">Basket</Button>
+            <Button Height="200">Hitory</Button>
         </StackPanel>
 
         <GridSplitter Grid.Column="1" 

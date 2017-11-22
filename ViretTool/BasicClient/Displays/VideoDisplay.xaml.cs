@@ -60,9 +60,5 @@ namespace ViretTool.BasicClient
 
             UpdateSelectionVisualization();
         }
-
-
-        
-
     }
 }

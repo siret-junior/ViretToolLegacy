@@ -16,6 +16,7 @@ using ViretTool.BasicClient;
 using ViretTool.RankingModel;
 using ViretTool.RankingModel.FilterModels;
 using ViretTool.RankingModel.SimilarityModels;
+using ViretTool.Utils;
 
 namespace ViretTool
 {
@@ -26,6 +27,10 @@ namespace ViretTool
     {
         private DataModel.Dataset mDataset;
         private RankingEngine mRankingEngine;
+        private FrameSelectionController mFrameSelectionController;
+        private Submission mSubmissionClient;
+        private Settings mSettings = Settings.LoadSettings();
+
         private Cursor mPreviousCursor;
 
         public MainWindow()
@@ -53,15 +58,23 @@ namespace ViretTool
 
             // TODO filter GUI
             mRankingEngine.VideoAggregateFilterEnabled = true;
-            mRankingEngine.VideoAggregateFilterMaxFrames = 2;
+            mRankingEngine.VideoAggregateFilterMaxFrames = 10;
 
             keywordSearchTextBox.Init(mDataset, new string[] {
                 "GoogLeNet", "YFCC100M"
             });
 
             // initialize selection controller
-            FrameSelectionController frameSelectionController
-                = new FrameSelectionController();
+            mFrameSelectionController = new FrameSelectionController();
+
+            // initialize submission client
+            mSubmissionClient = new Submission();
+            mSubmissionClient.Connect(mSettings.IPAddress, mSettings.Port, mSettings.TeamName);
+            mSettings.SettingsChangedEvent +=
+                (settings) =>
+                {
+                    mSubmissionClient.Connect(settings.IPAddress, settings.Port, settings.TeamName);
+                };
 
             // ranking model input
             keywordSearchTextBox.KeywordChangedEvent +=
@@ -76,9 +89,22 @@ namespace ViretTool
                 {
                     DisableInput();
                     mRankingEngine.UpdateColorModelRanking(sketch);
+                    
+                    // TODO:
+                    //mRankingEngine.UpdateColorModelRanking(new List<Tuple<Point, Color>>());
+
                     EnableInput();
                 };
-            frameSelectionController.SelectionSubmittedEvent +=
+            mFrameSelectionController.SelectionSubmittedColorModelEvent +=
+                (frameSelection) =>
+                {
+                    DisableInput();
+                    // TODO:
+                    //semanticModelDisplay.DisplayFrames(frameSelection);
+                    mRankingEngine.UpdateColorModelRanking(frameSelection);
+                    EnableInput();
+                };
+            mFrameSelectionController.SelectionSubmittedSemanticModelEvent +=
                 (frameSelection) =>
                 {
                     DisableInput();
@@ -108,27 +134,45 @@ namespace ViretTool
                 (rankedResult) =>
                 {
                     resultDisplay.ResultFrames = rankedResult;
-                    frameSelectionController.ResetSelection();
+                    mFrameSelectionController.ResetSelection();
                 };
 
 
             // frame selection
-            resultDisplay.AddingToSelectionEvent += frameSelectionController.AddToSelection;
-            resultDisplay.RemovingFromSelectionEvent += frameSelectionController.RemoveFromSelection;
-            resultDisplay.ResettingSelectionEvent += frameSelectionController.ResetSelection;
-            resultDisplay.SubmittingSelectionEvent += frameSelectionController.SubmitSelection;
+            resultDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            resultDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            resultDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            resultDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            resultDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            resultDisplay.SubmittingToServerEvent +=
+                (frame) =>
+                {
+                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+                };
 
-            videoDisplay.AddingToSelectionEvent += frameSelectionController.AddToSelection;
-            videoDisplay.RemovingFromSelectionEvent += frameSelectionController.RemoveFromSelection;
-            videoDisplay.ResettingSelectionEvent += frameSelectionController.ResetSelection;
-            videoDisplay.SubmittingSelectionEvent += frameSelectionController.SubmitSelection;
+            videoDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            videoDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            videoDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            videoDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            videoDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            videoDisplay.SubmittingToServerEvent +=
+                (frame) =>
+                {
+                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+                };
 
-            semanticModelDisplay.AddingToSelectionEvent += frameSelectionController.AddToSelection;
-            semanticModelDisplay.RemovingFromSelectionEvent += frameSelectionController.RemoveFromSelection;
-            semanticModelDisplay.ResettingSelectionEvent += frameSelectionController.ResetSelection;
-            semanticModelDisplay.SubmittingSelectionEvent += frameSelectionController.SubmitSelection;
+            semanticModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            semanticModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            semanticModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            semanticModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            semanticModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            semanticModelDisplay.SubmittingToServerEvent +=
+                (frame) =>
+                {
+                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+                };
 
-            frameSelectionController.SelectionChangedEvent +=
+            mFrameSelectionController.SelectionChangedEvent +=
                 (selectedFrames) =>
                 {
                     resultDisplay.SelectedFrames = selectedFrames;
@@ -183,6 +227,59 @@ namespace ViretTool
         private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             resultDisplay.UpdateDisplayGrid();
+        }
+
+        private void clearAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: without reranking in between
+            keywordSearchTextBox.Clear();
+            sketchCanvas.Clear();
+            mFrameSelectionController.ResetSelection();
+            mFrameSelectionController.SubmitSelectionSemanticModel();
+        }
+
+        private void mainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Home:
+                    resultDisplay.DisplayPage(0);
+                    break;
+                //case Key.End: // TODO
+                //    resultDisplay.DisplayPage(0);
+                //    break;
+                case Key.PageDown:
+                    resultDisplay.IncrementDisplay(10);
+                    break;
+                case Key.PageUp:
+                    resultDisplay.IncrementDisplay(-10);
+                    break;
+                case Key.Right:
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                    {
+                        resultDisplay.IncrementDisplay(10);
+                    }
+                    else
+                    {
+                        resultDisplay.IncrementDisplay(1);
+                    }
+                    break;
+                case Key.Left:
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                    {
+                        resultDisplay.IncrementDisplay(-10);
+                    }
+                    else
+                    {
+                        resultDisplay.IncrementDisplay(-1);
+                    }
+                    break;
+            }
+        }
+
+        private void settingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            mSettings.OpenSettingsWindow();
         }
     }
 }

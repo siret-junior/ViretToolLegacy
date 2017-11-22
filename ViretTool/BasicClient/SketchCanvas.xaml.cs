@@ -66,6 +66,8 @@ namespace ViretTool.BasicClient
 
             mColorPoints.Clear();
             mSelectedColorPoint = null;
+            
+            RaiseSketchChangedEvent();
         }
 
         private void RaiseSketchChangedEvent()
@@ -369,7 +371,6 @@ namespace ViretTool.BasicClient
         private void sketchClearButton_Click(object sender, RoutedEventArgs e)
         {
             Clear();
-            RaiseSketchChangedEvent();
         }
     }
 }

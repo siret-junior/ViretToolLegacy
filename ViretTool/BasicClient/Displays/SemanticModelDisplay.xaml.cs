@@ -21,16 +21,13 @@ namespace ViretTool.BasicClient
     /// </summary>
     public partial class SemanticModelDisplay : DisplayControl
     {
-        private int mColRatio;
-        private int mRowRatio;
+        private int mColRatio = 3;
+        private int mRowRatio = 2;
 
         
         public SemanticModelDisplay()
         {
             InitializeComponent();
-            
-            mColRatio = 3;
-            mRowRatio = 2;
             FitDisplay(1);
         }
 
@@ -88,7 +85,7 @@ namespace ViretTool.BasicClient
         private void semanticClearButton_Click(object sender, RoutedEventArgs e)
         {
             RaiseResettingSelectionEvent();
-            RaiseSubmittingSelectionEvent();
+            RaiseSelectionSemanticSearchEvent();
         }
 
 
