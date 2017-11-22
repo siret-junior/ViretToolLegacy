@@ -53,7 +53,10 @@ namespace VitretTool.EvaluationServer {
                 "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
                 "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
 
-            //ConvertFrameIdsToTimestamps.Convert(dataset, "E:\\TRECVidselected\\10s\\task_timing.for_generation_only", "E:\\TRECVidselected\\10s\\tasks.txt");
+            ConvertFrameIdsToTimestamps.Convert(dataset,
+                "..\\..\\..\\EvaluationServer\\ExampleData\\fps.for_generation_only",
+                "..\\..\\..\\EvaluationServer\\ExampleData\\run_ffmpeg.bat.for_generation_only",
+                "..\\..\\..\\EvaluationServer\\ExampleData\\tasks.txt");
 
             int port = 9999;
             IPAddress ip = GetIPAddress();

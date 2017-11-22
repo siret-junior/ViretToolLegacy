@@ -130,7 +130,7 @@ namespace VitretTool.EvaluationServer {
             }
             
             if (videoId == VideoId && frameId <= EndFrame && frameId >= StartFrame) {
-                res.Value = (int)Math.Max(0, (50 + 50 * (1 - Remaining.TotalSeconds / Duration.TotalSeconds) - res.Tries * 10));
+                res.Value = (int)Math.Max(0, (50 + 50 * (Remaining.TotalSeconds / Duration.TotalSeconds) - res.Tries * 10));
                 res.Successful = true;
             }
 
