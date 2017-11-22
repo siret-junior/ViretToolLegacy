@@ -120,8 +120,17 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cd "$(ProjectDir)"
-xcopy /E /D /Y ".\ExampleData" ".\$(OutDir)"
 
+mkdir ".\$(OutDir)\10s"
+xcopy /E /D /Y ".\ExampleData\10s" ".\$(OutDir)\10s"
+
+
+mkdir ".\$(OutDir)\Tasks"
+
+
+mkdir ".\$(OutDir)\Teams"
+
+copy ".\ExampleData\tasks.txt" ".\$(OutDir)\tasks.txt"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
