@@ -39,7 +39,16 @@ namespace ViretTool.BasicClient
             {
                 return;
             }
-            DataModel.Video video = frame.FrameVideo;
+
+            //List<DataModel.Frame> framesToDisplay = frame.FrameVideo.Frames;
+            DataModel.Frame[] allFrames = frame.FrameVideo.VideoDataset.ReadAllVideoFrames(frame.FrameVideo);
+            List<DataModel.Frame> framesToDisplay = new List<DataModel.Frame>(allFrames.Length / 8);
+            for (int i = 0; i < allFrames.Length; i += 8)
+            {
+                framesToDisplay.Add(allFrames[i]);
+            }
+
+
             // TODO move to separate method
             // clear display
             for (int i = 0; i < DisplayedFrames.Length; i++)
@@ -48,14 +57,14 @@ namespace ViretTool.BasicClient
             }
 
             // resize display
-            int nRows = ((video.Frames.Count - 1) / mDisplayWidth) + 1;
+            int nRows = ((framesToDisplay.Count - 1) / mDisplayWidth) + 1;
             int nCols = mDisplayWidth;
             ResizeDisplay(nRows, nCols, displayGrid);
 
             // display frames
-            for (int i = 0; i < video.Frames.Count; i++)
+            for (int i = 0; i < framesToDisplay.Count; i++)
             {
-                DisplayedFrames[i].Frame = video.Frames[i];
+                DisplayedFrames[i].Frame = framesToDisplay[i];
             }
 
             UpdateSelectionVisualization();

@@ -33,7 +33,9 @@ namespace ViretTool.BasicClient
                 if (value != null)
                 {
                     image.Source = mFrame.Bitmap;
-                    label.Content = mFrame.ID.ToString();
+                    //label.Content = mFrame.ID.ToString();
+                    label.Content = mFrame.FrameVideo.VideoID;
+                    labelFrame.Content = mFrame.FrameNumber;
                 }
                 else
                 {
@@ -127,6 +129,7 @@ namespace ViretTool.BasicClient
 
             // set frame and content
             image.Source = VideoFrames[mDisplayedVideoFrameId].Bitmap;
+            //label.Content = VideoFrames[mDisplayedVideoFrameId].FrameNumber;
         }
 
         private void ResetDisplayVideoFrame()
@@ -137,6 +140,7 @@ namespace ViretTool.BasicClient
             if (Frame != null && image.Source != Frame.Bitmap)
             {
                 image.Source = Frame.Bitmap;
+                //label.Content = mFrame.FrameNumber;
             }
         }
 

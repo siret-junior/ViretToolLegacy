@@ -26,11 +26,18 @@
             <Label Name="label" 
                    FontSize="8"
                    Padding="1"
-                   Background="white"
+                   Background="LightCoral"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top" />
 
-            
+            <Label Name="labelFrame" 
+                   FontSize="8"
+                   Padding="1"
+                   Background="LightSkyBlue"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Top" />
+
+
             <Grid Name="displayButtons"
                   Width="100"
                   Height="16"

@@ -49,7 +49,10 @@
 
         <GridSplitter Grid.Column="1" 
                       Width="5" 
-                      HorizontalAlignment="Stretch" />
+                      HorizontalAlignment="Stretch"
+                      Focusable="False">
+            
+        </GridSplitter>
 
 
         <Grid Grid.Column="2" >
