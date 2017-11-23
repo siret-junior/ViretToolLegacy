@@ -23,7 +23,7 @@ namespace ViretTool.BasicClient
     {
         
         private int mDisplayWidth = 16;
-
+        private int maxFramesToDisplay = 16 * 10;
         
         public VideoDisplay()
         {
@@ -40,13 +40,15 @@ namespace ViretTool.BasicClient
                 return;
             }
 
-            //List<DataModel.Frame> framesToDisplay = frame.FrameVideo.Frames;
-            DataModel.Frame[] allFrames = frame.FrameVideo.VideoDataset.ReadAllVideoFrames(frame.FrameVideo);
-            List<DataModel.Frame> framesToDisplay = new List<DataModel.Frame>(allFrames.Length / 8);
-            for (int i = 0; i < allFrames.Length; i += 8)
-            {
-                framesToDisplay.Add(allFrames[i]);
-            }
+            List<DataModel.Frame> framesToDisplay = frame.FrameVideo.Frames;
+
+            framesToDisplay = ReduceFrameSet(framesToDisplay, maxFramesToDisplay);
+            //DataModel.Frame[] allFrames = frame.FrameVideo.VideoDataset.ReadAllVideoFrames(frame.FrameVideo);
+            //List<DataModel.Frame> framesToDisplay = new List<DataModel.Frame>(allFrames.Length / 8);
+            //for (int i = 0; i < allFrames.Length; i += 8)
+            //{
+            //    framesToDisplay.Add(allFrames[i]);
+            //}
 
 
             // TODO move to separate method
@@ -68,6 +70,23 @@ namespace ViretTool.BasicClient
             }
 
             UpdateSelectionVisualization();
+        }
+
+
+        private List<DataModel.Frame> ReduceFrameSet(List<DataModel.Frame> frames, int maxFrames)
+        {
+            if (frames.Count <= maxFrames)
+            {
+                return frames;
+            }
+
+            List<DataModel.Frame> result = new List<DataModel.Frame>();
+            for (int i = 0; i < maxFrames; i++)
+            {
+                int index = (int)(((double)i / maxFrames) * frames.Count);
+                result.Add(frames[index]);
+            }
+            return result;
         }
     }
 }
