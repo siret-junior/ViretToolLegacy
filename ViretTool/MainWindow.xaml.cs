@@ -78,6 +78,14 @@ namespace ViretTool
                 (settings) =>
                 {
                     mSubmissionClient.Connect(settings.IPAddress, settings.Port, settings.TeamName);
+
+                    // log message
+                    string message = "Connect request to setver: "
+                            + "(IP:" + mSettings.IPAddress
+                            + ", Port:" + mSettings.Port
+                            + ", TeamName:" + mSettings.TeamName 
+                            + "), Is connected: " + mSubmissionClient.IsConnected.ToString();
+                    Logger.LogInfo(semanticModelDisplay, message);
                 };
 
             // ranking model input
@@ -87,130 +95,8 @@ namespace ViretTool
                     DisableInput();
                     mRankingEngine.UpdateKeywordModelRanking(query, annotationSource);
                     EnableInput();
-                };
-            sketchCanvas.SketchChangedEvent += 
-                (sketch) => 
-                {
-                    DisableInput();
-                    mRankingEngine.UpdateColorModelRanking(sketch);
-                    
-                    // TODO:
-                    //mRankingEngine.UpdateColorModelRanking(new List<Tuple<Point, Color>>());
 
-                    EnableInput();
-                };
-            mFrameSelectionController.SelectionSubmittedColorModelEvent +=
-                (frameSelection) =>
-                {
-                    DisableInput();
-                    // TODO:
-                    //semanticModelDisplay.DisplayFrames(frameSelection);
-                    mRankingEngine.UpdateColorModelRanking(frameSelection);
-                    EnableInput();
-                };
-            mFrameSelectionController.SelectionSubmittedSemanticModelEvent +=
-                (frameSelection) =>
-                {
-                    DisableInput();
-                    semanticModelDisplay.DisplayFrames(frameSelection);
-                    mRankingEngine.UpdateVectorModelRanking(frameSelection);
-                    EnableInput();
-                };
-
-            resultDisplay.DisplayRandomItemsRequestedEvent += 
-                () =>
-                {
-                    DisableInput();
-                    mRankingEngine.GenerateRandomRanking();
-                    EnableInput();
-                };
-            resultDisplay.DisplaySequentialItemsRequestedEvent +=
-                () =>
-                {
-                    DisableInput();
-                    mRankingEngine.GenerateSequentialRanking();
-                    EnableInput();
-                };
-
-
-            // ranking model output visualization
-            mRankingEngine.RankingChangedEvent += 
-                (rankedResult) =>
-                {
-                    resultDisplay.ResultFrames = rankedResult;
-                    mFrameSelectionController.ResetSelection();
-                };
-
-
-            // frame selection
-            resultDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
-            resultDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
-            resultDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
-            resultDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
-            resultDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
-            resultDisplay.SubmittingToServerEvent +=
-                (frame) =>
-                {
-                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
-                };
-
-            videoDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
-            videoDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
-            videoDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
-            videoDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
-            videoDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
-            videoDisplay.SubmittingToServerEvent +=
-                (frame) =>
-                {
-                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
-                };
-
-            semanticModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
-            semanticModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
-            semanticModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
-            semanticModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
-            semanticModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
-            semanticModelDisplay.SubmittingToServerEvent +=
-                (frame) =>
-                {
-                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
-                };
-
-            mFrameSelectionController.SelectionChangedEvent +=
-                (selectedFrames) =>
-                {
-                    resultDisplay.SelectedFrames = selectedFrames;
-                    videoDisplay.SelectedFrames = selectedFrames;
-                    semanticModelDisplay.SelectedFrames = selectedFrames;
-                };
-
-            // show frame video on video display
-            resultDisplay.DisplayingFrameVideoEvent += videoDisplay.DisplayFrameVideo;
-            videoDisplay.DisplayingFrameVideoEvent += videoDisplay.DisplayFrameVideo;
-            semanticModelDisplay.DisplayingFrameVideoEvent += videoDisplay.DisplayFrameVideo;
-
-            // set first display
-            mRankingEngine.GenerateSequentialRanking();
-
-
-            // logging
-            TimeSpan taskTimeout = TimeSpan.FromMilliseconds(250);
-
-            keywordSearchTextBox.KeywordChangedEvent +=
-                (query, annotationSource) =>
-                {
-                    // get current task ID
-                    Task<int> asyncTask = mSubmissionClient.GetCurrentTaskId();
-                    string currentTask = "Task ID: ";
-                    if (asyncTask.Wait(taskTimeout))
-                    {
-                        currentTask += asyncTask.Result.ToString();
-                    }
-                    else
-                    {
-                        currentTask += "null";
-                    }
-                    
+                    // logging
                     // build query objects string
                     string queryObjects = " ";
                     int queryCount;
@@ -234,25 +120,43 @@ namespace ViretTool
                     }
 
                     // log message
-                    string message = currentTask + ", keyword model changed: "
+                    string message = "Keyword model changed: "
                         + "annotation source: " + annotationSource
-                        + " " + queryCount + " query objects:" + queryObjects;
+                        + ", " + queryCount + " query objects:" + queryObjects;
                     Logger.LogInfo(keywordSearchTextBox, message);
                 };
-
-
-
-
-            sketchCanvas.SketchChangedEvent +=
-                (sketch) =>
+            sketchCanvas.SketchChangedEvent += 
+                (sketch) => 
                 {
                     DisableInput();
                     mRankingEngine.UpdateColorModelRanking(sketch);
-
-                    // TODO:
-                    //mRankingEngine.UpdateColorModelRanking(new List<Tuple<Point, Color>>());
-
                     EnableInput();
+
+                    // logging
+                    // build query objects string
+                    string querySketch = " ";
+                    int queryCount = 0;
+                    if (sketch != null)
+                    {
+                        for (int i = 0; i < sketch.Count; i++)
+                        {
+                            Point point = sketch[i].Item1;
+                            Color color = sketch[i].Item2;
+                            querySketch += "{XY[" + point.X + "," + point.Y
+                            + "], RGB[" + color.R + "," + color.G + "," + color.B + "]}, ";
+                            queryCount++;
+                        }
+                    }
+                    else
+                    {
+                        querySketch = "null";
+                        queryCount = 0;
+                    }
+
+                    // log message
+                    string message = "Color sketch model changed: "
+                        + queryCount + " color points:" + querySketch;
+                    Logger.LogInfo(sketchCanvas, message);
                 };
             mFrameSelectionController.SelectionSubmittedColorModelEvent +=
                 (frameSelection) =>
@@ -262,6 +166,32 @@ namespace ViretTool
                     //semanticModelDisplay.DisplayFrames(frameSelection);
                     mRankingEngine.UpdateColorModelRanking(frameSelection);
                     EnableInput();
+
+                    // logging
+                    // build query objects string
+                    string querySelection = " ";
+                    int queryCount = 0;
+                    if (frameSelection != null)
+                    {
+                        for (int i = 0; i < frameSelection.Count; i++)
+                        {
+                            DataModel.Frame frame = frameSelection[i];
+                            querySelection += "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + "), ";
+                            queryCount++;
+                        }
+                    }
+                    else
+                    {
+                        querySelection = "null";
+                        queryCount = 0;
+                    }
+
+                    // log message
+                    string message = "Color model changed: "
+                        + queryCount + " example frames:" + querySelection;
+                    Logger.LogInfo(mFrameSelectionController, message);
                 };
             mFrameSelectionController.SelectionSubmittedSemanticModelEvent +=
                 (frameSelection) =>
@@ -270,7 +200,186 @@ namespace ViretTool
                     semanticModelDisplay.DisplayFrames(frameSelection);
                     mRankingEngine.UpdateVectorModelRanking(frameSelection);
                     EnableInput();
+
+                    // build query objects string
+                    string querySelection = " ";
+                    int queryCount = 0;
+                    if (frameSelection != null)
+                    {
+                        for (int i = 0; i < frameSelection.Count; i++)
+                        {
+                            DataModel.Frame frame = frameSelection[i];
+                            querySelection += "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + "), ";
+                            queryCount++;
+                        }
+                    }
+                    else
+                    {
+                        querySelection = "null";
+                        queryCount = 0;
+                    }
+
+                    // log message
+                    string message = "Semantic model changed: "
+                        + queryCount + " example frames:" + querySelection;
+                    Logger.LogInfo(mFrameSelectionController, message);
                 };
+
+            resultDisplay.DisplayRandomItemsRequestedEvent += 
+                () =>
+                {
+                    DisableInput();
+                    mRankingEngine.GenerateRandomRanking();
+                    EnableInput();
+
+                    // log message
+                    string message = "User selected random display.";
+                    Logger.LogInfo(resultDisplay, message);
+                };
+            resultDisplay.DisplaySequentialItemsRequestedEvent +=
+                () =>
+                {
+                    DisableInput();
+                    mRankingEngine.GenerateSequentialRanking();
+                    EnableInput();
+
+                    // log message
+                    string message = "User selected sequential display.";
+                    Logger.LogInfo(resultDisplay, message);
+                };
+
+
+            // ranking model output visualization
+            mRankingEngine.RankingChangedEvent += 
+                (rankedResult) =>
+                {
+                    resultDisplay.ResultFrames = rankedResult;
+                    mFrameSelectionController.ResetSelection();
+
+                    // build query objects string
+                    int resultSize = rankedResult != null ? rankedResult.Count : 0;
+
+                    // log message
+                    string message = "Ranking updated, "
+                         + resultSize + " ranked frames returned.";
+                    Logger.LogInfo(mRankingEngine, message);
+                };
+
+
+            // frame selection
+            resultDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            resultDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            resultDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            resultDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            resultDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            resultDisplay.SubmittingToServerEvent +=
+                (frame) =>
+                {
+                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+
+                    // logging
+                    string currentTask = GetCurrentTaskId();
+
+                    // log message
+                    string message = currentTask + ", frame submitted: "
+                            + "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + ")";
+                    Logger.LogInfo(resultDisplay, message);
+                };
+
+            videoDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            videoDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            videoDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            videoDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            videoDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            videoDisplay.SubmittingToServerEvent +=
+                (frame) =>
+                {
+                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+
+                    // logging
+                    string currentTask = GetCurrentTaskId();
+
+                    // log message
+                    string message = currentTask + ", frame submitted: "
+                            + "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + ")";
+                    Logger.LogInfo(videoDisplay, message);
+                };
+
+            semanticModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            semanticModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            semanticModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            semanticModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            semanticModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            semanticModelDisplay.SubmittingToServerEvent +=
+                (frame) =>
+                {
+                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+
+                    // logging
+                    string currentTask = GetCurrentTaskId();
+
+                    // log message
+                    string message = currentTask + ", frame submitted: "
+                            + "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + ")";
+                    Logger.LogInfo(semanticModelDisplay, message);
+                };
+
+            mFrameSelectionController.SelectionChangedEvent +=
+                (selectedFrames) =>
+                {
+                    resultDisplay.SelectedFrames = selectedFrames;
+                    videoDisplay.SelectedFrames = selectedFrames;
+                    semanticModelDisplay.SelectedFrames = selectedFrames;
+                };
+
+            // show frame video on video display
+            resultDisplay.DisplayingFrameVideoEvent +=
+                (frame) =>
+                {
+                    videoDisplay.DisplayFrameVideo(frame);
+                    
+                    // log message
+                    string message = "Video displayed: "
+                            + "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + ")";
+                    Logger.LogInfo(resultDisplay, message);
+                };
+            videoDisplay.DisplayingFrameVideoEvent +=
+                (frame) =>
+                {
+                    videoDisplay.DisplayFrameVideo(frame);
+
+                    // log message
+                    string message = "Video displayed: "
+                            + "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + ")";
+                    Logger.LogInfo(videoDisplay, message);
+                };
+            semanticModelDisplay.DisplayingFrameVideoEvent +=
+                (frame) =>
+                {
+                    videoDisplay.DisplayFrameVideo(frame);
+
+                    // log message
+                    string message = "Video displayed: "
+                            + "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + ")";
+                    Logger.LogInfo(semanticModelDisplay, message);
+                };
+
+            // set first display
+            mRankingEngine.GenerateSequentialRanking();
         }
 
         private void DisableInput()
@@ -308,6 +417,23 @@ namespace ViretTool
             //videoDisplay.IsEnabled = true;
         }
 
+        private string GetCurrentTaskId()
+        {
+            TimeSpan taskTimeout = TimeSpan.FromMilliseconds(250);
+            Task<int> asyncTask = mSubmissionClient.GetCurrentTaskId();
+            string currentTask = "Task ID: ";
+            if (asyncTask.Wait(taskTimeout))
+            {
+                currentTask += asyncTask.Result.ToString();
+            }
+            else
+            {
+                currentTask += "null";
+            }
+            return currentTask;
+        }
+
+
         private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             resultDisplay.UpdateDisplayGrid();
@@ -320,6 +446,10 @@ namespace ViretTool
             sketchCanvas.Clear();
             mFrameSelectionController.ResetSelection();
             mFrameSelectionController.SubmitSelectionSemanticModel();
+
+            // log message
+            string message = "Reset of all models and their controls.";
+            Logger.LogInfo(semanticModelDisplay, message);
         }
 
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -364,6 +494,14 @@ namespace ViretTool
         private void settingsButton_Click(object sender, RoutedEventArgs e)
         {
             mSettings.OpenSettingsWindow();
+
+            // log message
+            string message = "Settings changed: "
+                    + "(IP:" + mSettings.IPAddress
+                    + ", Port:" + mSettings.Port
+                    + ", TeamName:" + mSettings.TeamName
+                    + "), Is connected: " + mSubmissionClient.IsConnected.ToString();
+            Logger.LogInfo(semanticModelDisplay, message);
         }
     }
 }

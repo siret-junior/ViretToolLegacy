@@ -35,6 +35,9 @@ namespace ViretTool.BasicClient
             { return mResultFrames; }
             set
             {
+                int itemCount = value != null ? value.Count : 0;
+                string message = "Result display received " + itemCount + " items.";
+                Logger.LogInfo(this, message);
                 if (value == null || value.Count == 0)
                 {
                     return;
@@ -87,6 +90,10 @@ namespace ViretTool.BasicClient
                 // TODO: recompute correct page
                 DisplayPage(0);
             }
+
+            string message = "Result display was resized to " + nColumns * nRows + "items (" 
+                + nColumns + " columns, " + nRows + " rows).";
+            Logger.LogInfo(this, message);
         }
         
         private void ClearDisplay()
@@ -95,6 +102,9 @@ namespace ViretTool.BasicClient
             {
                 DisplayedFrames[i].Frame = null;
             }
+
+            string message = "Result display was cleared.";
+            Logger.LogInfo(this, message);
         }
 
         public void DisplayPage(int page)
@@ -145,18 +155,28 @@ namespace ViretTool.BasicClient
 
             // display frames
             int iterator = 0;
+            string message = "Result display displayed page " + mPage + ", "
+                + framesToDisplay.Count + " items: ";
             for (int iRow = 0; iRow < mDisplayRows; iRow++)
             {
                 for (int iCol = 0; iCol < mDisplayCols; iCol++)
                 {
                     if (arrangedDisplay[iRow, iCol] == null) continue; // TODO rewrite
                     DisplayedFrames[iterator++].Frame = arrangedDisplay[iRow, iCol].Frame;
+
+                    message += "(Frame ID:" + arrangedDisplay[iRow, iCol].Frame.ID
+                            + ", Video:" + arrangedDisplay[iRow, iCol].Frame.FrameVideo.VideoID
+                            + ", Number:" + arrangedDisplay[iRow, iCol].Frame.FrameNumber + "), ";
+
                     if (iterator > framesToDisplay.Count)
                     {
                         break;
                     }
                 }
             }
+
+            
+            Logger.LogInfo(this, message);
 
             UpdateSelectionVisualization();
             RaiseDisplayChangedEvent();
