@@ -191,6 +191,86 @@ namespace ViretTool
 
             // set first display
             mRankingEngine.GenerateSequentialRanking();
+
+
+            // logging
+            TimeSpan taskTimeout = TimeSpan.FromMilliseconds(250);
+
+            keywordSearchTextBox.KeywordChangedEvent +=
+                (query, annotationSource) =>
+                {
+                    // get current task ID
+                    Task<int> asyncTask = mSubmissionClient.GetCurrentTaskId();
+                    string currentTask = "Task ID: ";
+                    if (asyncTask.Wait(taskTimeout))
+                    {
+                        currentTask += asyncTask.Result.ToString();
+                    }
+                    else
+                    {
+                        currentTask += "null";
+                    }
+                    
+                    // build query objects string
+                    string queryObjects = " ";
+                    int queryCount;
+                    if (query != null)
+                    {
+                        for (int i = 0; i < query.Count; i++)
+                        {
+                            queryObjects += "(";
+                            for (int j = 0; j < query[i].Count; j++)
+                            {
+                                queryObjects += query[i][j].ToString() + ", ";
+                            }
+                            queryObjects += "),";
+                        }
+                        queryCount = query.Count;
+                    }
+                    else
+                    {
+                        queryObjects = "null";
+                        queryCount = 0;
+                    }
+
+                    // log message
+                    string message = currentTask + ", keyword model changed: "
+                        + "annotation source: " + annotationSource
+                        + " " + queryCount + " query objects:" + queryObjects;
+                    Logger.LogInfo(keywordSearchTextBox, message);
+                };
+
+
+
+
+            sketchCanvas.SketchChangedEvent +=
+                (sketch) =>
+                {
+                    DisableInput();
+                    mRankingEngine.UpdateColorModelRanking(sketch);
+
+                    // TODO:
+                    //mRankingEngine.UpdateColorModelRanking(new List<Tuple<Point, Color>>());
+
+                    EnableInput();
+                };
+            mFrameSelectionController.SelectionSubmittedColorModelEvent +=
+                (frameSelection) =>
+                {
+                    DisableInput();
+                    // TODO:
+                    //semanticModelDisplay.DisplayFrames(frameSelection);
+                    mRankingEngine.UpdateColorModelRanking(frameSelection);
+                    EnableInput();
+                };
+            mFrameSelectionController.SelectionSubmittedSemanticModelEvent +=
+                (frameSelection) =>
+                {
+                    DisableInput();
+                    semanticModelDisplay.DisplayFrames(frameSelection);
+                    mRankingEngine.UpdateVectorModelRanking(frameSelection);
+                    EnableInput();
+                };
         }
 
         private void DisableInput()

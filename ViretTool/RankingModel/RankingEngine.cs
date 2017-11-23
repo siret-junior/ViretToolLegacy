@@ -81,7 +81,6 @@ namespace ViretTool.RankingModel
             List<RankedFrame> result = ComputeRankingFilteringAndSorting();
             return result;
         }
-
         
         public List<RankedFrame> UpdateColorModelRanking(List<DataModel.Frame> queryFrames)
         {
