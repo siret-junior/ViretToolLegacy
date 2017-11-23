@@ -43,6 +43,7 @@
 
             <control:KeywordSearchControl x:Name="keywordSearchTextBox"/>
             <control:SketchCanvas x:Name="sketchCanvas"/>
+            <control:ColorModelDisplay x:Name="colorModelDisplay"/>
             <control:SemanticModelDisplay x:Name="semanticModelDisplay"/>
             <Button Height="800"></Button>
         </StackPanel>

@@ -85,7 +85,7 @@ namespace ViretTool
                             + ", Port:" + mSettings.Port
                             + ", TeamName:" + mSettings.TeamName 
                             + "), Is connected: " + mSubmissionClient.IsConnected.ToString();
-                    Logger.LogInfo(semanticModelDisplay, message);
+                    Logger.LogInfo(mSettings, message);
                 };
 
             // ranking model input
@@ -125,6 +125,7 @@ namespace ViretTool
                         + ", " + queryCount + " query objects:" + queryObjects;
                     Logger.LogInfo(keywordSearchTextBox, message);
                 };
+            sketchCanvas.SketchChangingEvent += colorModelDisplay.Clear;
             sketchCanvas.SketchChangedEvent += 
                 (sketch) => 
                 {
@@ -163,7 +164,7 @@ namespace ViretTool
                 {
                     DisableInput();
                     // TODO:
-                    //semanticModelDisplay.DisplayFrames(frameSelection);
+                    colorModelDisplay.DisplayFrames(frameSelection);
                     mRankingEngine.UpdateColorModelRanking(frameSelection);
                     EnableInput();
 
@@ -311,6 +312,29 @@ namespace ViretTool
                     Logger.LogInfo(videoDisplay, message);
                 };
 
+            colorModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            colorModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            colorModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            colorModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            colorModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            colorModelDisplay.SubmittingToServerEvent +=
+                (frame) =>
+                {
+                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+
+                    // logging
+                    string currentTask = GetCurrentTaskId();
+
+                    // log message
+                    string message = currentTask + ", frame submitted: "
+                            + "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + ")";
+                    Logger.LogInfo(colorModelDisplay, message);
+                };
+            colorModelDisplay.ColorExampleChangingEvent += sketchCanvas.DeletePoints;
+
+
             semanticModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
             semanticModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
             semanticModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
@@ -337,6 +361,7 @@ namespace ViretTool
                 {
                     resultDisplay.SelectedFrames = selectedFrames;
                     videoDisplay.SelectedFrames = selectedFrames;
+                    colorModelDisplay.SelectedFrames = selectedFrames;
                     semanticModelDisplay.SelectedFrames = selectedFrames;
                 };
 
@@ -364,6 +389,18 @@ namespace ViretTool
                             + ", Video:" + frame.FrameVideo.VideoID
                             + ", Number:" + frame.FrameNumber + ")";
                     Logger.LogInfo(videoDisplay, message);
+                };
+            colorModelDisplay.DisplayingFrameVideoEvent +=
+                (frame) =>
+                {
+                    videoDisplay.DisplayFrameVideo(frame);
+
+                    // log message
+                    string message = "Video displayed: "
+                            + "(Frame ID:" + frame.ID
+                            + ", Video:" + frame.FrameVideo.VideoID
+                            + ", Number:" + frame.FrameNumber + ")";
+                    Logger.LogInfo(semanticModelDisplay, message);
                 };
             semanticModelDisplay.DisplayingFrameVideoEvent +=
                 (frame) =>
