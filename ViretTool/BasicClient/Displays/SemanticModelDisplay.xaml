@@ -21,7 +21,7 @@
                 Grid.Column="0" 
                 Background="DarkGray"
                 FontWeight="Bold"
-                Content="Semantic model" />
+                Content="Semantic model query by example" />
 
             <!--
             <Grid

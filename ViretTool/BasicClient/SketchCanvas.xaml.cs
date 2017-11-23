@@ -25,13 +25,15 @@ namespace ViretTool.BasicClient
 
         private SolidColorBrush[] mColorPickerBrushes;
 
+        public delegate void SketchChangingEventHandler();
         public delegate void SketchChangedEventHandler(List<Tuple<Point, Color>> colorSketch);
 
         /// <summary>
         /// SketchChangedEvent is raised whenever users create, move or delete a colored circle.
         /// </summary>
+        public event SketchChangingEventHandler SketchChangingEvent;
         public event SketchChangedEventHandler SketchChangedEvent;
-        
+
         public SketchCanvas()
         {
             InitializeComponent();
@@ -70,8 +72,18 @@ namespace ViretTool.BasicClient
             RaiseSketchChangedEvent();
         }
 
+        public void DeletePoints()
+        {
+            foreach (ColorPoint CP in mColorPoints)
+                CP.RemoveFromCanvas(sketchCanvas);
+            mColorPoints.Clear();
+            mSelectedColorPoint = null;
+        }
+
         private void RaiseSketchChangedEvent()
         {
+            SketchChangingEvent?.Invoke();
+
             if (SketchChangedEvent != null)
             {
                 List<Tuple<Point, Color>> colorSketch = new List<Tuple<Point, Color>>();
