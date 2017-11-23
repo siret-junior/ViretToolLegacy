@@ -68,6 +68,30 @@ namespace ViretTool.BasicClient {
         private void SuggestionTextBox_QueryChangedEvent(IEnumerable<IQueryPart> query, string annotationSource) {
             if (annotationSource == null) return;
 
+            var sb = new StringBuilder();
+            sb.Append("QueryChangedEvent {source:");
+            sb.Append(annotationSource);
+            sb.Append(",wordnet_query:");
+            foreach (IQueryPart q in query) {
+                switch (q.Type) {
+                    case TextBlockType.Class:
+                        sb.Append(q.Id);
+                        sb.Append(q.UseChildren ? ",1" : ",0");
+                        break;
+                    case TextBlockType.OR:
+                        sb.Append("or");
+                        break;
+                    case TextBlockType.AND:
+                        sb.Append("and");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            sb.Append("}");
+
+            Logger.Log(this, Severity.Debug, sb.ToString());
+
             List<List<int>> expanded = ExpandQuery(query, mLabelProviders[annotationSource]);
             KeywordChangedEvent?.Invoke(expanded, annotationSource);
         }
