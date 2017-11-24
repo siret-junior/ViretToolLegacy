@@ -53,7 +53,7 @@ namespace ViretTool.BasicClient
 
         private static string GenerateFilename()
         {
-            string filename = "ViretTool_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".log";
+            string filename = "ViretTool_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".txt";
             Directory.CreateDirectory(LOG_FOLDER);
             string relativePath = Path.Combine(LOG_FOLDER, filename);
             return relativePath;
