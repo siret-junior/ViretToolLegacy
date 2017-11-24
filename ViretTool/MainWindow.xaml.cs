@@ -73,7 +73,7 @@ namespace ViretTool
 
             // initialize submission client
             mSubmissionClient = new Submission();
-            mSubmissionClient.Connect(mSettings.IPAddress, mSettings.Port, mSettings.TeamName);
+            //mSubmissionClient.Connect(mSettings.IPAddress, mSettings.Port, mSettings.TeamName);
             mSettings.SettingsChangedEvent +=
                 (settings) =>
                 {
@@ -275,63 +275,21 @@ namespace ViretTool
             resultDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
             resultDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
             resultDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
-            resultDisplay.SubmittingToServerEvent +=
-                (frame) =>
-                {
-                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
-
-                    // logging
-                    string currentTask = GetCurrentTaskId();
-
-                    // log message
-                    string message = currentTask + ", frame submitted: "
-                            + "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
-                            + ", Number:" + frame.FrameNumber + ")";
-                    Logger.LogInfo(resultDisplay, message);
-                };
+            resultDisplay.SubmittingToServerEvent += OpenSubmitWindow;
 
             videoDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
             videoDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
             videoDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
             videoDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
             videoDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
-            videoDisplay.SubmittingToServerEvent +=
-                (frame) =>
-                {
-                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
-
-                    // logging
-                    string currentTask = GetCurrentTaskId();
-
-                    // log message
-                    string message = currentTask + ", frame submitted: "
-                            + "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
-                            + ", Number:" + frame.FrameNumber + ")";
-                    Logger.LogInfo(videoDisplay, message);
-                };
+            videoDisplay.SubmittingToServerEvent += OpenSubmitWindow;
 
             colorModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
             colorModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
             colorModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
             colorModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
             colorModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
-            colorModelDisplay.SubmittingToServerEvent +=
-                (frame) =>
-                {
-                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
-
-                    // logging
-                    string currentTask = GetCurrentTaskId();
-
-                    // log message
-                    string message = currentTask + ", frame submitted: "
-                            + "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
-                            + ", Number:" + frame.FrameNumber + ")";
-                    Logger.LogInfo(colorModelDisplay, message);
-                };
+            colorModelDisplay.SubmittingToServerEvent += OpenSubmitWindow;
             colorModelDisplay.ColorExampleChangingEvent += sketchCanvas.DeletePoints;
 
 
@@ -340,21 +298,7 @@ namespace ViretTool
             semanticModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
             semanticModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
             semanticModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
-            semanticModelDisplay.SubmittingToServerEvent +=
-                (frame) =>
-                {
-                    mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
-
-                    // logging
-                    string currentTask = GetCurrentTaskId();
-
-                    // log message
-                    string message = currentTask + ", frame submitted: "
-                            + "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
-                            + ", Number:" + frame.FrameNumber + ")";
-                    Logger.LogInfo(semanticModelDisplay, message);
-                };
+            semanticModelDisplay.SubmittingToServerEvent += OpenSubmitWindow;
 
             mFrameSelectionController.SelectionChangedEvent +=
                 (selectedFrames) =>
@@ -366,54 +310,10 @@ namespace ViretTool
                 };
 
             // show frame video on video display
-            resultDisplay.DisplayingFrameVideoEvent +=
-                (frame) =>
-                {
-                    videoDisplay.DisplayFrameVideo(frame);
-                    
-                    // log message
-                    string message = "Video displayed: "
-                            + "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
-                            + ", Number:" + frame.FrameNumber + ")";
-                    Logger.LogInfo(resultDisplay, message);
-                };
-            videoDisplay.DisplayingFrameVideoEvent +=
-                (frame) =>
-                {
-                    videoDisplay.DisplayFrameVideo(frame);
-
-                    // log message
-                    string message = "Video displayed: "
-                            + "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
-                            + ", Number:" + frame.FrameNumber + ")";
-                    Logger.LogInfo(videoDisplay, message);
-                };
-            colorModelDisplay.DisplayingFrameVideoEvent +=
-                (frame) =>
-                {
-                    videoDisplay.DisplayFrameVideo(frame);
-
-                    // log message
-                    string message = "Video displayed: "
-                            + "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
-                            + ", Number:" + frame.FrameNumber + ")";
-                    Logger.LogInfo(semanticModelDisplay, message);
-                };
-            semanticModelDisplay.DisplayingFrameVideoEvent +=
-                (frame) =>
-                {
-                    videoDisplay.DisplayFrameVideo(frame);
-
-                    // log message
-                    string message = "Video displayed: "
-                            + "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
-                            + ", Number:" + frame.FrameNumber + ")";
-                    Logger.LogInfo(semanticModelDisplay, message);
-                };
+            resultDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
+            videoDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
+            colorModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
+            semanticModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
 
             // set first display
             mRankingEngine.GenerateSequentialRanking();
@@ -470,6 +370,40 @@ namespace ViretTool
             return currentTask;
         }
 
+        private void OpenSubmitWindow(DataModel.Frame frame)
+        {
+            SubmitWindow window = new SubmitWindow(mSubmissionClient, frame);
+            window.ShowDialog();
+        }
+
+
+        private void SubmitToServer(DataModel.Frame frame)
+        {
+            mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+
+            // logging
+            string currentTask = GetCurrentTaskId();
+
+            // log message
+            string message = currentTask + ", frame submitted: "
+                    + "(Frame ID:" + frame.ID
+                    + ", Video:" + frame.FrameVideo.VideoID
+                    + ", Number:" + frame.FrameNumber + ")";
+            Logger.LogInfo(this, message);
+        }
+        
+
+        private void LogVideoDisplayed(DataModel.Frame frame)
+        {
+            videoDisplay.DisplayFrameVideo(frame);
+
+            // log message
+            string message = "Video displayed: "
+                    + "(Frame ID:" + frame.ID
+                    + ", Video:" + frame.FrameVideo.VideoID
+                    + ", Number:" + frame.FrameNumber + ")";
+            Logger.LogInfo(this, message);
+        }
 
         private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
@@ -539,6 +473,126 @@ namespace ViretTool
                     + ", TeamName:" + mSettings.TeamName
                     + "), Is connected: " + mSubmissionClient.IsConnected.ToString();
             Logger.LogInfo(semanticModelDisplay, message);
+        }
+    }
+
+    class SubmitWindow : Window
+    {
+        private Submission mSubmissionClient;
+        private DataModel.Frame mFrame;
+
+        public SubmitWindow(Submission submissionClient, DataModel.Frame frame)
+        {
+            mSubmissionClient = submissionClient;
+            mFrame = frame;
+
+            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            this.SizeToContent = SizeToContent.WidthAndHeight;
+            this.Background = Brushes.DarkGray;
+
+            Grid grid = new Grid();
+            grid.HorizontalAlignment = HorizontalAlignment.Center;
+            grid.VerticalAlignment = VerticalAlignment.Center;
+            grid.Margin = new Thickness(32);
+
+            ColumnDefinition gridCol1 = new ColumnDefinition();
+            gridCol1.Width = new GridLength(1, GridUnitType.Star);
+            ColumnDefinition gridCol2 = new ColumnDefinition();
+            gridCol2.Width = new GridLength(1, GridUnitType.Star);
+            grid.ColumnDefinitions.Add(gridCol1);
+            grid.ColumnDefinitions.Add(gridCol2);
+
+            RowDefinition gridRow1 = new RowDefinition();
+            gridRow1.Height = GridLength.Auto;
+            RowDefinition gridRow2 = new RowDefinition();
+            gridRow2.Height = GridLength.Auto;
+            RowDefinition gridRow3 = new RowDefinition();
+            gridRow3.Height = new GridLength(32);
+            grid.RowDefinitions.Add(gridRow1);
+            grid.RowDefinitions.Add(gridRow2);
+            grid.RowDefinitions.Add(gridRow3);
+            this.AddChild(grid);
+
+
+            Label question = new Label();
+            question.Content = "Are you sure you want to submit this frame?";
+            question.FontSize = 32;
+            Grid.SetColumn(question, 0);
+            Grid.SetRow(question, 0);
+            question.HorizontalAlignment = HorizontalAlignment.Center;
+            question.VerticalAlignment = VerticalAlignment.Center;
+            question.SetValue(Grid.ColumnSpanProperty, 2);
+            grid.Children.Add(question);
+
+            Image image = new Image();
+            image.Source = frame.Bitmap;
+            image.Width = 320;
+            image.Height = 240;
+            image.Margin = new Thickness(32);
+            Grid.SetColumn(image, 0);
+            Grid.SetRow(image, 1);
+            image.SetValue(Grid.ColumnSpanProperty, 2);
+            grid.Children.Add(image);
+
+
+            Button cancel = new Button();
+            cancel.Content = "No";
+            cancel.Background = Brushes.LightCoral;
+            Grid.SetColumn(cancel, 0);
+            Grid.SetRow(cancel, 2);
+            cancel.Click += cancel_Click;
+            grid.Children.Add(cancel);
+
+            Button submit = new Button();
+            submit.Content = "Yes";
+            submit.Background = Brushes.DarkSeaGreen;
+            Grid.SetColumn(submit, 1);
+            Grid.SetRow(submit, 2);
+            submit.Click += submit_Click;
+            grid.Children.Add(submit);
+
+        }
+
+        private void cancel_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void submit_Click(object sender, RoutedEventArgs e)
+        {
+            SubmitToServer(mFrame);
+            Close();
+        }
+
+        private void SubmitToServer(DataModel.Frame frame)
+        {
+            mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+
+            // logging
+            string currentTask = GetCurrentTaskId();
+
+            // log message
+            string message = currentTask + ", frame submitted: "
+                    + "(Frame ID:" + frame.ID
+                    + ", Video:" + frame.FrameVideo.VideoID
+                    + ", Number:" + frame.FrameNumber + ")";
+            Logger.LogInfo(this, message);
+        }
+
+        private string GetCurrentTaskId()
+        {
+            TimeSpan taskTimeout = TimeSpan.FromMilliseconds(250);
+            Task<int> asyncTask = mSubmissionClient.GetCurrentTaskId();
+            string currentTask = "Task ID: ";
+            if (asyncTask.Wait(taskTimeout))
+            {
+                currentTask += asyncTask.Result.ToString();
+            }
+            else
+            {
+                currentTask += "null";
+            }
+            return currentTask;
         }
     }
 }

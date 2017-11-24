@@ -84,6 +84,11 @@ namespace ViretTool.BasicClient
             ParentDisplay = parentDisplay;
         }
 
+        public DisplayFrame()
+        {
+            InitializeComponent();
+            ParentDisplay = null;
+        }
 
 
         private int ComputeClosestVideoFrameId()
@@ -193,7 +198,7 @@ namespace ViretTool.BasicClient
             // TODO: reconfigurable buttons
             if (Frame != null)
             {
-                if (e.LeftButton == MouseButtonState.Pressed)
+                if (e.LeftButton == MouseButtonState.Pressed && ParentDisplay != null)
                 {
                     ParentDisplay.RaiseResettingSelectionEvent();
                     Select();
