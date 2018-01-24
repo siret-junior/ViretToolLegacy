@@ -22,11 +22,10 @@ namespace ViretTool.BasicClient
     {
         private List<ColorPoint> mColorPoints;
         private ColorPoint mSelectedColorPoint;
-
-        private SolidColorBrush[] mColorPickerBrushes;
+        private ColorPoint mSelectedColorPointEllipse;
 
         public delegate void SketchChangingEventHandler();
-        public delegate void SketchChangedEventHandler(List<Tuple<Point, Color>> colorSketch);
+        public delegate void SketchChangedEventHandler(List<Tuple<Point, Color, Point, bool>> colorSketch);
 
         /// <summary>
         /// SketchChangedEvent is raised whenever users create, move or delete a colored circle.
@@ -47,14 +46,9 @@ namespace ViretTool.BasicClient
 
             mColorPoints = new List<ColorPoint>();
             mSelectedColorPoint = null;
+            mSelectedColorPointEllipse = null;
 
             DrawGrid();
-
-            // TODO - load palette from file
-            mColorPickerBrushes = typeof(Brushes).GetProperties()
-                .Select(b => b.GetValue(null) as SolidColorBrush)
-                .OrderBy(x => x.Color.ToString())
-                .ToArray();
         }
 
 
@@ -86,12 +80,14 @@ namespace ViretTool.BasicClient
 
             if (SketchChangedEvent != null)
             {
-                List<Tuple<Point, Color>> colorSketch = new List<Tuple<Point, Color>>();
+                List<Tuple<Point, Color, Point, bool>> colorSketch = new List<Tuple<Point, Color, Point, bool>>();
 
                 foreach (ColorPoint CP in mColorPoints)
                 {
-                    Point p = new Point(CP.Position.X / sketchCanvas.Width, CP.Position.Y / sketchCanvas.Height);
-                    colorSketch.Add(new Tuple<Point, Color>(p, CP.FillColor));
+                    Point position = new Point(CP.Position.X / sketchCanvas.Width, CP.Position.Y / sketchCanvas.Height);
+                    Point ellipseAxis = new Point(CP.SearchRadiusX / sketchCanvas.Width, CP.SearchRadiusY / sketchCanvas.Height);
+
+                    colorSketch.Add(new Tuple<Point, Color, Point, bool>(position, CP.FillColor, ellipseAxis, CP.Area));
                 }
 
                 SketchChangedEvent(colorSketch);
@@ -129,6 +125,18 @@ namespace ViretTool.BasicClient
             Point p = e.GetPosition(sketchCanvas);
 
             mSelectedColorPoint = ColorPoint.IsSelected(mColorPoints, p);
+            mSelectedColorPointEllipse = ColorPoint.IsSelectedEllipse(mColorPoints, p);
+
+            // change circle type
+            if (e.RightButton == MouseButtonState.Pressed && mSelectedColorPointEllipse != null)
+            {
+                mSelectedColorPointEllipse.Area = !mSelectedColorPointEllipse.Area;
+
+                RaiseSketchChangedEvent();
+
+                mSelectedColorPointEllipse = null;
+                return;
+            }
 
             // remove circle
             if (e.RightButton == MouseButtonState.Pressed && mSelectedColorPoint != null)
@@ -143,10 +151,10 @@ namespace ViretTool.BasicClient
             }
 
             // add new circle
-            if (mSelectedColorPoint == null)
+            if (mSelectedColorPoint == null && mSelectedColorPointEllipse == null)
             {
                 // once the window is closed it cannot be reopened (consider visibility = hidden)
-                ColorPicker colorPicker = new ColorPicker(mColorPickerBrushes);
+                ColorPicker colorPicker = new ColorPicker();
         
                 if (colorPicker.Show(Mouse.GetPosition(Application.Current.MainWindow)))
                 {
@@ -165,7 +173,13 @@ namespace ViretTool.BasicClient
                 RaiseSketchChangedEvent();
             }
 
+            if (mSelectedColorPointEllipse != null)
+            {
+                RaiseSketchChangedEvent();
+            }
+
             mSelectedColorPoint = null;
+            mSelectedColorPointEllipse = null;
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
@@ -178,6 +192,11 @@ namespace ViretTool.BasicClient
             {
                 mSelectedColorPoint.UpdatePosition(p);
             }
+
+            if (mSelectedColorPointEllipse != null)
+            {
+                mSelectedColorPointEllipse.UpdateEllipse(p);
+            }
         }
         
 
@@ -187,8 +206,34 @@ namespace ViretTool.BasicClient
             public Color FillColor;
             public Ellipse FillEllipse;
             public Ellipse SearchRadiusEllipse;
-            public const int Radius = 15;
-            public const int SearchRadius = 40;
+            public const int Radius = 12;
+            private double mSearchRadiusX = 40;
+            private double mSearchRadiusY = 40;
+            private bool mArea;
+
+            public double SearchRadiusX
+            {
+                get { return mSearchRadiusX; }
+                set { mSearchRadiusX = value; }
+            }
+
+            public double SearchRadiusY
+            {
+                get { return mSearchRadiusY; }
+                set { mSearchRadiusY = value; }
+            }
+
+            public bool Area
+            {
+                get { return mArea; }
+                set
+                {
+                    mArea = value;
+
+                    if (mArea) SearchRadiusEllipse.Stroke = FillEllipse.Fill;
+                    else SearchRadiusEllipse.Stroke = Brushes.LightGray;
+                }
+            }
 
             public ColorPoint(Point p, Color c, Canvas canvas)
             {
@@ -202,12 +247,13 @@ namespace ViretTool.BasicClient
                 canvas.Children.Add(FillEllipse);
 
                 SearchRadiusEllipse = new Ellipse();
-                SearchRadiusEllipse.Width = 2 * SearchRadius;
-                SearchRadiusEllipse.Height = 2 * SearchRadius;
+                SearchRadiusEllipse.Width = 2 * mSearchRadiusX;
+                SearchRadiusEllipse.Height = 2 * mSearchRadiusY;
                 SearchRadiusEllipse.Stroke = Brushes.LightGray;
                 canvas.Children.Add(SearchRadiusEllipse);
 
                 UpdatePosition(p);
+                Area = true;
             }
 
             public void RemoveFromCanvas(Canvas canvas)
@@ -222,8 +268,26 @@ namespace ViretTool.BasicClient
                 Canvas.SetTop(FillEllipse, Position.Y - Radius);
                 Canvas.SetLeft(FillEllipse, Position.X - Radius);
 
-                Canvas.SetTop(SearchRadiusEllipse, Position.Y - SearchRadius);
-                Canvas.SetLeft(SearchRadiusEllipse, Position.X - SearchRadius);
+                Canvas.SetTop(SearchRadiusEllipse, Position.Y - mSearchRadiusY);
+                Canvas.SetLeft(SearchRadiusEllipse, Position.X - mSearchRadiusX);
+            }
+
+            public void UpdateEllipse(Point p)
+            {
+                double newX = Math.Abs(Position.X - p.X), newY = Math.Abs(Position.Y - p.Y);
+                if (newX > Radius + 2)
+                {
+                    mSearchRadiusX = newX;
+                    SearchRadiusEllipse.Width = 2 * mSearchRadiusX;
+                    Canvas.SetLeft(SearchRadiusEllipse, Position.X - mSearchRadiusX);
+                }
+
+                if (newY > Radius + 2)
+                {
+                    mSearchRadiusY = newY;
+                    SearchRadiusEllipse.Height = 2 * mSearchRadiusY;
+                    Canvas.SetTop(SearchRadiusEllipse, Position.Y - mSearchRadiusY);
+                }
             }
 
             public static ColorPoint IsSelected(List<ColorPoint> colorPoints, Point p)
@@ -235,9 +299,23 @@ namespace ViretTool.BasicClient
 
                 return result;
             }
+
+            public static ColorPoint IsSelectedEllipse(List<ColorPoint> colorPoints, Point p)
+            {
+                ColorPoint result = null;
+                foreach (ColorPoint CP in colorPoints)
+                {
+                    double value = (CP.Position.X - p.X) * (CP.Position.X - p.X) / (CP.SearchRadiusX * CP.SearchRadiusX) + (CP.Position.Y - p.Y) * (CP.Position.Y - p.Y) / (CP.SearchRadiusY * CP.SearchRadiusY);
+                    if (value > 0.8 && value < 1.3)
+                        return CP;
+                }
+
+                return result;
+            }
+
         }
 
-        
+
         private class ColorPicker : Window
         {
             private Canvas mColorPickerPanel;
@@ -245,9 +323,9 @@ namespace ViretTool.BasicClient
             public Color SelectedColor = Colors.White;
 
 
-            public ColorPicker(SolidColorBrush[] brushes)
+            public ColorPicker()
             {
-                brushes = CreateBrushes();
+                SolidColorBrush[]  brushes = CreateBrushes();
                 mColorPickerPanel = new Canvas();
 
                 Content = mColorPickerPanel;

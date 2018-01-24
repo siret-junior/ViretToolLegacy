@@ -70,7 +70,7 @@ namespace ViretTool.RankingModel
         //public bool UseVectorModel { get; set; }
         //public bool UseKeywordModel { get; set; }
 
-        public List<RankedFrame> UpdateColorModelRanking(List<Tuple<Point, Color>> colorModelSketchQuery)
+        public List<RankedFrame> UpdateColorModelRanking(List<Tuple<Point, Color, Point, bool>> colorModelSketchQuery)
         {
             // store current sketch query (TODO remove?)
             //mColorModelSketchQuery = colorModelSketchQuery;

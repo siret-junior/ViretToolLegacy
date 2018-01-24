@@ -19,7 +19,6 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         private int mSignatureWidth = 20;     // TODO: load dynamically from provided initializer file
         private int mSignatureHeight = 15;
-        private const int mGridRadius = 2;
 
         private readonly string mDescriptorsFilename;
 
@@ -39,32 +38,66 @@ namespace ViretTool.RankingModel.SimilarityModels
         }
 
 
-        public List<RankedFrame> RankFramesBasedOnSketch(List<Tuple<Point, Color>> queryCentroids)
+        Dictionary<string, double[]> mCache = new Dictionary<string, double[]>();
+        public List<RankedFrame> RankFramesBasedOnSketch(List<Tuple<Point, Color, Point, bool>> queryCentroids)
         {
             List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset);
 
-            // transform [x, y] to a list of investigated positions in mGridRadius
-            List<Tuple<int[], Color>> queries = PrepareQueries(queryCentroids);
+            // reuse cached results
+            Dictionary<string, double[]> cache = new Dictionary<string, double[]>();
 
-            // TODO - cache results
-            Parallel.For(0, result.Count(), i =>
+            foreach (Tuple<Point, Color, Point, bool> t in queryCentroids)
             {
-                RankedFrame rf = result[i];
-                byte[] signature = mColorSignatures[rf.Frame.ID];
+                string key = t.ToString();
+                if (mCache.ContainsKey(key))
+                    cache.Add(key, mCache[key]);
+                else
+                    cache.Add(key, EvaluateOneQueryCentroid(t));
+            }
 
-                foreach (Tuple<int[], Color> t in queries)
+            mCache = cache;
+
+            foreach (double[] distances in cache.Values)
+                Parallel.For(0, result.Count, i =>
+                {
+                    result[i].Rank += distances[i];
+                });
+
+            return result;
+        }
+
+        private double[] EvaluateOneQueryCentroid(Tuple<Point, Color, Point, bool> qc)
+        {
+            double[] distances = new double[mDataset.Frames.Count];
+
+            // transform [x, y] to a list of investigated positions in mGridRadius
+            Tuple<int[], Color, bool> t = PrepareQuery(qc);
+
+            Parallel.For(0, distances.Length, i =>
+            {
+                byte[] signature = mColorSignatures[i];
+
+                int R = t.Item2.R, G = t.Item2.G, B = t.Item2.B;
+
+                if (!t.Item3)
                 {
                     double minRank = int.MaxValue;
-                    int R = t.Item2.R, G = t.Item2.G, B = t.Item2.B;
-
                     foreach (int offset in t.Item1)
                         minRank = Math.Min(minRank, L2SquareDistance(R, signature[offset], G, signature[offset + 1], B, signature[offset + 2]));
 
-                    rf.Rank -= Math.Sqrt(minRank);
+                    distances[i] -= Math.Sqrt(minRank);
                 }
+                else
+                {
+                    double avgRank = 0;
+                    foreach (int offset in t.Item1)
+                        avgRank += Math.Sqrt(L2SquareDistance(R, signature[offset], G, signature[offset + 1], B, signature[offset + 2]));
+
+                    distances[i] -= avgRank / t.Item1.Length;
+                }              
             });
 
-            return result;
+            return distances;
         }
         
         public List<RankedFrame> RankFramesBasedOnExampleFrames(List<DataModel.Frame> queryFrames)
@@ -96,24 +129,37 @@ namespace ViretTool.RankingModel.SimilarityModels
         /// </summary>
         /// <param name="queryCentroids">Set of colored points from the color sketch.</param>
         /// <returns></returns>
-        private List<Tuple<int[], Color>> PrepareQueries(List<Tuple<Point, Color>> queryCentroids)
+        private List<Tuple<int[], Color, bool>> PrepareQueries(List<Tuple<Point, Color, Point, bool>> queryCentroids)
         {
-            List<Tuple<int[], Color>> queries = new List<Tuple<int[], Color>>();
+            List<Tuple<int[], Color, bool>> queries = new List<Tuple<int[], Color, bool>>();
 
-            foreach (Tuple<Point, Color> t in queryCentroids)
-            {
-                double x = t.Item1.X * mSignatureWidth, y = t.Item1.Y * mSignatureHeight;
-                List<int> offsets = new List<int>();
-                for (int i = 0; i < mSignatureWidth; i++)
-                    for (int j = 0; j < mSignatureHeight; j++)
-                        if (mGridRadius * mGridRadius >= (x - i - 0.5) * (x - i - 0.5) + (y - j - 0.5) * (y - j - 0.5))
-                            offsets.Add(j * mSignatureWidth * 3 + i * 3);
-
-                //queries.Add(new Tuple<int[], Color>(offsets.ToArray(), t.Item2));
-                queries.Add(new Tuple<int[], Color>(offsets.ToArray(), ImageHelper.RGBtoLabByte(t.Item2.R, t.Item2.G, t.Item2.B)));
-            }
+            foreach (Tuple<Point, Color, Point, bool> t in queryCentroids)
+                queries.Add(PrepareQuery(t));
 
             return queries;
+        }
+
+        /// <summary>
+        /// Precompute a set of 2D grid cells (represented as offsets in 1D array) that should be investigated for the most similar query color.
+        /// </summary>
+        /// <param name="queryCentroid">Colored point from the color sketch.</param>
+        /// <returns></returns>
+        private Tuple<int[], Color, bool> PrepareQuery(Tuple<Point, Color, Point, bool> queryCentroid)
+        {
+            List<Tuple<int[], Color, bool>> queries = new List<Tuple<int[], Color, bool>>();
+
+            double x = queryCentroid.Item1.X * mSignatureWidth, y = queryCentroid.Item1.Y * mSignatureHeight;
+            double ax = queryCentroid.Item3.X * mSignatureWidth, ay = queryCentroid.Item3.Y * mSignatureHeight;
+            double ax2 = ax * ax, ay2 = ay * ay;
+
+            List<int> offsets = new List<int>();
+            for (int i = 0; i < mSignatureWidth; i++)
+                for (int j = 0; j < mSignatureHeight; j++)
+                    if (1 >= (x - i - 0.5) * (x - i - 0.5) / ax2 + (y - j - 0.5) * (y - j - 0.5) / ay2)
+                        offsets.Add(j * mSignatureWidth * 3 + i * 3);
+
+            return new Tuple<int[], Color, bool>(offsets.ToArray(), 
+                ImageHelper.RGBtoLabByte(queryCentroid.Item2.R, queryCentroid.Item2.G, queryCentroid.Item2.B), queryCentroid.Item4);
         }
 
         private static int L2SquareDistance(int r1, int r2, int g1, int g2, int b1, int b2)

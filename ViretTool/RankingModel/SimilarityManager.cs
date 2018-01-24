@@ -42,7 +42,7 @@ namespace ViretTool.RankingModel.SimilarityModels
         }
 
 
-        public void UpdateColorModelRanking(List<Tuple<Point, Color>> queryCentroids)
+        public void UpdateColorModelRanking(List<Tuple<Point, Color, Point, bool>> queryCentroids)
         {
             if (queryCentroids != null && queryCentroids.Count > 0)
             {
