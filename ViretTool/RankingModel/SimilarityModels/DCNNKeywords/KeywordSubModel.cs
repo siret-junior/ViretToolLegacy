@@ -13,18 +13,25 @@ namespace ViretTool.RankingModel.SimilarityModels {
     /// </summary>
     class KeywordSubModel {
 
+        private bool mUseIDF;
         private string mIndexFilePath;
 
         private Dataset mDataset;
+        /// <summary>
+        /// Maps class ID from query to list of frames containing the class
+        /// </summary>
         private Dictionary<int, List<RankedFrame>> mClasses;
         private Task mLoadTask;
 
+        private float[] IDF;
+
         /// <param name="lp">For class name to class id conversion</param>
         /// <param name="filePath">Relative or absolute path to index file</param>
-        public KeywordSubModel(Dataset dataset, string filePath) {
+        public KeywordSubModel(Dataset dataset, string filePath, bool useIDF = false) {
             mIndexFilePath = filePath;
             mDataset = dataset;
             mClasses = new Dictionary<int, List<RankedFrame>>();
+            mUseIDF = useIDF;
 
             mLoadTask = Task.Factory.StartNew(LoadFromFile);
         }
@@ -50,6 +57,11 @@ namespace ViretTool.RankingModel.SimilarityModels {
         private void LoadFromFile() {
             BinaryReader stream = null;
             Dictionary<int, int> classLocations = new Dictionary<int, int>();
+
+            if (mUseIDF) {
+                if (!File.Exists(mIndexFilePath + ".idf")) mUseIDF = false;
+                else IDF = DCNNKeywords.IDFLoader.LoadFromFile(mIndexFilePath + ".idf");
+            }
 
             try {
                 stream = new BinaryReader(File.OpenRead(mIndexFilePath));
@@ -136,30 +148,40 @@ namespace ViretTool.RankingModel.SimilarityModels {
 
             // should be fast
             // http://alicebobandmallory.com/articles/2012/10/18/merge-collections-without-duplicates-in-c
-            RankedFrame fIn;
             foreach (List<int> listOfIds in ids) {
                 int i = 0;
+                // there can be classes with no frames, skip them
                 while (i < listOfIds.Count && !mClasses.ContainsKey(listOfIds[i])) { i++; }
 
+                // no class with a frame found
                 if (i == listOfIds.Count) {
                     list.Add(new Dictionary<int, RankedFrame>());
                     continue;
                 }
 
                 Dictionary<int, RankedFrame> dict = new Dictionary<int, RankedFrame>(); //= mClasses[listOfIds[i]].ToDictionary(f => f.Frame.ID);
-                foreach (var item in mClasses[listOfIds[i]]) {
-                    dict.Add(item.Frame.ID, item.Clone());
-                }
-                i++;
-
+                
                 for (; i < listOfIds.Count; i++) {
                     if (!mClasses.ContainsKey(listOfIds[i])) continue;
 
-                    foreach (RankedFrame f in mClasses[listOfIds[i]]) {
-                        if (dict.ContainsKey(f.Frame.ID)) {
-                            dict[f.Frame.ID].Rank += f.Rank;
-                        } else {
-                            dict.Add(f.Frame.ID, f.Clone());
+                    if (mUseIDF) {
+                        float idf = IDF[listOfIds[i]];
+                        foreach (RankedFrame f in mClasses[listOfIds[i]]) {
+                            if (dict.ContainsKey(f.Frame.ID)) {
+                                dict[f.Frame.ID].Rank += f.Rank * idf;
+                            } else {
+                                var frame = f.Clone();
+                                frame.Rank *= idf;
+                                dict.Add(f.Frame.ID, frame);
+                            }
+                        }
+                    } else {
+                        foreach (RankedFrame f in mClasses[listOfIds[i]]) {
+                            if (dict.ContainsKey(f.Frame.ID)) {
+                                dict[f.Frame.ID].Rank += f.Rank;
+                            } else {
+                                dict.Add(f.Frame.ID, f.Clone());
+                            }
                         }
                     }
                 }

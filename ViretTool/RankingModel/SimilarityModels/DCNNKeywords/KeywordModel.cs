@@ -13,7 +13,7 @@ namespace ViretTool.RankingModel.SimilarityModels {
 
             foreach (var source in sources) {
                 string index = dataset.AllExtractedFramesFilename.Split('-')[0] + "-" + source + ".keyword";
-                KeywordSubModel model = new KeywordSubModel(dataset, index);
+                KeywordSubModel model = new KeywordSubModel(dataset, index, useIDF: true);
                 mKeywordModels.Add(source, model);
             }
         }
