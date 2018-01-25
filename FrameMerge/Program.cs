@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -181,12 +182,20 @@ namespace FrameMerge
                 Image resizedImage = new Bitmap(width, height);
                 using (Graphics gfx = Graphics.FromImage(resizedImage))
                 {
+                    ImageAttributes attributes = new ImageAttributes();     // ghost edges fix
+                    attributes.SetWrapMode(WrapMode.TileFlipXY);
+
                     gfx.SmoothingMode = SmoothingMode.HighQuality;
                     gfx.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     gfx.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    gfx.DrawImage(originalImage, new Rectangle(0, 0, width, height));
+                    //gfx.DrawImage(originalImage, new Rectangle(0, 0, width, height));
+
+                    gfx.DrawImage(originalImage,
+                        new Rectangle(0, 0, width, height),
+                        0, 0, originalImage.Width, originalImage.Height,
+                        GraphicsUnit.Pixel, attributes);
                 }
-                resizedImage.Save(outputStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                resizedImage.Save(outputStream, ImageFormat.Jpeg);
                 result = outputStream.ToArray();
             }
             return result;
