@@ -12,6 +12,8 @@ namespace FrameIO
     {
         private BinaryReader mReader;
 
+        private object mLock = new object();
+
         /// <summary>
         /// A unique timestamp associated with the actual set of selected videos and frames.
         /// </summary>
@@ -131,10 +133,13 @@ namespace FrameIO
         /// thumbnail encoded as a JPEG image.</returns
         public Tuple<int, int, byte[]> ReadFrameAt(int globalId)
         {
-            long frameOffset = mFrameOffsets[globalId];
-            mReader.BaseStream.Seek(frameOffset, SeekOrigin.Begin);
-            
-            return ReadNextFrame();
+            lock (mLock)
+            {
+                long frameOffset = mFrameOffsets[globalId];
+                mReader.BaseStream.Seek(frameOffset, SeekOrigin.Begin);
+
+                return ReadNextFrame();
+            }
         }
 
         /// <summary>
@@ -150,12 +155,15 @@ namespace FrameIO
         /// thumbnail encoded as a JPEG image.</returns>
         public Tuple<int, int, byte[]> ReadNextFrame()
         {
-            int videoId = mReader.ReadInt32();
-            int frameNumber = mReader.ReadInt32();
-            int dataLength = mReader.ReadInt32();
-            byte[] jpgData = mReader.ReadBytes(dataLength);
+            lock (mLock)
+            {
+                int videoId = mReader.ReadInt32();
+                int frameNumber = mReader.ReadInt32();
+                int dataLength = mReader.ReadInt32();
+                byte[] jpgData = mReader.ReadBytes(dataLength);
 
-            return new Tuple<int, int, byte[]>(videoId, frameNumber, jpgData);
+                return new Tuple<int, int, byte[]>(videoId, frameNumber, jpgData);
+            }
         }
 
         /// <summary>
@@ -173,21 +181,24 @@ namespace FrameIO
         /// thumbnail encoded as a JPEG image.</returns>
         public Tuple<int, int, byte[]>[] ReadVideoFrames(int videoId)
         {
-            // seek the stream to the video start position
-            long videoOffset = mVideoOffsets[videoId];
-            mReader.BaseStream.Seek(videoOffset, SeekOrigin.Begin);
-
-            // prepare result array
-            int frameCount = mVideoLengths[videoId];
-            Tuple<int, int, byte[]>[] result = new Tuple<int, int, byte[]>[frameCount];
-
-            // fill result array
-            for (int i = 0; i < frameCount; i++)
+            lock (mLock)
             {
-                result[i] = ReadNextFrame();
-            }
+                // seek the stream to the video start position
+                long videoOffset = mVideoOffsets[videoId];
+                mReader.BaseStream.Seek(videoOffset, SeekOrigin.Begin);
 
-            return result;
+                // prepare result array
+                int frameCount = mVideoLengths[videoId];
+                Tuple<int, int, byte[]>[] result = new Tuple<int, int, byte[]>[frameCount];
+
+                // fill result array
+                for (int i = 0; i < frameCount; i++)
+                {
+                    result[i] = ReadNextFrame();
+                }
+
+                return result;
+            }
         }
 
 
