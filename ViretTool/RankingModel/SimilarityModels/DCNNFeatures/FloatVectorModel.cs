@@ -41,7 +41,7 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         public float[] AddQueryResultsToCache(DataModel.Frame query, bool positiveExample)
         {
-            if (mCache[query.ID] != null)
+            if (mCache.ContainsKey(query.ID))
                 return mCache[query.ID];
 
             float[] results = new float[mDataset.Frames.Count];
