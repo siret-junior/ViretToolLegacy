@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define LEGACY
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +14,11 @@ namespace ViretTool.RankingModel
         public DataModel.Frame Frame { get; }
         public double Rank { get; set; }
         public byte[] ColorSignature { get; set; }
+#if LEGACY
         public byte[] SemanticDescriptor { get; set; }
+#else
+        public float[] SemanticDescriptor { get; set; }
+#endif
 
         public RankedFrame(DataModel.Frame frame, double rank)
         {
@@ -39,10 +45,14 @@ namespace ViretTool.RankingModel
 
         public static double SemanticDistance(RankedFrame x, RankedFrame y)
         {
+#if LEGACY
             return ByteVectorModel.ComputeDistance(x.SemanticDescriptor, y.SemanticDescriptor);
+#else
+            return FloatVectorModel.ComputeDistance(x.SemanticDescriptor, y.SemanticDescriptor);
+#endif
         }
 
-        public static double ColorDistance(RankedFrame x, RankedFrame y)
+    public static double ColorDistance(RankedFrame x, RankedFrame y)
         {
             return ColorSignatureModel.ComputeDistance(x.ColorSignature, y.ColorSignature);
         }

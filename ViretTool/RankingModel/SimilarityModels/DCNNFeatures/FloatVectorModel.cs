@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViretTool.RankingModel.SimilarityModels.DCNNFeatures
+namespace ViretTool.RankingModel.SimilarityModels
 {
     class FloatVectorModel
     {
@@ -15,7 +16,7 @@ namespace ViretTool.RankingModel.SimilarityModels.DCNNFeatures
         /// </summary>
         private List<float[]> mFloatVectors;
 
-        private int mDimension;
+        private int mVectorDimension;
 
         private readonly string mDescriptorsFilename;
 
@@ -56,7 +57,9 @@ namespace ViretTool.RankingModel.SimilarityModels.DCNNFeatures
             return mCache[query.ID];
         }
 
-        public List<RankedFrame> RankFramesBasedOnExampleFrames(List<DataModel.Frame> positiveExamples, List<DataModel.Frame> negativeExamples)
+        public List<RankedFrame> RankFramesBasedOnExampleFrames(
+            List<DataModel.Frame> positiveExamples, 
+            List<DataModel.Frame> negativeExamples = null)
         {
             List<RankedFrame> rankedFrames = RankedFrame.InitializeResultList(mDataset.Frames);
 
@@ -116,26 +119,26 @@ namespace ViretTool.RankingModel.SimilarityModels.DCNNFeatures
 
         private void LoadDescriptors()
         {
-            if (!System.IO.File.Exists(mDescriptorsFilename))
+            if (!File.Exists(mDescriptorsFilename))
                 throw new Exception("Descriptors were not created to " + mDescriptorsFilename);
 
-            using (System.IO.BinaryReader BR = new System.IO.BinaryReader(System.IO.File.OpenRead(mDescriptorsFilename)))
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(mDescriptorsFilename)))
             {
-                if (!mDataset.ReadAndCheckFileHeader(BR))
+                if (!mDataset.ReadAndCheckFileHeader(reader))
                     throw new Exception("Dataset/descriptor mismatch. Delete file " + mDescriptorsFilename);
 
-                int count = BR.ReadInt32();
-                if (count < mDataset.Frames.Count)
+                int vectorCount = reader.ReadInt32();
+                if (vectorCount < mDataset.Frames.Count)
                     throw new Exception("Too few descriptors in file " + mDescriptorsFilename);
 
-                count = mDataset.Frames.Count;
+                vectorCount = mDataset.Frames.Count;
 
-                mDimension = BR.ReadInt32();
+                mVectorDimension = reader.ReadInt32();
 
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < vectorCount; i++)
                 {
-                    byte[] data = BR.ReadBytes(mDimension * sizeof(float));
-                    float[] dataVector = new float[mDimension];
+                    byte[] data = reader.ReadBytes(mVectorDimension * sizeof(float));
+                    float[] dataVector = new float[mVectorDimension];
 
                     Buffer.BlockCopy(data, 0, dataVector, 0, data.Length);
 
