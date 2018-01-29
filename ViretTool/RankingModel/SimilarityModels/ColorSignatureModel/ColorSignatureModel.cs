@@ -22,29 +22,28 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         private readonly string mDescriptorsFilename;
 
+        private Dictionary<string, float[]> mCache;
+
         public ColorSignatureModel(DataModel.Dataset dataset)
         {
             mDataset = dataset;
             mColorSignatures = new List<byte[]>();
-
-            // TODO - name should be connected to the dataset name or ID
-            //mDescriptorsFilename = System.IO.Path.Combine(mDataset.AllExtractedFramesFilename, "ColorSignatures.vt");
-            string stripFilename = System.IO.Path.GetFileNameWithoutExtension(mDataset.AllExtractedFramesFilename);
-            string modelFilename = stripFilename.Split('-')[0] + ".color";    // TODO: find better solution
-            string parentDirectory = System.IO.Directory.GetParent(mDataset.AllExtractedFramesFilename).ToString();
-            mDescriptorsFilename = System.IO.Path.Combine(parentDirectory, modelFilename);
-
+            mDescriptorsFilename = dataset.GetFileNameByExtension(".color");
             LoadDescriptors();
+            Clear();
         }
 
+        public void Clear()
+        {
+            mCache = new Dictionary<string, float[]>();
+        }
 
-        Dictionary<string, double[]> mCache = new Dictionary<string, double[]>();
         public List<RankedFrame> RankFramesBasedOnSketch(List<Tuple<Point, Color, Point, bool>> queryCentroids)
         {
-            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset);
+            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset.Frames);
 
             // reuse cached results
-            Dictionary<string, double[]> cache = new Dictionary<string, double[]>();
+            Dictionary<string, float[]> cache = new Dictionary<string, float[]>();
 
             foreach (Tuple<Point, Color, Point, bool> t in queryCentroids)
             {
@@ -57,7 +56,7 @@ namespace ViretTool.RankingModel.SimilarityModels
 
             mCache = cache;
 
-            foreach (double[] distances in cache.Values)
+            foreach (float[] distances in cache.Values)
                 Parallel.For(0, result.Count, i =>
                 {
                     result[i].Rank += distances[i];
@@ -66,9 +65,9 @@ namespace ViretTool.RankingModel.SimilarityModels
             return result;
         }
 
-        private double[] EvaluateOneQueryCentroid(Tuple<Point, Color, Point, bool> qc)
+        private float[] EvaluateOneQueryCentroid(Tuple<Point, Color, Point, bool> qc)
         {
-            double[] distances = new double[mDataset.Frames.Count];
+            float[] distances = new float[mDataset.Frames.Count];
 
             // transform [x, y] to a list of investigated positions in mGridRadius
             Tuple<int[], Color, bool> t = PrepareQuery(qc);
@@ -85,7 +84,7 @@ namespace ViretTool.RankingModel.SimilarityModels
                     foreach (int offset in t.Item1)
                         minRank = Math.Min(minRank, L2SquareDistance(R, signature[offset], G, signature[offset + 1], B, signature[offset + 2]));
 
-                    distances[i] -= Math.Sqrt(minRank);
+                    distances[i] -= Convert.ToSingle(Math.Sqrt(minRank));
                 }
                 else
                 {
@@ -93,7 +92,7 @@ namespace ViretTool.RankingModel.SimilarityModels
                     foreach (int offset in t.Item1)
                         avgRank += Math.Sqrt(L2SquareDistance(R, signature[offset], G, signature[offset + 1], B, signature[offset + 2]));
 
-                    distances[i] -= avgRank / t.Item1.Length;
+                    distances[i] -= Convert.ToSingle(avgRank / t.Item1.Length);
                 }              
             });
 
@@ -102,7 +101,7 @@ namespace ViretTool.RankingModel.SimilarityModels
         
         public List<RankedFrame> RankFramesBasedOnExampleFrames(List<DataModel.Frame> queryFrames)
         {
-            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset);
+            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset.Frames);
 
             Parallel.For(0, result.Count(), i =>
             {
@@ -185,11 +184,15 @@ namespace ViretTool.RankingModel.SimilarityModels
 
             using (System.IO.BinaryReader BR = new System.IO.BinaryReader(System.IO.File.OpenRead(mDescriptorsFilename)))
             {
-                int datasetID = BR.ReadInt32();
-                if (mDataset.DatasetID != datasetID)
+                if (!mDataset.ReadAndCheckFileHeader(BR))
                     throw new Exception("Dataset/descriptor mismatch. Delete file " + mDescriptorsFilename);
 
                 int count = BR.ReadInt32();
+                if (count < mDataset.Frames.Count)
+                    throw new Exception("Too few descriptors in file " + mDescriptorsFilename);
+
+                count = mDataset.Frames.Count;
+                
                 mSignatureWidth = BR.ReadInt32();
                 mSignatureHeight = BR.ReadInt32();
                 int size = mSignatureWidth * mSignatureHeight * 3;

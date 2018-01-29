@@ -41,6 +41,20 @@ namespace ViretTool.RankingModel.SimilarityModels
             Reset();
         }
 
+        public List<RankedFrame> KeywordBasedRanking
+        {
+            get { return mKeywordBasedRanking; }
+        }
+
+        public List<RankedFrame> ColorSketchBasedRanking
+        {
+            get { return mColorSignatureBasedRanking; }
+        }
+
+        public List<RankedFrame> VectorBasedRanking
+        {
+            get { return mVectorBasedRanking; }
+        }
 
         public void UpdateColorModelRanking(List<Tuple<Point, Color, Point, bool>> queryCentroids)
         {
@@ -91,35 +105,42 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         public List<RankedFrame> GenerateRandomRanking()
         {
-            List<RankedFrame> randomRanking = RankedFrame.InitializeResultList(mDataset);
+            List<RankedFrame> rankedFrames = new List<RankedFrame>();
 
-            for (int i = 0; i < randomRanking.Count; i++)
+            foreach (DataModel.Video v in mDataset.Videos)
             {
-                randomRanking[i].Rank = random.Next();
+                int idx = v.Frames.Count / 2;
+
+                if (v.Frames.Count > 6) idx = 3 + (random.Next() % (v.Frames.Count - 6));
+
+                rankedFrames.Add(new RankedFrame(v.Frames[idx], random.Next()));
             }
 
-            return randomRanking;
+            return rankedFrames;
         }
 
         public List<RankedFrame> GenerateSequentialRanking()
         {
-            List<RankedFrame> sequentialRanking = RankedFrame.InitializeResultList(mDataset);
+            return GenerateSequentialRanking(mDataset.Frames);
+        }
 
-            for (int i = 0; i < sequentialRanking.Count; i++)
-            {
-                sequentialRanking[i].Rank = sequentialRanking.Count - i;
-            }
+        public List<RankedFrame> GenerateSequentialRanking(List<DataModel.Frame> filteredFrames)
+        {
+            List<RankedFrame> sequentialRanking = new List<RankedFrame>();
+
+            foreach (DataModel.Frame f in filteredFrames)
+                sequentialRanking.Add(new RankedFrame(f, f.ID));
 
             return sequentialRanking;
         }
 
         // TODO: different aggregation strategies (sum, max)
-        public List<RankingModel.RankedFrame> GetMaxNormalizedAndSortedFinalRanking()
+        public List<RankingModel.RankedFrame> GetMaxNormalizedFinalRanking(List<DataModel.Frame> frames, bool keywordBasedRanking, bool colorSignatureBasedRanking, bool vectorBasedRanking)
         {
             // rankings are kept max-normalized
 
             // TODO: different aggregation strategies
-            List<RankingModel.RankedFrame> resultRanking = AggregateRankingSum();
+            List<RankingModel.RankedFrame> resultRanking = AggregateRankingSum(frames, keywordBasedRanking, colorSignatureBasedRanking, vectorBasedRanking);
             
             return resultRanking;
         }
@@ -178,36 +199,33 @@ namespace ViretTool.RankingModel.SimilarityModels
             }
         }
 
-        private List<RankingModel.RankedFrame> AggregateRankingSum()
+        private List<RankedFrame> AggregateRankingSum(List<DataModel.Frame> frames, bool keywordBasedRanking, bool colorSignatureBasedRanking, bool vectorBasedRanking)
         {
-            List<RankingModel.RankedFrame> aggregatedResult;
+            List<List<RankedFrame>> rankingListsForSorting = new List<List<RankedFrame>>();
 
-            if (mColorSignatureBasedRanking == null
-                && mVectorBasedRanking == null
-                && mKeywordBasedRanking == null)
+            if (mColorSignatureBasedRanking != null && colorSignatureBasedRanking)
+                rankingListsForSorting.Add(mColorSignatureBasedRanking);
+
+            if (mVectorBasedRanking != null && vectorBasedRanking)
+                rankingListsForSorting.Add(mVectorBasedRanking);
+
+            if (mKeywordBasedRanking != null && keywordBasedRanking)
+                rankingListsForSorting.Add(mKeywordBasedRanking);
+
+            if (rankingListsForSorting.Count == 0)
+                return GenerateSequentialRanking(frames);
+
+            List<RankedFrame> aggregatedResult = RankedFrame.InitializeResultList(frames); ;
+
+            Parallel.For(0, aggregatedResult.Count, index =>
             {
-                aggregatedResult = GenerateSequentialRanking();
-            }
-            else
-            {
-                aggregatedResult = RankingModel.RankedFrame.InitializeResultList(mDataset);
-                Parallel.For(0, aggregatedResult.Count, index =>
-                {
-                    // TODO: multipliers
-                    if (mColorSignatureBasedRanking != null)
-                    {
-                        aggregatedResult[index].Rank += mColorSignatureBasedRanking[index].Rank;
-                    }
-                    if (mVectorBasedRanking != null)
-                    {
-                        aggregatedResult[index].Rank += mVectorBasedRanking[index].Rank;
-                    }
-                    if (mKeywordBasedRanking != null)
-                    {
-                        aggregatedResult[index].Rank += mKeywordBasedRanking[index].Rank;
-                    }
-                });
-            }
+                RankedFrame rf = aggregatedResult[index];
+
+                // TODO: multipliers and vector instructions
+                foreach (List<RankedFrame> list in rankingListsForSorting)
+                    rf.Rank += list[rf.Frame.ID].Rank;
+            });
+
             return aggregatedResult;
         }
 

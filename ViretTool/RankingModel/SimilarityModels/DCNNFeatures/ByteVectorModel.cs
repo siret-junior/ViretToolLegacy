@@ -25,18 +25,14 @@ namespace ViretTool.RankingModel.SimilarityModels
             mDataset = dataset;
             mByteVectors = new List<byte[]>();
 
-            // TODO - name should be connected to the dataset name
-            string stripFilename = System.IO.Path.GetFileNameWithoutExtension(mDataset.AllExtractedFramesFilename);
-            string modelFilename = stripFilename.Split('-')[0] + ".vector";    // TODO: find better solution
-            string parentDirectory = System.IO.Directory.GetParent(mDataset.AllExtractedFramesFilename).ToString();
-            mDescriptorsFilename = System.IO.Path.Combine(parentDirectory, modelFilename);
+            mDescriptorsFilename = dataset.GetFileNameByExtension(".vector");
 
             LoadDescriptors();
         }
 
         public List<RankedFrame> RankFramesBasedOnExampleFrames(List<DataModel.Frame> queryFrames)
         {
-            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset);
+            List<RankedFrame> result = RankedFrame.InitializeResultList(mDataset.Frames);
 
             foreach (DataModel.Frame queryFrame in queryFrames)
             {
@@ -123,11 +119,15 @@ namespace ViretTool.RankingModel.SimilarityModels
 
             using (System.IO.BinaryReader BR = new System.IO.BinaryReader(System.IO.File.OpenRead(mDescriptorsFilename)))
             {
-                int datasetID = BR.ReadInt32();
-                if (mDataset.DatasetID != datasetID)
+                if (!mDataset.ReadAndCheckFileHeader(BR))
                     throw new Exception("Dataset/descriptor mismatch. Delete file " + mDescriptorsFilename);
 
                 int count = BR.ReadInt32();
+                if (count < mDataset.Frames.Count)
+                    throw new Exception("Too few descriptors in file " + mDescriptorsFilename);
+
+                count = mDataset.Frames.Count;
+
                 mDimension = BR.ReadInt32();
 
                 for (int i = 0; i < count; i++)

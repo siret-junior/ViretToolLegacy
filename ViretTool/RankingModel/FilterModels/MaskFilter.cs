@@ -34,30 +34,31 @@ namespace ViretTool.RankingModel.FilterModels
             }
         }
 
-
-        public MaskFilter(DataModel.Dataset dataset, bool[] mask)
-            : base(dataset)
-        {
-            Mask = mask;
-        }
-
-        public MaskFilter(DataModel.Dataset dataset)
-            : base(dataset)
+        public MaskFilter(DataModel.Dataset dataset) : base(dataset)
         {
             Mask = null;
         }
 
+        public MaskFilter(DataModel.Dataset dataset, bool[] mask) : base(dataset)
+        {
+            Mask = mask;
+        }
 
-        public bool[] AggregateMasks(params bool[][] masks)
+        public void Clear()
+        {
+            SetMaskTo(mMask, true);
+            Mask = mMask;
+        }
+
+        public static bool[] AggregateMasks(int datasetLength, List<bool[]> masks)
         {
             // check null input
-            if (masks == null || masks.Length == 0)
+            if (masks == null || masks.Count == 0)
             {
                 throw new ArgumentException("Input masks are empty!");
             }
 
             // check mask length
-            int datasetLength = mDataset.Frames.Count;
             if (!masks.All(x => x.Length == datasetLength))
             {
                 throw new ArgumentException("Input masks do not have the same length!");
@@ -68,9 +69,10 @@ namespace ViretTool.RankingModel.FilterModels
             SetMaskTo(result, true);
 
             // aggregate masks
+            int masksCount = masks.Count;
             Parallel.For(0, datasetLength, index =>
             {
-                for (int iMask = 0; iMask < masks.Length; iMask++)
+                for (int iMask = 0; iMask < masksCount; iMask++)
                 {
                     if (masks[iMask][index] == false)
                     {

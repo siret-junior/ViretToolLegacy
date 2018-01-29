@@ -19,127 +19,95 @@ namespace ViretTool.RankingModel
         private readonly SimilarityManager mSimilarityManager;
         private readonly FilterManager mFilterManager;
 
-        private List<RankedFrame> mRankedSimilarityResult;
-        private List<RankedFrame> mRankedFilteredSortedResult;
+        private List<RankedFrame> mFilteredRankedSortedResult;
 
         public delegate void RankedResultEventHandler(List<RankedFrame> rankedResult);
         public event RankedResultEventHandler RankingChangedEvent;
-        
+
+        private double mPercentageOfDatabaseKeyword = 0.5;
+        private double mPercentageOfDatabaseColor = 0.975;
+        private double mPercentageOfDatabaseSemantic = 0.5;
+
+        // TODO - set to false once updated from GUI
+        private bool mSortByKeyword = false;
+        private bool mSortByColor = true;
+        private bool mSortBySemantic = true;
+
         public RankingEngine(SimilarityManager similarityManager, FilterManager filterManager)
         {
             mSimilarityManager = similarityManager;
             mFilterManager = filterManager;
         }
 
-
-        private List<RankedFrame> ComputeSimilarityRanking()
+        public void ResetEngine()
         {
-            // cache intermediate ranking result for reusing when changing just filtering
-            mRankedSimilarityResult = mSimilarityManager.GetMaxNormalizedAndSortedFinalRanking();
-            return mRankedSimilarityResult;
-        }
-
-        private List<RankedFrame> ComputeFilteringAndSorting()
-        {
-            // TODO: mask filters vs. flow filters
-
-            // ranked result is reused, only filtering is applied
-            mRankedFilteredSortedResult = mFilterManager.ApplyFilters(mRankedSimilarityResult);
-
-            // fill similarity descriptors
-            mSimilarityManager.FillSimilarityDescriptors(mRankedFilteredSortedResult);
-
-            RankingChangedEvent?.Invoke(mRankedFilteredSortedResult);
-            return mRankedFilteredSortedResult;
-        }
-
-        private List<RankedFrame> ComputeRankingFilteringAndSorting()
-        {
-            ComputeSimilarityRanking();
-            ComputeFilteringAndSorting();
-
-            return mRankedFilteredSortedResult;
-        }
-
-
-        #region --[ Similarity model facade ]--
-
-        // TODO: removed (will be reimplemented in GUI?)
-        // toggle "use model" switches are implemented using properties
-        //public bool UseColorModel { get; set; }
-        //public bool UseVectorModel { get; set; }
-        //public bool UseKeywordModel { get; set; }
-
-        public List<RankedFrame> UpdateColorModelRanking(List<Tuple<Point, Color, Point, bool>> colorModelSketchQuery)
-        {
-            // store current sketch query (TODO remove?)
-            //mColorModelSketchQuery = colorModelSketchQuery;
+            mSimilarityManager.Reset();
             
-            // update model ranking
-            mSimilarityManager.UpdateColorModelRanking(colorModelSketchQuery);
-            // recompute aggregation, filtering and sorting
-            List<RankedFrame> result = ComputeRankingFilteringAndSorting();
-            return result;
-        }
-        
-        public List<RankedFrame> UpdateColorModelRanking(List<DataModel.Frame> queryFrames)
-        {
-            // TODO: clone selected frames?
-
-            // update model ranking
-            mSimilarityManager.UpdateColorModelRanking(queryFrames);
-            // recompute aggregation, filtering and sorting
-            List<RankedFrame> result = ComputeRankingFilteringAndSorting();
-            return result;
+            // TODO
         }
 
-        public List<RankedFrame> UpdateVectorModelRanking(List<DataModel.Frame> queryFrames)
+        public void GenerateRandomRanking()
         {
-            // TODO: clone selected frames?
-
-            // update model ranking
-            mSimilarityManager.UpdateVectorModelRanking(queryFrames);
-            // recompute aggregation, filtering and sorting
-            List<RankedFrame> result = ComputeRankingFilteringAndSorting();
-            return result;
+            RaiseRankingChangedEvent(mSimilarityManager.GenerateRandomRanking());
         }
 
-        public List<RankedFrame> UpdateKeywordModelRanking(List<List<int>> queryKeyword, string source)
+        public void GenerateSequentialRanking()
         {
-            // update model ranking
-            mSimilarityManager.UpdateKeywordModelRanking(queryKeyword, source);
-            // recompute aggregation, filtering and sorting
-            List<RankedFrame> result = ComputeRankingFilteringAndSorting();
-            return result;
+            RaiseRankingChangedEvent(mSimilarityManager.GenerateSequentialRanking());
         }
 
-        public List<RankedFrame> GenerateRandomRanking()
+        /// <summary>
+        /// The main ranking process, assumes updated models and filters. Invoked after each update.
+        /// </summary>
+        private void ComputeFilteredRankedSortedResult()
         {
-            mRankedSimilarityResult = mSimilarityManager.GenerateRandomRanking();
-            List<RankedFrame> result = ComputeFilteringAndSorting();
-            return result;
+            List<DataModel.Frame> filteredFrames = mFilterManager.GetMaskFilteredFrames();
+
+            List<RankedFrame> aggregatedRankingResult =
+                mSimilarityManager.GetMaxNormalizedFinalRanking(filteredFrames, SortByKeyword, SortByColor, SortBySemantic);
+
+            RaiseRankingChangedEvent(mFilterManager.SortAndApplyVideoAggregateFilter(aggregatedRankingResult));
         }
 
-        public List<RankedFrame> GenerateSequentialRanking()
-        {
-            mRankedSimilarityResult = mSimilarityManager.GenerateSequentialRanking();
-            List<RankedFrame> result = ComputeFilteringAndSorting();
-            return result;
+        private void RaiseRankingChangedEvent(List<RankedFrame> result)
+        { 
+            mFilteredRankedSortedResult = result;
+
+            mSimilarityManager.FillSimilarityDescriptors(mFilteredRankedSortedResult);
+
+            RankingChangedEvent?.Invoke(mFilteredRankedSortedResult);
+        }
+
+        #region --[ Sort properties ]--
+
+        public bool SortByKeyword {
+            get { return mSortByKeyword; }
+            set { mSortByKeyword = value;
+                    ComputeFilteredRankedSortedResult(); }
+        }
+
+        public bool SortByColor {
+            get { return mSortByColor; }
+            set { mSortByColor = value;
+                    ComputeFilteredRankedSortedResult(); }
+        }
+
+        public bool SortBySemantic {
+            get { return mSortBySemantic; }
+            set { mSortBySemantic = value;
+                ComputeFilteredRankedSortedResult(); }
         }
 
         #endregion
 
-
-        #region --[ Filter facade ]--
-
-        // TODO: change to methods
+        #region --[ Set flow filters ]--
 
         public bool VideoAggregateFilterEnabled
         {
             get
             { return mFilterManager.VideoAggregateFilterEnabled; }
             set
-            { mFilterManager.VideoAggregateFilterEnabled = value; }
+            { mFilterManager.VideoAggregateFilterEnabled = value; ComputeFilteredRankedSortedResult(); }
         }
 
         public int VideoAggregateFilterMaxFrames
@@ -147,20 +115,112 @@ namespace ViretTool.RankingModel
             get
             { return mFilterManager.VideoAggregateFilterMaxFrames; }
             set
-            { mFilterManager.VideoAggregateFilterMaxFrames = value; }
+            { mFilterManager.VideoAggregateFilterMaxFrames = value; ComputeFilteredRankedSortedResult(); }
         }
-
-        // TODO:
-        // toggle filter: B/W
-
-        // toggle filter: aspect ratio
-
-        // toggle filter: examined
-
-        // filter: N per video
 
         #endregion
 
+        #region --[ Set threshold filters]--
 
-    }
+        public void SetBlackAndWhiteFilter(bool enable, bool useInvertedMask)
+        {
+            mFilterManager.SetBlackAndWhiteFilter(enable, useInvertedMask);
+            ComputeFilteredRankedSortedResult();
+        }
+
+        public void SetBlackAndWhiteFilterMask(float maxAllowedDeltaRGB)
+        {
+            mFilterManager.SetBlackAndWhiteFilterMask(maxAllowedDeltaRGB);
+            ComputeFilteredRankedSortedResult();
+        }
+
+        public void SetPercentageOfBlackColorFilter(bool enable, bool useInvertedMask)
+        {
+            mFilterManager.SetPercentageOfBlackColorFilter(enable, useInvertedMask);
+            ComputeFilteredRankedSortedResult();
+        }
+
+        public void SetPercentageOfBlackColorFilterMask(float maxAllowedPercentageOfBlackColor)
+        {
+            mFilterManager.SetPercentageOfBlackColorFilterMask(maxAllowedPercentageOfBlackColor);
+            ComputeFilteredRankedSortedResult();
+        }
+
+        #endregion
+
+        #region --[ Set rank dataset filters ]--
+        public void SetFilterThresholdForKeywordModel(double percentageOfDatabase)
+        {
+            mPercentageOfDatabaseKeyword = percentageOfDatabase;
+
+            if (mPercentageOfDatabaseKeyword == 0 || mSimilarityManager.KeywordBasedRanking == null)
+                mFilterManager.KeywordRankingFilterEnabled = false;
+            else
+            {
+                mFilterManager.KeywordRankingFilterEnabled = true;
+                mFilterManager.SetKeywordRankingFilterMask(mSimilarityManager.KeywordBasedRanking, percentageOfDatabase);   
+            }
+
+            ComputeFilteredRankedSortedResult();
+        }
+
+        public void SetFilterThresholdForColorModel(double percentageOfDatabase)
+        {
+            mPercentageOfDatabaseColor = percentageOfDatabase;
+
+            if (mPercentageOfDatabaseColor == 0 || mSimilarityManager.ColorSketchBasedRanking == null)
+                mFilterManager.ColorRankingFilterEnabled = false;
+            else
+            {
+                mFilterManager.ColorRankingFilterEnabled = true;
+                mFilterManager.SetColorRankingFilterMask(mSimilarityManager.ColorSketchBasedRanking, percentageOfDatabase);
+            }
+
+            ComputeFilteredRankedSortedResult();
+        }
+
+        public void SetFilterThresholdForSemanticModel(double percentageOfDatabase)
+        {
+            mPercentageOfDatabaseSemantic = percentageOfDatabase;
+
+            if (mPercentageOfDatabaseSemantic == 0 || mSimilarityManager.VectorBasedRanking == null)
+                mFilterManager.VectorRankingFilterEnabled = false;
+            else
+            {
+                mFilterManager.VectorRankingFilterEnabled = true;
+                mFilterManager.SetVectorRankingFilterMask(mSimilarityManager.VectorBasedRanking, percentageOfDatabase);
+            }
+
+            ComputeFilteredRankedSortedResult();
+        }
+
+        #endregion
+
+        #region --[ Update queries ]--
+
+        public void UpdateKeywordModelRankingAndFilterMask(List<List<int>> queryKeyword, string source)
+        {
+            mSimilarityManager.UpdateKeywordModelRanking(queryKeyword, source);
+
+            SetFilterThresholdForKeywordModel(mPercentageOfDatabaseKeyword);
+        }
+
+        public void UpdateColorModelRankingAndFilterMask(List<Tuple<Point, Color, Point, bool>> colorModelSketchQuery)
+        {
+            mSimilarityManager.UpdateColorModelRanking(colorModelSketchQuery);
+
+            SetFilterThresholdForColorModel(mPercentageOfDatabaseColor);
+        }
+
+        public void UpdateVectorModelRankingAndFilterMask(List<DataModel.Frame> queryFrames, bool onlyUpdateCache)
+        {
+            mSimilarityManager.UpdateVectorModelRanking(queryFrames);
+
+            if (!onlyUpdateCache)
+                SetFilterThresholdForSemanticModel(mPercentageOfDatabaseSemantic);
+        }
+
+        #endregion
+
+     }
 }
