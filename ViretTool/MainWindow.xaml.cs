@@ -40,7 +40,7 @@ namespace ViretTool
             // prepare data model
             //mDataset = new DataModel.Dataset("..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb", "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
 
-            mDataset = new DataModel.Dataset("..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb", "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
+            //mDataset = new DataModel.Dataset("..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb", "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
 
             //StringBuilder SB = new StringBuilder(); int c = 0;
             //foreach (DataModel.Frame f in mDataset.Frames)
@@ -67,6 +67,11 @@ namespace ViretTool
             //mDataset = new DataModel.Dataset(
             //    "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
             //    "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
+
+            mDataset = new DataModel.Dataset(
+                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb",
+                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected-100x75.thumb",
+                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected.topology");
 
 
             // initialize ranking engine

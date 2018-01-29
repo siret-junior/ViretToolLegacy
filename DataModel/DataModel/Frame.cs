@@ -20,7 +20,7 @@ namespace ViretTool.DataModel {
 
         private byte[] mJPGThumbnail { get; }
 
-        public Frame(Video frameVideo, int id, int frameNumber, byte[] JPGThumbnail) {
+        public Frame(Video frameVideo, Group frameGroup, int id, int frameNumber, byte[] JPGThumbnail) {
             FrameVideo = frameVideo;
             ID = id;
             FrameNumber = frameNumber;
@@ -34,7 +34,7 @@ namespace ViretTool.DataModel {
 
         public override string ToString()
         {
-            return "ID: " + ID.ToString("00000") 
+            return "ID: " + ID.ToString() 
                 + ", frame: " + FrameNumber.ToString("00000") 
                 + ", Video ID: " + FrameVideo.VideoID.ToString("00000");
         }

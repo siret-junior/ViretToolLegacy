@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define LEGACY
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +22,11 @@ namespace ViretTool.RankingModel.SimilarityModels
         private readonly ColorSignatureModel mColorSignatureModel;
         private List<RankedFrame> mColorSignatureBasedRanking;
 
-        private readonly ByteVectorModel mVectorModel;
+#if LEGACY
+        private readonly ByteVectorModel mVectorModel; // TODO: add generic vector model
+#else
+        private readonly FloatVectorModel mVectorModel; // TODO: add generic vector model
+#endif
         private List<RankedFrame> mVectorBasedRanking;
 
         // TODO - keyword based ranking model
@@ -32,9 +38,13 @@ namespace ViretTool.RankingModel.SimilarityModels
         {
             mDataset = dataset;
 
+#if LEGACY
+            mVectorModel = new ByteVectorModel(mDataset);        
+#else
+            mVectorModel = new FloatVectorModel(mDataset);
+#endif
             mColorSignatureModel = new ColorSignatureModel(mDataset);
-            mVectorModel = new RankingModel.SimilarityModels.ByteVectorModel(mDataset);
-            mKeywordModel = new RankingModel.SimilarityModels.KeywordModel(mDataset, new string[] {
+            mKeywordModel = new KeywordModel(mDataset, new string[] {
                 "GoogLeNet", "YFCC100M"
             });
 
