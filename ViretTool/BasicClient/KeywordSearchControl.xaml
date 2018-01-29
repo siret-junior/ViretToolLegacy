@@ -69,22 +69,6 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <StackPanel>
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="1*" />
-            </Grid.ColumnDefinitions>
-            <Label 
-                    Grid.Column="0" 
-                    Background="DarkGray"
-                    FontWeight="Bold"
-                    Content="Keyword model" />
-
-            <Button Name="textClearButton" 
-                        Grid.Column="2" 
-                        Click="textClearButton_Click"
-                        Content="Clear" />
-        </Grid>
         <!--#region Keyword Search -->
         <controls:SuggestionTextBox x:Name="suggestionTextBox"
                                     ItemTemplateSelector="{StaticResource ResourceKey=HypernymSelector}">

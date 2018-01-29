@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="ViretTool.BasicClient.ModelControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ViretTool.BasicClient"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:DoubleToStringConverter x:Key="doubleConverter" />
+    </UserControl.Resources>
+    
+    <Grid Background="DarkGray">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <Label Grid.Column="0"
+               FontWeight="Bold"
+               Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ModelControl}}, Path=ModelName}" />
+
+        <Slider Grid.Column="1"
+                Margin="10, 0, 0, 0"
+                VerticalAlignment="Center"
+                Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ModelControl}}, Mode=TwoWay, Path=Value}"
+                Maximum="1"
+                PreviewMouseUp="Slider_MouseUp"/>
+
+        <TextBlock Grid.Column="2"
+                   TextAlignment="Right"
+                   Width="40"
+                   VerticalAlignment="Center"
+                   Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ModelControl}}, Mode=TwoWay, Path=Value, Converter={StaticResource doubleConverter}}" />
+        
+        <CheckBox Grid.Column="3"
+                  Content="Sort"
+                  VerticalAlignment="Center"
+                  Margin="10, 0, 10, 0"
+                  IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ModelControl}}, Mode=TwoWay, Path=UseForSorting}"
+                  Unchecked="CheckBox_Changed"
+                  Checked="CheckBox_Changed" />
+        
+        <Button Grid.Column="4"
+                Click="Clear"
+                Padding="10, 0, 10, 0"
+                Content="Clear" />
+    </Grid>
+</UserControl>

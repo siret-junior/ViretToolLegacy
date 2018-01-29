@@ -93,6 +93,38 @@ namespace ViretTool
             };
 
 
+            // model filters
+            keywordSearchControlBar.DefaultValue = 0.5;
+            keywordSearchControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
+                mRankingEngine.SortByKeyword = useForSorting;
+                mRankingEngine.SetFilterThresholdForKeywordModel(value);
+            };
+            keywordSearchControlBar.ModelClearedEvent += () => {
+                keywordSearchTextBox.Clear();
+            };
+
+            sketchCanvasControlBar.DefaultValue = 0.95;
+            sketchCanvasControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
+                mRankingEngine.SortByColor = useForSorting;
+                mRankingEngine.SetFilterThresholdForColorModel(value);
+            };
+            sketchCanvasControlBar.ModelClearedEvent += () => {
+                sketchCanvas.Clear();
+            };
+
+            semanticModelControlBar.DefaultValue = 0.70;
+            semanticModelControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
+                mRankingEngine.SortBySemantic = useForSorting;
+                mRankingEngine.SetFilterThresholdForSemanticModel(value);
+            };
+            semanticModelControlBar.ModelClearedEvent += () => {
+                mFrameSelectionController.ResetSelection();
+                mFrameSelectionController.SubmitSelectionSemanticModel();
+            };
+
+
+
+
             // TODO filter GUI
             mRankingEngine.VideoAggregateFilterEnabled = true;
             mRankingEngine.VideoAggregateFilterMaxFrames = 15;
@@ -125,7 +157,11 @@ namespace ViretTool
             keywordSearchTextBox.KeywordChangedEvent +=
                 (query, annotationSource) =>
                 {
+                    if (!keywordSearchControlBar.UseForSorting && !sketchCanvasControlBar.UseForSorting && !semanticModelControlBar.UseForSorting && query != null) {
+                        keywordSearchControlBar.CheckMe();
+                    }
                     DisableInput();
+
                     mRankingEngine.UpdateKeywordModelRankingAndFilterMask(query, annotationSource);
                     EnableInput();
 
@@ -162,6 +198,9 @@ namespace ViretTool
             sketchCanvas.SketchChangedEvent += 
                 (sketch) => 
                 {
+                    if (!keywordSearchControlBar.UseForSorting && !sketchCanvasControlBar.UseForSorting && !semanticModelControlBar.UseForSorting && sketch.Count > 0) {
+                        sketchCanvasControlBar.CheckMe();
+                    }
                     DisableInput();
                     mRankingEngine.UpdateColorModelRankingAndFilterMask(sketch);
                     EnableInput();
@@ -230,6 +269,11 @@ namespace ViretTool
             mFrameSelectionController.SelectionSubmittedSemanticModelEvent +=
                 (frameSelection) =>
                 {
+                    // TODO: Nekde je chyba... 
+                    // Zavolanim ModelSettingChangedEvent na semanticModelControlBar to nezobrazi vysledek
+                    //if (!keywordSearchControlBar.UseForSorting && !sketchCanvasControlBar.UseForSorting && !semanticModelControlBar.UseForSorting && frameSelection.Count > 0) {
+                    //    semanticModelControlBar.CheckMe();
+                    //}
                     DisableInput();
                     semanticModelDisplay.DisplayFrames(frameSelection);
                     mRankingEngine.UpdateVectorModelRankingAndFilterMask(frameSelection, false);
@@ -491,8 +535,13 @@ namespace ViretTool
             sketchCanvas.Clear();
             mFrameSelectionController.ResetSelection();
             mFrameSelectionController.SubmitSelectionSemanticModel();
+
             filterBW.Reset();
             filterPercentageOfBlack.Reset();
+
+            keywordSearchControlBar.Clear();
+            sketchCanvasControlBar.Clear();
+            semanticModelControlBar.Clear();
 
             // log message
             string message = "Reset of all models and their controls.";

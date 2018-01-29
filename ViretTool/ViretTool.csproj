@@ -63,6 +63,9 @@
     <Compile Include="BasicClient\Controls\FilterControl.xaml.cs">
       <DependentUpon>FilterControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BasicClient\Controls\ModelControl.xaml.cs">
+      <DependentUpon>ModelControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BasicClient\Controls\RadioEnumToBooleanConverter.cs" />
     <Compile Include="BasicClient\Displays\ColorModelDisplay.xaml.cs">
       <DependentUpon>ColorModelDisplay.xaml</DependentUpon>
@@ -131,6 +134,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BasicClient\Controls\KeywordSearch\Themes\SuggestionTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BasicClient\Controls\ModelControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
