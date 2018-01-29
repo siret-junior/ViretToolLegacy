@@ -70,11 +70,14 @@ namespace ViretTool.RankingModel.SimilarityModels
                     { rankedFrames[i].Rank += partialResults[i]; });
             }
 
-            foreach (DataModel.Frame queryFrame in negativeExamples)
+            if (negativeExamples != null)
             {
-                float[] partialResults = AddQueryResultsToCache(queryFrame, false);
-                Parallel.For(0, rankedFrames.Count(), i =>
-                    { rankedFrames[i].Rank -= partialResults[i]; });
+                foreach (DataModel.Frame queryFrame in negativeExamples)
+                {
+                    float[] partialResults = AddQueryResultsToCache(queryFrame, false);
+                    Parallel.For(0, rankedFrames.Count(), i =>
+                        { rankedFrames[i].Rank -= partialResults[i]; });
+                }
             }
 
             return rankedFrames;
