@@ -91,6 +91,8 @@
     <Compile Include="RankingModel\FilterModels\MaskFilter.cs" />
     <Compile Include="RankingModel\FilterModels\MaskFilters\AspectRatioFilter.cs" />
     <Compile Include="RankingModel\FilterModels\MaskFilters\BlackAndWhiteFilter.cs" />
+    <Compile Include="RankingModel\FilterModels\MaskFilters\RankedDatasetFilter.cs" />
+    <Compile Include="RankingModel\FilterModels\MaskFilters\ThresholdFilter.cs" />
     <Compile Include="RankingModel\RankingEngine.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\IIdentifiable.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\SuggestionResultItem.cs" />
@@ -105,6 +107,7 @@
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\LabelProvider.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\SuggestionProvider.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\IDFLoader.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNFeatures\FloatVectorModel.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordModel.cs" />
     <Compile Include="Utils\Submission.cs" />
     <Compile Include="Utils\TextSearch\AhoCorasick.cs" />

@@ -38,21 +38,35 @@ namespace ViretTool
             InitializeComponent();
 
             // prepare data model
-            //mDataset = new DataModel.Dataset(
-            //    "..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb",
-            //    "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
+            //mDataset = new DataModel.Dataset("..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb", "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
 
-            //mDataset = new DataModel.Dataset(
-            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb",
-            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
+            mDataset = new DataModel.Dataset("..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb", "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
+
+            //StringBuilder SB = new StringBuilder(); int c = 0;
+            //foreach (DataModel.Frame f in mDataset.Frames)
+            //{
+            //    BitmapSource bs = f.Bitmap;
+            //    byte[] pixels = ImageHelper.ResizeAndStoreImageToRGBByteArray(bs, (int)bs.Width, (int)bs.Height);
+            //    double pc = pixels.Length / 3, black = 0, white = 0, intensity = 0;
+            //    for (int i = 0; i < pc; i++)
+            //    {
+            //        int offset = i * 3;
+            //        if (pixels[offset] < 32 && pixels[offset + 1] < 32 && pixels[offset + 2] < 32) black++;
+            //        if (pixels[offset] > 224 && pixels[offset + 1] > 224 && pixels[offset + 2] > 224) white++;
+            //        intensity += 0.2126 * pixels[offset] + 0.7152 * pixels[offset + 1] + 0.0722 * pixels[offset + 2];
+            //    }
+            //    SB.AppendLine((black / pc).ToString("0.00") + " " + (white / pc).ToString("0.00") + " " + (intensity / pc).ToString("0.00"));
+            //    if (c++ > 50000) break;
+            //}
+            //Clipboard.SetText(SB.ToString());
 
             //mDataset = new DataModel.Dataset(
             //    "..\\..\\..\\TestData\\TRECVid700v\\TRECVid700v-KF-100x75.thumb",
             //    "..\\..\\..\\TestData\\TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
 
-            mDataset = new DataModel.Dataset(
-                "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
-                "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
+            //mDataset = new DataModel.Dataset(
+            //    "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
+            //    "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
 
 
             // initialize ranking engine
@@ -62,7 +76,7 @@ namespace ViretTool
 
             // TODO filter GUI
             mRankingEngine.VideoAggregateFilterEnabled = true;
-            mRankingEngine.VideoAggregateFilterMaxFrames = 10;
+            mRankingEngine.VideoAggregateFilterMaxFrames = 15;
 
             keywordSearchTextBox.Init(mDataset, new string[] {
                 "GoogLeNet", "YFCC100M"
@@ -93,7 +107,7 @@ namespace ViretTool
                 (query, annotationSource) =>
                 {
                     DisableInput();
-                    mRankingEngine.UpdateKeywordModelRanking(query, annotationSource);
+                    mRankingEngine.UpdateKeywordModelRankingAndFilterMask(query, annotationSource);
                     EnableInput();
 
                     // logging
@@ -130,7 +144,7 @@ namespace ViretTool
                 (sketch) => 
                 {
                     DisableInput();
-                    mRankingEngine.UpdateColorModelRanking(sketch);
+                    mRankingEngine.UpdateColorModelRankingAndFilterMask(sketch);
                     EnableInput();
 
                     // logging
@@ -165,7 +179,7 @@ namespace ViretTool
                     DisableInput();
                     // TODO:
                     colorModelDisplay.DisplayFrames(frameSelection);
-                    mRankingEngine.UpdateColorModelRanking(frameSelection);
+                    //mRankingEngine.UpdateColorModelRanking(frameSelection);
                     EnableInput();
 
                     // logging
@@ -199,7 +213,7 @@ namespace ViretTool
                 {
                     DisableInput();
                     semanticModelDisplay.DisplayFrames(frameSelection);
-                    mRankingEngine.UpdateVectorModelRanking(frameSelection);
+                    mRankingEngine.UpdateVectorModelRankingAndFilterMask(frameSelection, false);
                     EnableInput();
 
                     // build query objects string
@@ -256,6 +270,8 @@ namespace ViretTool
             mRankingEngine.RankingChangedEvent += 
                 (rankedResult) =>
                 {
+                    ShowRank(rankedResult);
+
                     resultDisplay.ResultFrames = rankedResult;
                     mFrameSelectionController.ResetSelection();
 
@@ -317,6 +333,45 @@ namespace ViretTool
 
             // set first display
             mRankingEngine.GenerateSequentialRanking();
+
+            TestButton.Click += TestButton_Click;
+            TestButton.Height = 350;
+            
+        }
+
+        private DataModel.Frame mSearchedFrame = null;
+        private void TestButton_Click(object sender, RoutedEventArgs e)
+        {
+            Random r = new Random();
+            mSearchedFrame = mDataset.Frames[r.Next() % mDataset.Frames.Count];
+            TestLabel.Content = mSearchedFrame.ID.ToString();
+            TestButton.Content = new Image
+            {
+                Source = mSearchedFrame.Bitmap,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+        }
+
+        private void ShowRank(List<RankedFrame> result)
+        {
+            if (mSearchedFrame != null)
+            {
+                TestLabel.Content = "";
+
+                for (int i = 0; i < result.Count; i++)
+                    if (result[i].Frame.FrameVideo.VideoID == mSearchedFrame.FrameVideo.VideoID)
+                    {
+                        TestLabel.Content = "video: " + i; break;
+                    }          
+
+                for (int i = 0; i < result.Count; i++)
+                    if (result[i].Frame.ID == mSearchedFrame.ID)
+                    {
+                        TestLabel.Content += ", frame:" + i; return;
+                    }
+
+                TestLabel.Content += " frame filtered";
+            }
         }
 
         private void DisableInput()

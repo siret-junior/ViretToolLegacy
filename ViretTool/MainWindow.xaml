@@ -43,9 +43,10 @@
 
             <control:KeywordSearchControl x:Name="keywordSearchTextBox"/>
             <control:SketchCanvas x:Name="sketchCanvas"/>
-            <control:ColorModelDisplay x:Name="colorModelDisplay"/>
-            <control:SemanticModelDisplay x:Name="semanticModelDisplay"/>
-            <Button Height="800"></Button>
+            <control:ColorModelDisplay x:Name="colorModelDisplay" Height="50"/>
+            <control:SemanticModelDisplay x:Name="semanticModelDisplay" Height="150" Margin="0,0,0.2,0"/>
+            <Label x:Name="TestLabel" Content=""></Label>
+            <Button Height="200" x:Name="TestButton"></Button>
         </StackPanel>
 
         <GridSplitter Grid.Column="1" 

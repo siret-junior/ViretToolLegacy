@@ -27,12 +27,11 @@ namespace ViretTool.RankingModel
             return -Rank.CompareTo(other.Rank);
         }
 
-        public static List<RankedFrame> InitializeResultList(DataModel.Dataset dataset)
+        public static List<RankedFrame> InitializeResultList(List<DataModel.Frame> frames)
         {
-            List<RankedFrame> result = new List<RankedFrame>();
-            result.Capacity = dataset.Frames.Count;
+            List<RankedFrame> result = new List<RankedFrame>(frames.Count);
 
-            foreach (DataModel.Frame frame in dataset.Frames)
+            foreach (DataModel.Frame frame in frames)
                 result.Add(new RankedFrame(frame, 0));
 
             return result;
