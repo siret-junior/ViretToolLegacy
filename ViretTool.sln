@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViretTool", "ViretTool\ViretTool.csproj", "{83A3AC99-C09A-4744-9364-00E7AC2941DB}"
 EndProject
@@ -39,6 +39,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FlowFilters", "FlowFilters", "{95B2AF04-7EE5-4030-8B72-F77ABD365507}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackAndWhiteFilter", "BlackAndWhiteFilter\BlackAndWhiteFilter.csproj", "{2C729E68-925E-4D93-876A-9CACE75AC2EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyFileGenerator", "TopologyFileGenerator\TopologyFileGenerator.csproj", "{4478F063-7A1F-48CB-BD40-DA26ABF770E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +80,10 @@ Global
 		{2C729E68-925E-4D93-876A-9CACE75AC2EF}.Debug|x64.Build.0 = Debug|x64
 		{2C729E68-925E-4D93-876A-9CACE75AC2EF}.Release|x64.ActiveCfg = Release|x64
 		{2C729E68-925E-4D93-876A-9CACE75AC2EF}.Release|x64.Build.0 = Release|x64
+		{4478F063-7A1F-48CB-BD40-DA26ABF770E7}.Debug|x64.ActiveCfg = Debug|x64
+		{4478F063-7A1F-48CB-BD40-DA26ABF770E7}.Debug|x64.Build.0 = Debug|x64
+		{4478F063-7A1F-48CB-BD40-DA26ABF770E7}.Release|x64.ActiveCfg = Release|x64
+		{4478F063-7A1F-48CB-BD40-DA26ABF770E7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,6 +101,7 @@ Global
 		{11D97996-F8D1-4624-9250-6C47F78E2039} = {3DE87BF7-2871-4E3B-A8FE-2A574CEBA1FA}
 		{95B2AF04-7EE5-4030-8B72-F77ABD365507} = {3DE87BF7-2871-4E3B-A8FE-2A574CEBA1FA}
 		{2C729E68-925E-4D93-876A-9CACE75AC2EF} = {11D97996-F8D1-4624-9250-6C47F78E2039}
+		{4478F063-7A1F-48CB-BD40-DA26ABF770E7} = {07C01CEE-9F09-48AF-BAAB-6D44BC424EA1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0AA05E90-3307-4A81-9E94-F6D04B2C79D3}
