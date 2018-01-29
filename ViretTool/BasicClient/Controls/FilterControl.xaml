@@ -57,9 +57,9 @@
                FontWeight="Bold"
                Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}}, Path=FilterName}" />
 
-        <Slider Grid.Column="1" Name="slider"
-                VerticalAlignment="Center"
-                Maximum="1" ValueChanged="slider_ValueChanged"/>
+        <Slider Grid.Column="1"
+                VerticalAlignment="Center" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}}, Mode=TwoWay, Path=Value}"
+                Maximum="1" PreviewMouseUp="Slider_MouseUp"/>
         <TextBlock TextAlignment="Right"
                    Width="40"
                    VerticalAlignment="Center"
@@ -68,21 +68,21 @@
 
 
         <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="0,2,0,2">
-            <RadioButton GroupName="g" IsChecked="{Binding
+            <RadioButton GroupName="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}}, Path=FilterName}" IsChecked="{Binding
                 RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}},
-                Mode=TwoWay, Path=State, Converter={StaticResource enumConverter}, ConverterParameter=Y}">
+                Mode=TwoWay, Path=State, Converter={StaticResource enumConverter}, ConverterParameter=Y}" Checked="RadioButton_Checked">
 
                 <Run Foreground="Green">Y</Run>
             </RadioButton>
-            <RadioButton GroupName="g" IsChecked="{Binding
+            <RadioButton GroupName="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}}, Path=FilterName}" IsChecked="{Binding
                 RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}},
-                Mode=TwoWay, Path=State, Converter={StaticResource enumConverter}, ConverterParameter=N}">
+                Mode=TwoWay, Path=State, Converter={StaticResource enumConverter}, ConverterParameter=N}" Checked="RadioButton_Checked">
 
                 <Run Foreground="Red">N</Run>
             </RadioButton>
-            <RadioButton GroupName="g" IsChecked="{Binding
+            <RadioButton GroupName="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}}, Path=FilterName}" IsChecked="{Binding
                 RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}},
-                Mode=TwoWay, Path=State, Converter={StaticResource enumConverter}, ConverterParameter=Off}">
+                Mode=TwoWay, Path=State, Converter={StaticResource enumConverter}, ConverterParameter=Off}" Checked="RadioButton_Checked">
 
                 <Run Foreground="Gray">Off</Run>
             </RadioButton>

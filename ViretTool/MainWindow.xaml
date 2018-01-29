@@ -40,8 +40,8 @@
                         Click="clearAllButton_Click"/>
             </Grid>
 
-            <control:FilterControl x:Name="filter1" FilterName="B/W"/>
-            <control:FilterControl x:Name="filter2" FilterName="% of Black"/>
+            <control:FilterControl x:Name="filterBW" FilterName="B/W"/>
+            <control:FilterControl x:Name="filterPercentageOfBlack" FilterName="% of Black"/>
             <control:KeywordSearchControl x:Name="keywordSearchTextBox"/>
             <control:SketchCanvas x:Name="sketchCanvas"/>
             <control:ColorModelDisplay x:Name="colorModelDisplay" Height="50"/>

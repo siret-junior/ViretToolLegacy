@@ -19,6 +19,8 @@ namespace ViretTool.BasicClient {
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             string button = (string)parameter;
 
+            if (!(bool)value) return null;
+
             return Enum.Parse(targetType, button);
         }
     }

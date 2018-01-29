@@ -24,29 +24,53 @@ namespace ViretTool.BasicClient {
 
         public enum FilterState { Y, N, Off }
 
+        public delegate void FilterChangedHandler(FilterState state, double value);
+
+        public event FilterChangedHandler FilterChangedEvent;
+
+
         public static readonly DependencyProperty FilterNameProperty = DependencyProperty.Register("FilterName", typeof(string), typeof(FilterControl), new FrameworkPropertyMetadata(null));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(FilterControl), new FrameworkPropertyMetadata(0.0d));
+        public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register("DefaultValue", typeof(double), typeof(FilterControl), new FrameworkPropertyMetadata(0.0d));
+        public static readonly DependencyProperty StateProperty = DependencyProperty.Register("State", typeof(FilterState), typeof(FilterControl), new FrameworkPropertyMetadata(FilterState.Off));
 
         public string FilterName {
             get { return (string)GetValue(FilterNameProperty); }
             set { SetValue(FilterNameProperty, value); }
         }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(FilterControl), new FrameworkPropertyMetadata(0.0d));
-
         public double Value {
             get { return (double)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
 
-        public static readonly DependencyProperty StateProperty = DependencyProperty.Register("State", typeof(FilterState), typeof(FilterControl), new FrameworkPropertyMetadata(FilterState.Off));
+        public double DefaultValue {
+            get { return (double)GetValue(DefaultValueProperty); }
+            set {
+                SetValue(DefaultValueProperty, value);
+                Value = value;
+            }
+        }
 
         public FilterState State {
             get { return (FilterState)GetValue(StateProperty); }
             set { SetValue(StateProperty, value); }
         }
 
-        private void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-            Value = e.NewValue;
+        public void Reset() {
+            Value = DefaultValue;
+            State = FilterState.Off;
+        }
+
+        private void RadioButton_Checked(object sender, RoutedEventArgs e) {
+            FilterChangedEvent?.Invoke(State, Value);
+        }
+
+        private void Slider_MouseUp(object sender, MouseButtonEventArgs e) {
+            if (State == FilterState.Off) {
+                State = FilterState.Y;
+            }
+            FilterChangedEvent?.Invoke(State, Value);
         }
     }
 }

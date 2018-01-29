@@ -74,6 +74,25 @@ namespace ViretTool
             FilterManager filterManager = new FilterManager(mDataset);
             mRankingEngine = new RankingEngine(similarityManager, filterManager);
 
+            // filter changed events
+            // default value can be set like...
+            //      filterBW.DefaultValue = 0.5;
+            filterBW.DefaultValue = 0.2;
+            filterBW.FilterChangedEvent += (state, value) => {
+                DisableInput();
+                mRankingEngine.SetBlackAndWhiteFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
+                mRankingEngine.SetBlackAndWhiteFilterMask((float)value);
+                EnableInput();
+            };
+
+            filterPercentageOfBlack.FilterChangedEvent += (state, value) => {
+                DisableInput();
+                mRankingEngine.SetPercentageOfBlackColorFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
+                mRankingEngine.SetPercentageOfBlackColorFilterMask((float)value);
+                EnableInput();
+            };
+
+
             // TODO filter GUI
             mRankingEngine.VideoAggregateFilterEnabled = true;
             mRankingEngine.VideoAggregateFilterMaxFrames = 15;
@@ -472,6 +491,8 @@ namespace ViretTool
             sketchCanvas.Clear();
             mFrameSelectionController.ResetSelection();
             mFrameSelectionController.SubmitSelectionSemanticModel();
+            filterBW.Reset();
+            filterPercentageOfBlack.Reset();
 
             // log message
             string message = "Reset of all models and their controls.";
