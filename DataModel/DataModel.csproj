@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="DataModel\Dataset.cs" />
     <Compile Include="DataModel\Frame.cs" />
+    <Compile Include="DataModel\Group.cs" />
     <Compile Include="DataModel\Video.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ImageHelper.cs" />

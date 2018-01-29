@@ -8,24 +8,32 @@ namespace ViretTool.DataModel
 {
     public class Video
     {
+        public readonly int VideoID;
+        public readonly string Name;
+
         public readonly Dataset VideoDataset;
+        public readonly List<Group> Groups;
         public readonly List<Frame> Frames;
 
-        public readonly string Name;
-        public readonly int VideoID;
-
+        
         public Video(Dataset videoDataset, string name, int videoID)
         {
             VideoDataset = videoDataset;
             Name = name;
             VideoID = videoID;
 
+            Groups = new List<Group>();
             Frames = new List<Frame>();
         }
 
         public void AddFrame(Frame frame)
         {
             Frames.Add(frame);
+        }
+
+        public void AddGroup(Group group)
+        {
+            Groups.Add(group);
         }
 
         public List<Frame> GetAllExtractedFrames()
@@ -42,7 +50,7 @@ namespace ViretTool.DataModel
                 int frameNumber = frameData.Item2;
                 byte[] jpgThumbnail = frameData.Item3;
 
-                Frame frame = new Frame(this, -1, frameNumber, jpgThumbnail);
+                Frame frame = new Frame(this, null, -1, frameNumber, jpgThumbnail);
                 allExtractedFrames.Add(frame);
             }
 
