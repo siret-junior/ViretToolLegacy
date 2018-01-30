@@ -48,13 +48,13 @@
 
             <control:ModelControl x:Name="sketchCanvasControlBar" ModelName="Color"/>
             <control:SketchCanvas x:Name="sketchCanvas"/>
-            <control:ColorModelDisplay x:Name="colorModelDisplay" Height="50"/>
+            <!--<control:ColorModelDisplay x:Name="colorModelDisplay" Height="50"/>-->
 
             <control:ModelControl x:Name="semanticModelControlBar" ModelName="Semantic"/>
             <control:SemanticModelDisplay x:Name="semanticModelDisplay" Height="150" Margin="0,0,0.2,0"/>
             
-            <Label x:Name="TestLabel" Content=""></Label>
-            <Button Height="200" x:Name="TestButton"></Button>
+            <!--<Label x:Name="TestLabel" Content=""></Label>-->
+            <Button Height="200" x:Name="TestButton" VerticalContentAlignment="Top"></Button>
         </StackPanel>
 
         <GridSplitter Grid.Column="1" 

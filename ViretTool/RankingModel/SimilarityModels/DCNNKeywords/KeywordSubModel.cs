@@ -33,6 +33,7 @@ namespace ViretTool.RankingModel.SimilarityModels {
             mClasses = new Dictionary<int, List<RankedFrameKW>>();
             mUseIDF = useIDF;
 
+            //mLoadTask = Task.Factory.StartNew(LoadFromFile);
             LoadFromFile();
         }
 
