@@ -174,7 +174,8 @@ namespace ViretTool
             keywordSearchTextBox.KeywordChangedEvent +=
                 (query, annotationSource) =>
                 {
-                    if (!keywordSearchControlBar.UseForSorting && !sketchCanvasControlBar.UseForSorting && !semanticModelControlBar.UseForSorting && query != null) {
+                    if (!keywordSearchControlBar.UseForSorting && !sketchCanvasControlBar.UseForSorting && !semanticModelControlBar.UseForSorting && query != null)
+                    {
                         keywordSearchControlBar.CheckMe();
                     }
                     DisableInput();
@@ -211,7 +212,7 @@ namespace ViretTool
                         + ", " + queryCount + " query objects:" + queryObjects;
                     Logger.LogInfo(keywordSearchTextBox, message);
                 };
-            sketchCanvas.SketchChangingEvent += colorModelDisplay.Clear;
+            //sketchCanvas.SketchChangingEvent += colorModelDisplay.Clear;
             sketchCanvas.SketchChangedEvent += 
                 (sketch) => 
                 {
@@ -354,7 +355,7 @@ namespace ViretTool
             mRankingEngine.RankingChangedEvent += 
                 (rankedResult) =>
                 {
-                    ShowRank(rankedResult);
+                    //ShowRank(rankedResult);
 
                     resultDisplay.ResultFrames = rankedResult;
                     //mFrameSelectionController.ResetSelection();
@@ -386,13 +387,13 @@ namespace ViretTool
             videoDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
             videoDisplay.SubmittingToServerEvent += OpenSubmitWindow;
 
-            colorModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
-            colorModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
-            //colorModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
-            //colorModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
-            colorModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
-            colorModelDisplay.SubmittingToServerEvent += OpenSubmitWindow;
-            colorModelDisplay.ColorExampleChangingEvent += sketchCanvas.DeletePoints;
+            //colorModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            //colorModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            ////colorModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            ////colorModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            //colorModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            //colorModelDisplay.SubmittingToServerEvent += OpenSubmitWindow;
+            //colorModelDisplay.ColorExampleChangingEvent += sketchCanvas.DeletePoints;
 
 
             semanticModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
@@ -407,7 +408,7 @@ namespace ViretTool
                 {
                     resultDisplay.SelectedFrames = selectedFrames;
                     videoDisplay.SelectedFrames = selectedFrames;
-                    colorModelDisplay.SelectedFrames = selectedFrames;
+                    //colorModelDisplay.SelectedFrames = selectedFrames;
                     semanticModelDisplay.DisplayFrames(selectedFrames);
                     semanticModelDisplay.SelectedFrames = selectedFrames;
                 };
@@ -420,7 +421,7 @@ namespace ViretTool
             // show frame video on video display
             resultDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             videoDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
-            colorModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
+            //colorModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             semanticModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
 
             #endregion
@@ -440,7 +441,7 @@ namespace ViretTool
         {
             Random r = new Random();
             mSearchedFrame = mDataset.Frames[r.Next() % mDataset.Frames.Count];
-            TestLabel.Content = mSearchedFrame.ID.ToString();
+            //TestLabel.Content = mSearchedFrame.ID.ToString();
             TestButton.Content = new Image
             {
                 Source = mSearchedFrame.Bitmap,
@@ -448,27 +449,27 @@ namespace ViretTool
             };
         }
 
-        private void ShowRank(List<RankedFrame> result)
-        {
-            if (mSearchedFrame != null)
-            {
-                TestLabel.Content = "";
+        //private void ShowRank(List<RankedFrame> result)
+        //{
+        //    if (mSearchedFrame != null)
+        //    {
+        //        TestLabel.Content = "";
 
-                for (int i = 0; i < result.Count; i++)
-                    if (result[i].Frame.FrameVideo.VideoID == mSearchedFrame.FrameVideo.VideoID)
-                    {
-                        TestLabel.Content = "video: " + i; break;
-                    }          
+        //        for (int i = 0; i < result.Count; i++)
+        //            if (result[i].Frame.FrameVideo.VideoID == mSearchedFrame.FrameVideo.VideoID)
+        //            {
+        //                TestLabel.Content = "video: " + i; break;
+        //            }          
 
-                for (int i = 0; i < result.Count; i++)
-                    if (result[i].Frame.ID == mSearchedFrame.ID)
-                    {
-                        TestLabel.Content += ", frame:" + i; return;
-                    }
+        //        for (int i = 0; i < result.Count; i++)
+        //            if (result[i].Frame.ID == mSearchedFrame.ID)
+        //            {
+        //                TestLabel.Content += ", frame:" + i; return;
+        //            }
 
-                TestLabel.Content += " frame filtered";
-            }
-        }
+        //        TestLabel.Content += " frame filtered";
+        //    }
+        //}
 
         private void DisableInput()
         {

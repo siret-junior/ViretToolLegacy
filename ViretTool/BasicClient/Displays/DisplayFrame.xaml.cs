@@ -43,6 +43,8 @@ namespace ViretTool.BasicClient
                     //label.Content = null;
                 }
                 mVideoFrames = null;
+                LeftScrollHelper.Visibility = Visibility.Hidden;
+                RightScrollHelper.Visibility = Visibility.Hidden;
             }
         }
 
@@ -204,6 +206,8 @@ namespace ViretTool.BasicClient
 
             // hide buttons
             displayButtons.Visibility = Visibility.Hidden;
+            LeftScrollHelper.Visibility = Visibility.Hidden;
+            RightScrollHelper.Visibility = Visibility.Hidden;
         }
 
        
@@ -237,10 +241,14 @@ namespace ViretTool.BasicClient
             if (e.Delta > 0)
             {
                 DisplayVideoFrame(mDisplayedVideoFrameId - 1);
+                LeftScrollHelper.Visibility = Visibility.Visible;
+                RightScrollHelper.Visibility = Visibility.Hidden;
             }
             else
             {
                 DisplayVideoFrame(mDisplayedVideoFrameId + 1);
+                RightScrollHelper.Visibility = Visibility.Visible;
+                LeftScrollHelper.Visibility = Visibility.Hidden;
             }
         }
 

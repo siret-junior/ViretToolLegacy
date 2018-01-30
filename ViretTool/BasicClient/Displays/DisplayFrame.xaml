@@ -58,36 +58,75 @@
                         Grid.Column="0"
                         FontSize="7"
                         Background="LightCoral"
-                        Content="+" 
-                        Click="Add_Click"/>
+                        Click="Add_Click">
+                    <TextBlock FontSize="16" VerticalAlignment="Top" Margin="0, -6, 0, 0" FontWeight="Bold">+</TextBlock>
+                </Button>
                 <Button Name="Remove"
                         Grid.Column="1"
                         FontSize="7"
                         Background="DeepSkyBlue"
-                        Content="X" 
-                        Click="Remove_Click"/>
-                
+                        Click="Remove_Click">
+                    <TextBlock FontSize="16" VerticalAlignment="Top" Margin="0, -6, 0, 0" FontWeight="Bold">-</TextBlock>
+                </Button>
                 <Button Name="AddSubmit"
                         Grid.Column="2"
                         FontSize="7"
                         Background="LightCoral"
-                        Content="++" 
-                        Click="AddSubmit_Click"/>
+                        Click="AddSubmit_Click">
+                    <TextBlock FontSize="10" VerticalAlignment="Top" Margin="0, -2, 0, 0" FontWeight="Bold">++</TextBlock>
+                </Button>
                 <Button Name="RemoveSubmit"
                         Grid.Column="3"
                         FontSize="7"
                         Background="DeepSkyBlue"
-                        Content="XX" 
-                        Click="RemoveSubmit_Click"/>
+                        Click="RemoveSubmit_Click">
+                    <TextBlock FontSize="12" VerticalAlignment="Top" Margin="0, -2.9, 0, 0" FontWeight="Bold">--</TextBlock>
+                </Button>
                 
                 <Button Name="submitButton"
                         Grid.Column="4"
                         FontSize="7"
                         Background="DarkSeaGreen"
-                        Content="Submit" 
-                        Click="submitButton_Click"/>
+                        Click="submitButton_Click">
+                    <TextBlock FontSize="8" VerticalAlignment="Top" Margin="0, 0, 0, 0" FontWeight="Bold">Submit</TextBlock>
+                </Button>
             </Grid>
-            
+
+            <Grid Name="scrollHelper"
+                  Width="100"
+                  Height="75"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Opacity="1"
+                  Visibility="Visible">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="4*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Name="LeftScrollHelper" 
+                           Grid.Column="0"
+                           Visibility="Hidden"
+                           Foreground="Azure"
+                           Text="&lt;" Margin="0,0,1,60">
+                    <TextBlock.RenderTransform>
+                        <ScaleTransform ScaleX="1" ScaleY="4" />
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <TextBlock Name="RightScrollHelper" 
+                           Grid.Column="3"
+                           Visibility="Hidden"
+                           Foreground="Azure"
+                           TextAlignment="Right"
+                           Text="&gt;" Margin="0,0,1,60">
+                    <TextBlock.RenderTransform>
+                        <ScaleTransform ScaleX="1" ScaleY="4" />
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+
+            </Grid>
+
         </Grid>
     </Viewbox>
 </UserControl>

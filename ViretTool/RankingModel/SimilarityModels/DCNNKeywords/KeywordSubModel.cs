@@ -33,7 +33,8 @@ namespace ViretTool.RankingModel.SimilarityModels {
             mClasses = new Dictionary<int, List<RankedFrame>>();
             mUseIDF = useIDF;
 
-            mLoadTask = Task.Factory.StartNew(LoadFromFile);
+            //mLoadTask = Task.Factory.StartNew(LoadFromFile);
+            LoadFromFile();
         }
 
         #region Rank Methods
