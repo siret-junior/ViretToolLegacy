@@ -80,6 +80,14 @@ namespace ViretTool.BasicClient {
             }
         }
 
+        public void UncheckMe()
+        {
+            if (UseForSorting)
+            {
+                UseForSorting = false;
+            }
+        }
+
         private void CheckBox_Changed(object sender, RoutedEventArgs e) {
             ModelSettingChangedEvent?.Invoke(Value, UseForSorting);
         }

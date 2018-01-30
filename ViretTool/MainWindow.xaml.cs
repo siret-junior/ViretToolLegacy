@@ -68,7 +68,7 @@ namespace ViretTool
             //    "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
             //    "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
 
-            const int MAX_VIDEO_COUNT = 1000;
+            const int MAX_VIDEO_COUNT = 700;
             mDataset = new DataModel.Dataset(
                 "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb",
                 "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected-100x75.thumb",
@@ -116,7 +116,7 @@ namespace ViretTool
                 keywordSearchTextBox.Clear();
             };
 
-            sketchCanvasControlBar.DefaultValue = 0.95;
+            sketchCanvasControlBar.DefaultValue = 0.90;
             sketchCanvasControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
                 mRankingEngine.SortByColor = useForSorting;
                 mRankingEngine.SetFilterThresholdForColorModel(value);
@@ -174,8 +174,10 @@ namespace ViretTool
             keywordSearchTextBox.KeywordChangedEvent +=
                 (query, annotationSource) =>
                 {
-                    if (!keywordSearchControlBar.UseForSorting && !sketchCanvasControlBar.UseForSorting && !semanticModelControlBar.UseForSorting && query != null)
+                    if (query != null)
                     {
+                        semanticModelControlBar.UncheckMe();
+                        sketchCanvasControlBar.UncheckMe();
                         keywordSearchControlBar.CheckMe();
                     }
                     DisableInput();
@@ -216,7 +218,9 @@ namespace ViretTool
             sketchCanvas.SketchChangedEvent += 
                 (sketch) => 
                 {
-                    if (!keywordSearchControlBar.UseForSorting && !sketchCanvasControlBar.UseForSorting && !semanticModelControlBar.UseForSorting && sketch.Count > 0) {
+                    if (sketch.Count > 0) {
+                        keywordSearchControlBar.UncheckMe();
+                        semanticModelControlBar.UncheckMe();
                         sketchCanvasControlBar.CheckMe();
                     }
                     DisableInput();
@@ -289,9 +293,12 @@ namespace ViretTool
                 {
                     // TODO: Nekde je chyba... 
                     // Zavolanim ModelSettingChangedEvent na semanticModelControlBar to nezobrazi vysledek
-                    //if (!keywordSearchControlBar.UseForSorting && !sketchCanvasControlBar.UseForSorting && !semanticModelControlBar.UseForSorting && frameSelection.Count > 0) {
-                    //    semanticModelControlBar.CheckMe();
-                    //}
+                    if (frameSelection.Count > 0)
+                    {
+                        keywordSearchControlBar.UncheckMe();
+                        sketchCanvasControlBar.UncheckMe();
+                        semanticModelControlBar.CheckMe();
+                    }
                     DisableInput();
                     semanticModelDisplay.DisplayFrames(frameSelection);
                     semanticModelDisplay.SelectedFrames = frameSelection;
