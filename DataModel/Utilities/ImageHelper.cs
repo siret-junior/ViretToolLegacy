@@ -343,13 +343,15 @@ namespace ViretTool
 
         private static Color ProjectLabToByte(CIELab lab)
         {
-            double offset = lab.bMinValue;
+            //maxL = 100, maxA = 98,2497239576523, maxB = 94,4877196299886
+            //minL = 0, minA = -86,1884340941196, minB = -107,853734252327
+
             double normalizer = 255.0 / (lab.bMaxValue - lab.bMinValue);
 
             Color color = new Color();
-            color.R = (byte)((lab.L + offset) * normalizer);
-            color.G = (byte)((lab.A + offset) * normalizer);
-            color.B = (byte)((lab.B + offset) * normalizer);
+            color.R = (byte)(lab.L * normalizer);
+            color.G = (byte)((lab.A - lab.aMinValue) * normalizer);
+            color.B = (byte)((lab.B - lab.bMinValue) * normalizer);
 
             return color;
         }
