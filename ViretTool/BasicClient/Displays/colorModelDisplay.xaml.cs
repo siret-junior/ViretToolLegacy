@@ -89,8 +89,8 @@ namespace ViretTool.BasicClient
 
         private void colorClearButton_Click(object sender, RoutedEventArgs e)
         {
-            RaiseResettingSelectionEvent();
-            RaiseSelectionColorSearchEvent();
+            //RaiseResettingSelectionEvent();
+            //RaiseSelectionColorSearchEvent();
         }
     }
 }

@@ -95,11 +95,11 @@ namespace ViretTool.BasicClient
             ResettingSelectionEvent?.Invoke();
         }
 
-        public event SubmitSelectionEventHandler SelectionColorSearchEvent;
-        public void RaiseSelectionColorSearchEvent()
-        {
-            SelectionColorSearchEvent?.Invoke();
-        }
+        //public event SubmitSelectionEventHandler SelectionColorSearchEvent;
+        //public void RaiseSelectionColorSearchEvent()
+        //{
+        //    SelectionColorSearchEvent?.Invoke();
+        //}
 
         public event SubmitSelectionEventHandler SelectionSemanticSearchEvent;
         public void RaiseSelectionSemanticSearchEvent()

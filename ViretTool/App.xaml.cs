@@ -21,7 +21,8 @@ namespace ViretTool
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            string errorMessage = string.Format("An unhandled exception occurred: {0}", e.Exception.Message);
+            string errorMessage = string.Format("An unhandled exception occurred: {0}", 
+                e.Exception.Message + "\n\n" + e.Exception.ToString());
             Logger.Log(sender, Severity.Fatal, errorMessage);
             Logger.Log(sender, Severity.Fatal, e.Exception.ToString());
 

@@ -42,7 +42,7 @@
             <Grid Name="displayButtons"
                   Width="100"
                   Height="16"
-                  HorizontalAlignment="Left"
+                  HorizontalAlignment="Center"
                   VerticalAlignment="Bottom"
                   Opacity="1"
                   Visibility="Hidden">
@@ -50,22 +50,38 @@
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Name="colorSearchButton"
+                <Button Name="Add"
                         Grid.Column="0"
                         FontSize="7"
                         Background="LightCoral"
-                        Content="Color" 
-                        Click="colorSearchButton_Click"/>
-                <Button Name="semanticSearchButton"
+                        Content="+" 
+                        Click="Add_Click"/>
+                <Button Name="Remove"
                         Grid.Column="1"
                         FontSize="7"
                         Background="DeepSkyBlue"
-                        Content="Semantic" 
-                        Click="semanticSearchButton_Click"/>
-                <Button Name="submitButton"
+                        Content="X" 
+                        Click="Remove_Click"/>
+                
+                <Button Name="AddSubmit"
                         Grid.Column="2"
+                        FontSize="7"
+                        Background="LightCoral"
+                        Content="++" 
+                        Click="AddSubmit_Click"/>
+                <Button Name="RemoveSubmit"
+                        Grid.Column="3"
+                        FontSize="7"
+                        Background="DeepSkyBlue"
+                        Content="XX" 
+                        Click="RemoveSubmit_Click"/>
+                
+                <Button Name="submitButton"
+                        Grid.Column="4"
                         FontSize="7"
                         Background="DarkSeaGreen"
                         Content="Submit" 

@@ -91,27 +91,36 @@ namespace ViretTool.BasicClient
         }
 
 
-        private int ComputeClosestVideoFrameId()
+        
+        private void UpdateSelectionVisualization()
         {
-            if (VideoFrames == null)
+            switch (mIsSelected)
             {
-                return -1;
-            }
-            else
-            {
-                // find video frame closest to the displayed frame
-                for (int i = 0; i < VideoFrames.Length; i++)
-                {
-                    mDisplayedVideoFrameId = i;
-                    DataModel.Frame videoFrame = VideoFrames[i];
-                    if (videoFrame.FrameNumber > mFrame.FrameNumber)
-                    {
-                        break;
-                    }
-                }
-                return mDisplayedVideoFrameId;
+                case false:
+                    rectangle.Stroke = Brushes.Transparent;
+                    break;
+
+                case true:
+                    rectangle.Stroke = Brushes.Lime;
+                    break;
             }
         }
+        
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // TODO: reconfigurable buttons
+            if (Frame != null)
+            {
+                if (e.LeftButton == MouseButtonState.Pressed && ParentDisplay != null)
+                {
+                    ParentDisplay.RaiseDisplayingFrameVideoEvent(Frame);
+                }
+            }
+        }
+
+
+        #region --[ Inside frame browsing ]--
 
         private void DisplayVideoFrame(int videoFrameId)
         {
@@ -140,7 +149,7 @@ namespace ViretTool.BasicClient
         private void ResetDisplayVideoFrame()
         {
             mDisplayedVideoFrameId = -1;
-            
+
             // restore the selected frame image
             if (Frame != null && image.Source != Frame.Bitmap)
             {
@@ -149,83 +158,16 @@ namespace ViretTool.BasicClient
             }
         }
 
-        private void UpdateSelectionVisualization()
-        {
-            switch (mIsSelected)
-            {
-                case false:
-                    rectangle.Stroke = Brushes.Transparent;
-                    break;
-
-                case true:
-                    rectangle.Stroke = Brushes.Lime;
-                    break;
-            }
-        }
-
-        private void ToggleSelection()
-        {
-            if (mIsSelected == false)
-            {
-                Select();
-            }
-            else
-            {
-                Deselect();
-            }
-        }
-
-
-        private void Select()
-        {
-            if (Frame != null)
-            {
-                ParentDisplay.RaiseAddingToSelectionEvent(Frame);
-            }
-        }
-
-        private void Deselect()
-        {
-            if (Frame != null)
-            {
-                ParentDisplay.RaiseRemovingFromSelectionEvent(Frame);
-            }
-        }
-
-
-        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            // TODO: reconfigurable buttons
-            if (Frame != null)
-            {
-                if (e.LeftButton == MouseButtonState.Pressed && ParentDisplay != null)
-                {
-                    ParentDisplay.RaiseResettingSelectionEvent();
-                    Select();
-                    ParentDisplay.RaiseDisplayingFrameVideoEvent(Frame);
-                }
-                else if (e.RightButton == MouseButtonState.Pressed)
-                {
-                    ToggleSelection();
-                }
-                else if (e.MiddleButton == MouseButtonState.Pressed)
-                {
-                }
-            }
-        }
 
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
             // video scrolling when middle button pressed
             if (Frame != null)
             {
-                if (e.MiddleButton == MouseButtonState.Pressed)
+                Point point = Mouse.GetPosition(this);
+
+                if (e.RightButton == MouseButtonState.Pressed)
                 {
-                    Point point = Mouse.GetPosition(this);
-
-                    // read selected keyframes (obsolete)
-                    //DataModel.Video video = Frame.FrameVideo;
-
                     // read all video frames (lazy)
                     if (mVideoFrames == null)
                     {
@@ -235,11 +177,17 @@ namespace ViretTool.BasicClient
                     mDisplayedVideoFrameId = (int)((point.X / ActualWidth) * (mVideoFrames.Length - 1));
                     image.Source = mVideoFrames[mDisplayedVideoFrameId].Bitmap;
                 }
-                //// the original frame image otherwise
-                //else if (image.Source != Frame.Bitmap)
-                //{
-                //    image.Source = Frame.Bitmap;
-                //}
+                else if (e.MiddleButton == MouseButtonState.Pressed)
+                {
+                    // read selected keyframes
+                    if (mVideoFrames == null)
+                    {
+                        mVideoFrames = Frame.FrameVideo.Frames.ToArray();
+                    }
+
+                    mDisplayedVideoFrameId = (int)((point.X / ActualWidth) * (mVideoFrames.Length - 1));
+                    image.Source = mVideoFrames[mDisplayedVideoFrameId].Bitmap;
+                }
             }
 
             // display buttons
@@ -258,6 +206,7 @@ namespace ViretTool.BasicClient
             displayButtons.Visibility = Visibility.Hidden;
         }
 
+       
         private void Grid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             // TODO: find better solution: 
@@ -270,7 +219,14 @@ namespace ViretTool.BasicClient
             // read all video frames (lazy)
             if (VideoFrames == null)
             {
-                VideoFrames = Frame.FrameVideo.VideoDataset.ReadAllVideoFrames(Frame.FrameVideo);
+                DataModel.Frame[] frames = Frame.FrameVideo.VideoDataset.ReadAllVideoFrames(Frame.FrameVideo);
+
+                // show every second
+                VideoFrames = new DataModel.Frame[frames.Length / 2];
+                for (int i = 0; i < frames.Length / 2; i++)
+                {
+                    VideoFrames[i] = frames[i * 2];
+                }
             }
 
             if (mDisplayedVideoFrameId == -1)
@@ -288,16 +244,66 @@ namespace ViretTool.BasicClient
             }
         }
 
-        private void colorSearchButton_Click(object sender, RoutedEventArgs e)
+        private int ComputeClosestVideoFrameId()
         {
-            Select();
-            ParentDisplay.RaiseSelectionColorSearchEvent();
+            if (VideoFrames == null)
+            {
+                return -1;
+            }
+            else
+            {
+                // find video frame closest to the displayed frame
+                for (int i = 0; i < VideoFrames.Length; i++)
+                {
+                    mDisplayedVideoFrameId = i;
+                    DataModel.Frame videoFrame = VideoFrames[i];
+                    if (videoFrame.FrameNumber > mFrame.FrameNumber)
+                    {
+                        break;
+                    }
+                }
+                return mDisplayedVideoFrameId;
+            }
         }
 
-        private void semanticSearchButton_Click(object sender, RoutedEventArgs e)
+
+        #endregion
+
+
+        #region --[ Display buttons ]--
+
+        private void Add_Click(object sender, RoutedEventArgs e)
         {
-            Select();
-            ParentDisplay.RaiseSelectionSemanticSearchEvent();
+            if (Frame != null)
+            {
+                ParentDisplay.RaiseAddingToSelectionEvent(Frame);
+            }
+        }
+
+        private void Remove_Click(object sender, RoutedEventArgs e)
+        {
+            if (Frame != null)
+            {
+                ParentDisplay.RaiseRemovingFromSelectionEvent(Frame);
+            }
+        }
+
+        private void AddSubmit_Click(object sender, RoutedEventArgs e)
+        {
+            if (Frame != null)
+            {
+                ParentDisplay.RaiseAddingToSelectionEvent(Frame);
+                ParentDisplay.RaiseSelectionSemanticSearchEvent();
+            }
+        }
+
+        private void RemoveSubmit_Click(object sender, RoutedEventArgs e)
+        {
+            if (Frame != null)
+            {
+                ParentDisplay.RaiseRemovingFromSelectionEvent(Frame);
+                ParentDisplay.RaiseSelectionSemanticSearchEvent();
+            }
         }
 
         private void submitButton_Click(object sender, RoutedEventArgs e)
@@ -312,5 +318,6 @@ namespace ViretTool.BasicClient
 
             ParentDisplay.RaiseSubmittingToServerEvent(submittedFrame);
         }
+#endregion
     }
 }

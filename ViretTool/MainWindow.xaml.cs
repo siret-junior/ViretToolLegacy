@@ -68,16 +68,24 @@ namespace ViretTool
             //    "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
             //    "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
 
+            const int MAX_VIDEO_COUNT = 1000;
             mDataset = new DataModel.Dataset(
                 "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb",
                 "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected-100x75.thumb",
-                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected.topology");
+                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected.topology",
+                MAX_VIDEO_COUNT);
 
 
             // initialize ranking engine
             SimilarityManager similarityManager = new SimilarityManager(mDataset);
             FilterManager filterManager = new FilterManager(mDataset);
             mRankingEngine = new RankingEngine(similarityManager, filterManager);
+
+            // initialize selection controller
+            mFrameSelectionController = new FrameSelectionController();
+
+
+            #region --[ Filter events ]--
 
             // filter changed events
             // default value can be set like...
@@ -127,8 +135,7 @@ namespace ViretTool
                 mFrameSelectionController.SubmitSelectionSemanticModel();
             };
 
-
-
+            
 
             // TODO filter GUI
             mRankingEngine.VideoAggregateFilterEnabled = true;
@@ -138,9 +145,11 @@ namespace ViretTool
                 "GoogLeNet", "YFCC100M"
             });
 
-            // initialize selection controller
-            mFrameSelectionController = new FrameSelectionController();
 
+            #endregion
+
+
+            
             // initialize submission client
             mSubmissionClient = new Submission();
             //mSubmissionClient.Connect(mSettings.IPAddress, mSettings.Port, mSettings.TeamName);
@@ -157,6 +166,9 @@ namespace ViretTool
                             + "), Is connected: " + mSubmissionClient.IsConnected.ToString();
                     Logger.LogInfo(mSettings, message);
                 };
+
+
+            #region --[ Ranking model input ]--
 
             // ranking model input
             keywordSearchTextBox.KeywordChangedEvent +=
@@ -236,41 +248,41 @@ namespace ViretTool
                         + queryCount + " color points:" + querySketch;
                     Logger.LogInfo(sketchCanvas, message);
                 };
-            mFrameSelectionController.SelectionSubmittedColorModelEvent +=
-                (frameSelection) =>
-                {
-                    DisableInput();
-                    // TODO:
-                    colorModelDisplay.DisplayFrames(frameSelection);
-                    //mRankingEngine.UpdateColorModelRanking(frameSelection);
-                    EnableInput();
+            //mFrameSelectionController.SelectionSubmittedColorModelEvent +=
+            //    (frameSelection) =>
+            //    {
+            //        DisableInput();
+            //        // TODO:
+            //        colorModelDisplay.DisplayFrames(frameSelection);
+            //        //mRankingEngine.UpdateColorModelRanking(frameSelection);
+            //        EnableInput();
 
-                    // logging
-                    // build query objects string
-                    string querySelection = " ";
-                    int queryCount = 0;
-                    if (frameSelection != null)
-                    {
-                        for (int i = 0; i < frameSelection.Count; i++)
-                        {
-                            DataModel.Frame frame = frameSelection[i];
-                            querySelection += "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
-                            + ", Number:" + frame.FrameNumber + "), ";
-                            queryCount++;
-                        }
-                    }
-                    else
-                    {
-                        querySelection = "null";
-                        queryCount = 0;
-                    }
+            //        // logging
+            //        // build query objects string
+            //        string querySelection = " ";
+            //        int queryCount = 0;
+            //        if (frameSelection != null)
+            //        {
+            //            for (int i = 0; i < frameSelection.Count; i++)
+            //            {
+            //                DataModel.Frame frame = frameSelection[i];
+            //                querySelection += "(Frame ID:" + frame.ID
+            //                + ", Video:" + frame.FrameVideo.VideoID
+            //                + ", Number:" + frame.FrameNumber + "), ";
+            //                queryCount++;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            querySelection = "null";
+            //            queryCount = 0;
+            //        }
 
-                    // log message
-                    string message = "Color model changed: "
-                        + queryCount + " example frames:" + querySelection;
-                    Logger.LogInfo(mFrameSelectionController, message);
-                };
+            //        // log message
+            //        string message = "Color model changed: "
+            //            + queryCount + " example frames:" + querySelection;
+            //        Logger.LogInfo(mFrameSelectionController, message);
+            //    };
             mFrameSelectionController.SelectionSubmittedSemanticModelEvent +=
                 (frameSelection) =>
                 {
@@ -281,6 +293,7 @@ namespace ViretTool
                     //}
                     DisableInput();
                     semanticModelDisplay.DisplayFrames(frameSelection);
+                    semanticModelDisplay.SelectedFrames = frameSelection;
                     mRankingEngine.UpdateVectorModelRankingAndFilterMask(frameSelection, false);
                     EnableInput();
 
@@ -310,6 +323,7 @@ namespace ViretTool
                     Logger.LogInfo(mFrameSelectionController, message);
                 };
 
+
             resultDisplay.DisplayRandomItemsRequestedEvent += 
                 () =>
                 {
@@ -333,6 +347,8 @@ namespace ViretTool
                     Logger.LogInfo(resultDisplay, message);
                 };
 
+            #endregion
+
 
             // ranking model output visualization
             mRankingEngine.RankingChangedEvent += 
@@ -341,7 +357,7 @@ namespace ViretTool
                     ShowRank(rankedResult);
 
                     resultDisplay.ResultFrames = rankedResult;
-                    mFrameSelectionController.ResetSelection();
+                    //mFrameSelectionController.ResetSelection();
 
                     // build query objects string
                     int resultSize = rankedResult != null ? rankedResult.Count : 0;
@@ -353,25 +369,27 @@ namespace ViretTool
                 };
 
 
-            // frame selection
+            #region --[ Frame selection ]--
+            
+            // frame selection events
             resultDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
             resultDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
-            resultDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
-            resultDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            //resultDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            //resultDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
             resultDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
             resultDisplay.SubmittingToServerEvent += OpenSubmitWindow;
 
             videoDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
             videoDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
-            videoDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
-            videoDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            //videoDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            //videoDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
             videoDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
             videoDisplay.SubmittingToServerEvent += OpenSubmitWindow;
 
             colorModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
             colorModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
-            colorModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
-            colorModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            //colorModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            //colorModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
             colorModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
             colorModelDisplay.SubmittingToServerEvent += OpenSubmitWindow;
             colorModelDisplay.ColorExampleChangingEvent += sketchCanvas.DeletePoints;
@@ -379,8 +397,8 @@ namespace ViretTool
 
             semanticModelDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
             semanticModelDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
-            semanticModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
-            semanticModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            //semanticModelDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            //semanticModelDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
             semanticModelDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
             semanticModelDisplay.SubmittingToServerEvent += OpenSubmitWindow;
 
@@ -390,8 +408,14 @@ namespace ViretTool
                     resultDisplay.SelectedFrames = selectedFrames;
                     videoDisplay.SelectedFrames = selectedFrames;
                     colorModelDisplay.SelectedFrames = selectedFrames;
+                    semanticModelDisplay.DisplayFrames(selectedFrames);
                     semanticModelDisplay.SelectedFrames = selectedFrames;
                 };
+
+            #endregion
+
+
+            #region --[ Video display ]--
 
             // show frame video on video display
             resultDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
@@ -399,12 +423,16 @@ namespace ViretTool
             colorModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             semanticModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
 
+            #endregion
+
+
+
             // set first display
             mRankingEngine.GenerateSequentialRanking();
 
+            // TODO remove
             TestButton.Click += TestButton_Click;
             TestButton.Height = 350;
-            
         }
 
         private DataModel.Frame mSearchedFrame = null;
@@ -477,6 +505,9 @@ namespace ViretTool
             //videoDisplay.IsEnabled = true;
         }
 
+
+        #region --[ Submission ]--
+
         private string GetCurrentTaskId()
         {
             TimeSpan taskTimeout = TimeSpan.FromMilliseconds(250);
@@ -514,7 +545,9 @@ namespace ViretTool
                     + ", Number:" + frame.FrameNumber + ")";
             Logger.LogInfo(this, message);
         }
-        
+
+        #endregion
+
 
         private void LogVideoDisplayed(DataModel.Frame frame)
         {
