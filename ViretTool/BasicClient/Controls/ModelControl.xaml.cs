@@ -57,7 +57,7 @@ namespace ViretTool.BasicClient {
         }
 
         private void Slider_MouseUp(object sender, MouseButtonEventArgs e) {
-            ModelSettingChangedEvent?.Invoke(Value, UseForSorting);
+            ModelSettingChangedEvent?.Invoke(Value/100d, UseForSorting);
         }
 
         public void Clear() {
@@ -65,7 +65,7 @@ namespace ViretTool.BasicClient {
             if (UseForSorting) {
                 UseForSorting = false;
             } else {
-                ModelSettingChangedEvent?.Invoke(Value, UseForSorting);
+                ModelSettingChangedEvent?.Invoke(Value/100d, UseForSorting);
             }
             ModelClearedEvent?.Invoke();
         }
@@ -89,7 +89,7 @@ namespace ViretTool.BasicClient {
         }
 
         private void CheckBox_Changed(object sender, RoutedEventArgs e) {
-            ModelSettingChangedEvent?.Invoke(Value, UseForSorting);
+            ModelSettingChangedEvent?.Invoke(Value/100d, UseForSorting);
         }
     }
 }

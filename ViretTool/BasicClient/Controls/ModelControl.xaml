@@ -27,7 +27,7 @@
                 Margin="10, 0, 0, 0"
                 VerticalAlignment="Center"
                 Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ModelControl}}, Mode=TwoWay, Path=Value}"
-                Maximum="1"
+                Maximum="99"
                 PreviewMouseUp="Slider_MouseUp"/>
 
         <TextBlock Grid.Column="2"

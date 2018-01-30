@@ -11,7 +11,7 @@ namespace ViretTool.BasicClient {
     [ValueConversion(typeof(double), typeof(string))]
     public sealed class DoubleToStringConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            double doubleType = ((double)value)*100;
+            double doubleType = ((double)value);
             return doubleType.ToString("0.0") + "%";
         }
 

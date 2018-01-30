@@ -90,24 +90,24 @@ namespace ViretTool
             // filter changed events
             // default value can be set like...
             //      filterBW.DefaultValue = 0.5;
-            filterBW.DefaultValue = 0.2;
-            filterBW.FilterChangedEvent += (state, value) => {
-                DisableInput();
-                mRankingEngine.SetBlackAndWhiteFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
-                mRankingEngine.SetBlackAndWhiteFilterMask((float)value);
-                EnableInput();
-            };
+            //filterBW.DefaultValue = 0.2;
+            //filterBW.FilterChangedEvent += (state, value) => {
+            //    DisableInput();
+            //    mRankingEngine.SetBlackAndWhiteFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
+            //    mRankingEngine.SetBlackAndWhiteFilterMask((float)value);
+            //    EnableInput();
+            //};
 
-            filterPercentageOfBlack.FilterChangedEvent += (state, value) => {
-                DisableInput();
-                mRankingEngine.SetPercentageOfBlackColorFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
-                mRankingEngine.SetPercentageOfBlackColorFilterMask((float)value);
-                EnableInput();
-            };
+            //filterPercentageOfBlack.FilterChangedEvent += (state, value) => {
+            //    DisableInput();
+            //    mRankingEngine.SetPercentageOfBlackColorFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
+            //    mRankingEngine.SetPercentageOfBlackColorFilterMask((float)value);
+            //    EnableInput();
+            //};
 
 
             // model filters
-            keywordSearchControlBar.DefaultValue = 0.5;
+            keywordSearchControlBar.DefaultValue = 50;
             keywordSearchControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
                 mRankingEngine.SortByKeyword = useForSorting;
                 mRankingEngine.SetFilterThresholdForKeywordModel(value);
@@ -116,7 +116,7 @@ namespace ViretTool
                 keywordSearchTextBox.Clear();
             };
 
-            sketchCanvasControlBar.DefaultValue = 0.90;
+            sketchCanvasControlBar.DefaultValue = 90;
             sketchCanvasControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
                 mRankingEngine.SortByColor = useForSorting;
                 mRankingEngine.SetFilterThresholdForColorModel(value);
@@ -125,7 +125,7 @@ namespace ViretTool
                 sketchCanvas.Clear();
             };
 
-            semanticModelControlBar.DefaultValue = 0.70;
+            semanticModelControlBar.DefaultValue = 70;
             semanticModelControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
                 mRankingEngine.SortBySemantic = useForSorting;
                 mRankingEngine.SetFilterThresholdForSemanticModel(value);
@@ -582,8 +582,8 @@ namespace ViretTool
             mFrameSelectionController.ResetSelection();
             mFrameSelectionController.SubmitSelectionSemanticModel();
 
-            filterBW.Reset();
-            filterPercentageOfBlack.Reset();
+            //filterBW.Reset();
+            //filterPercentageOfBlack.Reset();
 
             keywordSearchControlBar.Clear();
             sketchCanvasControlBar.Clear();
