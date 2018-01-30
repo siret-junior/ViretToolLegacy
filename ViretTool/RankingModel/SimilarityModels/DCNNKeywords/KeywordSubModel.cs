@@ -20,7 +20,7 @@ namespace ViretTool.RankingModel.SimilarityModels {
         /// <summary>
         /// Maps class ID from query to list of frames containing the class
         /// </summary>
-        private Dictionary<int, List<RankedFrame>> mClasses;
+        private Dictionary<int, List<RankedFrameKW>> mClasses;
         private Task mLoadTask;
 
         private float[] IDF;
@@ -30,19 +30,20 @@ namespace ViretTool.RankingModel.SimilarityModels {
         public KeywordSubModel(Dataset dataset, string filePath, bool useIDF = false) {
             mIndexFilePath = filePath;
             mDataset = dataset;
-            mClasses = new Dictionary<int, List<RankedFrame>>();
+            mClasses = new Dictionary<int, List<RankedFrameKW>>();
             mUseIDF = useIDF;
 
-            mLoadTask = Task.Factory.StartNew(LoadFromFile);
+            LoadFromFile();
         }
 
         #region Rank Methods
 
         public List<RankedFrame> RankFramesBasedOnQuery(List<List<int>> query) {
-            if (mLoadTask.IsFaulted) {
-                throw mLoadTask.Exception.InnerException;
-            }
-            if (!mLoadTask.IsCompleted || query == null) {
+            //if (mLoadTask.IsFaulted) {
+            //    throw mLoadTask.Exception.InnerException;
+            //}
+            if (query == null) {
+                //if (!mLoadTask.IsCompleted || query == null) {
                 return RankedFrame.InitializeResultList(mDataset.Frames);
             }
 
@@ -55,7 +56,6 @@ namespace ViretTool.RankingModel.SimilarityModels {
         #region (Private) Index File Loading
 
         private void LoadFromFile() {
-            BinaryReader stream = null;
             Dictionary<int, int> classLocations = new Dictionary<int, int>();
 
             if (mUseIDF) {
@@ -63,8 +63,9 @@ namespace ViretTool.RankingModel.SimilarityModels {
                 else IDF = DCNNKeywords.IDFLoader.LoadFromFile(mIndexFilePath + ".idf");
             }
 
-            try {
-                stream = new BinaryReader(File.OpenRead(mIndexFilePath));
+            int LAST_ID = mDataset.Videos[mDataset.Videos.Count - 1].Frames[mDataset.Videos[mDataset.Videos.Count - 1].Frames.Count - 1].ID;
+
+            using (DCNNKeywords.BufferedByteStream stream = new DCNNKeywords.BufferedByteStream(mIndexFilePath)) { 
 
                 // header = 'KS INDEX'+(Int64)-1
                 if (stream.ReadInt64() != 0x4b5320494e444558 && stream.ReadInt64() != -1)
@@ -80,30 +81,29 @@ namespace ViretTool.RankingModel.SimilarityModels {
                     } else break;
                 }
 
-                while (stream.BaseStream.Position != stream.BaseStream.Length) {
+                while (!stream.IsEndOfStream()) {
 
                     // list of class offets does not contain this one
-                    if (!classLocations.ContainsKey((int)stream.BaseStream.Position))
+                    if (!classLocations.ContainsKey(stream.Pointer))
                         throw new FileFormatException("Invalid index file format.");
 
-                    int classId = classLocations[(int)stream.BaseStream.Position];
-                    mClasses.Add(classId, new List<RankedFrame>());
+                    int classId = classLocations[stream.Pointer];
+                    mClasses.Add(classId, new List<RankedFrameKW>());
 
                     // add all images
                     while (true) {
-                        uint imageId = (uint)stream.ReadInt32();
-                        float imageProbability = stream.ReadSingle();
+                        int imageId = stream.ReadInt32();
+                        float imageProbability = stream.ReadFloat();
 
-                        if (imageId != 0xffffffff) {
+                        if (imageId != -1) {
+                            if (imageId > LAST_ID) continue;
 
-                            Frame f = mDataset.Frames[(int)imageId];
-                            RankedFrame rf = new RankedFrame(f, imageProbability);
+                            Frame f = mDataset.Frames[imageId];
+                            RankedFrameKW rf = new RankedFrameKW(f, imageProbability);
                             mClasses[classId].Add(rf);
                         } else break;
                     }
                 }
-            } finally {
-                stream.Dispose();
             }
         }
 
@@ -114,28 +114,28 @@ namespace ViretTool.RankingModel.SimilarityModels {
         private List<RankedFrame> GetRankedFrames(List<List<int>> ids) {
             List<RankedFrame> res = RankedFrame.InitializeResultList(mDataset.Frames);
 
-            List<Dictionary<int, RankedFrame>> clauses = ResolveClauses(ids);
-            Dictionary<int, RankedFrame> query = UniteClauses(clauses);
+            List<Dictionary<int, RankedFrameKW>> clauses = ResolveClauses(ids);
+            Dictionary<int, RankedFrameKW> query = UniteClauses(clauses);
 
-            foreach (KeyValuePair<int, RankedFrame> pair in query) {
-                res[pair.Key] = pair.Value;
+            foreach (KeyValuePair<int, RankedFrameKW> pair in query) {
+                res[pair.Key] = new RankedFrame(pair.Value.Frame, pair.Value.Rank);
             }
             
             return res;
         }
 
 
-        private Dictionary<int, RankedFrame> UniteClauses(List<Dictionary<int, RankedFrame>> clauses) {
+        private Dictionary<int, RankedFrameKW> UniteClauses(List<Dictionary<int, RankedFrameKW>> clauses) {
             var result = clauses[clauses.Count - 1];
             clauses.RemoveAt(clauses.Count - 1);
 
-            foreach (Dictionary<int, RankedFrame> clause in clauses) {
-                Dictionary<int, RankedFrame> tempResult = new Dictionary<int, RankedFrame>();
+            foreach (Dictionary<int, RankedFrameKW> clause in clauses) {
+                Dictionary<int, RankedFrameKW> tempResult = new Dictionary<int, RankedFrameKW>();
 
-                foreach (KeyValuePair<int, RankedFrame> rf in clause) {
-                    RankedFrame rfFromResult;
+                foreach (KeyValuePair<int, RankedFrameKW> rf in clause) {
+                    RankedFrameKW rfFromResult;
                     if (result.TryGetValue(rf.Value.Frame.ID, out rfFromResult)) {
-                        tempResult.Add(rf.Value.Frame.ID, new RankedFrame(rf.Value.Frame, rf.Value.Rank * rfFromResult.Rank));
+                        tempResult.Add(rf.Value.Frame.ID, new RankedFrameKW(rf.Value.Frame, rf.Value.Rank * rfFromResult.Rank));
                     }
                 }
                 result = tempResult;
@@ -143,8 +143,8 @@ namespace ViretTool.RankingModel.SimilarityModels {
             return result;
         }
 
-        private List<Dictionary<int, RankedFrame>> ResolveClauses(List<List<int>> ids) {
-            var list = new List<Dictionary<int, RankedFrame>>();
+        private List<Dictionary<int, RankedFrameKW>> ResolveClauses(List<List<int>> ids) {
+            var list = new List<Dictionary<int, RankedFrameKW>>();
 
             // should be fast
             // http://alicebobandmallory.com/articles/2012/10/18/merge-collections-without-duplicates-in-c
@@ -155,18 +155,18 @@ namespace ViretTool.RankingModel.SimilarityModels {
 
                 // no class with a frame found
                 if (i == listOfIds.Count) {
-                    list.Add(new Dictionary<int, RankedFrame>());
+                    list.Add(new Dictionary<int, RankedFrameKW>());
                     continue;
                 }
 
-                Dictionary<int, RankedFrame> dict = new Dictionary<int, RankedFrame>(); //= mClasses[listOfIds[i]].ToDictionary(f => f.Frame.ID);
+                Dictionary<int, RankedFrameKW> dict = new Dictionary<int, RankedFrameKW>(); //= mClasses[listOfIds[i]].ToDictionary(f => f.Frame.ID);
                 
                 for (; i < listOfIds.Count; i++) {
                     if (!mClasses.ContainsKey(listOfIds[i])) continue;
 
                     if (mUseIDF) {
                         float idf = IDF[listOfIds[i]];
-                        foreach (RankedFrame f in mClasses[listOfIds[i]]) {
+                        foreach (RankedFrameKW f in mClasses[listOfIds[i]]) {
                             if (dict.ContainsKey(f.Frame.ID)) {
                                 dict[f.Frame.ID].Rank += f.Rank * idf;
                             } else {
@@ -176,7 +176,7 @@ namespace ViretTool.RankingModel.SimilarityModels {
                             }
                         }
                     } else {
-                        foreach (RankedFrame f in mClasses[listOfIds[i]]) {
+                        foreach (RankedFrameKW f in mClasses[listOfIds[i]]) {
                             if (dict.ContainsKey(f.Frame.ID)) {
                                 dict[f.Frame.ID].Rank += f.Rank;
                             } else {
