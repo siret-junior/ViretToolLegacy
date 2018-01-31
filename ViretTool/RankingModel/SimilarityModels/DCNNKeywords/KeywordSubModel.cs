@@ -14,23 +14,21 @@ namespace ViretTool.RankingModel.SimilarityModels {
     class KeywordSubModel {
 
         private bool mUseIDF;
-        private string mIndexFilePath;
-
+        private string mSource;
         private Dataset mDataset;
         /// <summary>
         /// Maps class ID from query to list of frames containing the class
         /// </summary>
-        private Dictionary<int, List<RankedFrameKW>> mClasses;
-        private Task mLoadTask;
+        private Dictionary<int, List<RankedFrameKW>> mClasses = new Dictionary<int, List<RankedFrameKW>>();
+        //private Task mLoadTask;
 
         private float[] IDF;
 
         /// <param name="lp">For class name to class id conversion</param>
         /// <param name="filePath">Relative or absolute path to index file</param>
-        public KeywordSubModel(Dataset dataset, string filePath, bool useIDF = false) {
-            mIndexFilePath = filePath;
+        public KeywordSubModel(Dataset dataset, string source, bool useIDF = false) {
             mDataset = dataset;
-            mClasses = new Dictionary<int, List<RankedFrameKW>>();
+            mSource = source;
             mUseIDF = useIDF;
 
             //mLoadTask = Task.Factory.StartNew(LoadFromFile);
@@ -60,13 +58,14 @@ namespace ViretTool.RankingModel.SimilarityModels {
             Dictionary<int, int> classLocations = new Dictionary<int, int>();
 
             if (mUseIDF) {
-                if (!File.Exists(mIndexFilePath + ".idf")) mUseIDF = false;
-                else IDF = DCNNKeywords.IDFLoader.LoadFromFile(mIndexFilePath + ".idf");
+                string idfFilename = mDataset.GetFileNameByExtension($"-{mSource}.keyword.idf");
+                IDF = DCNNKeywords.IDFLoader.LoadFromFile(idfFilename);
             }
 
-            int LAST_ID = mDataset.Videos[mDataset.Videos.Count - 1].Frames[mDataset.Videos[mDataset.Videos.Count - 1].Frames.Count - 1].ID;
+            int lastId = mDataset.LAST_FRAME_TO_LOAD;
+            string indexFilename = mDataset.GetFileNameByExtension($"-{mSource}.keyword");
 
-            using (DCNNKeywords.BufferedByteStream stream = new DCNNKeywords.BufferedByteStream(mIndexFilePath)) { 
+            using (DCNNKeywords.BufferedByteStream stream = new DCNNKeywords.BufferedByteStream(indexFilename)) { 
 
                 // header = 'KS INDEX'+(Int64)-1
                 if (stream.ReadInt64() != 0x4b5320494e444558 && stream.ReadInt64() != -1)
@@ -97,7 +96,7 @@ namespace ViretTool.RankingModel.SimilarityModels {
                         float imageProbability = stream.ReadFloat();
 
                         if (imageId != -1) {
-                            if (imageId > LAST_ID) continue;
+                            if (imageId > lastId) continue;
 
                             Frame f = mDataset.Frames[imageId];
                             RankedFrameKW rf = new RankedFrameKW(f, imageProbability);

@@ -48,7 +48,7 @@ namespace ViretTool.BasicClient {
             suggestionTextBox.AnnotationSources = annotationSources;
 
             foreach (string source in annotationSources) {
-                string labels = dataset.AllExtractedFramesFilename.Split('-')[0] + "-" + source + ".label";
+                string labels = dataset.GetFileNameByExtension($"-{source}.label");
 
                 var labelProvider = new LabelProvider(labels);
                 mLabelProviders.Add(source, labelProvider);

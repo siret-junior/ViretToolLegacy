@@ -37,6 +37,11 @@ namespace ViretTool.DataModel
         /// </summary>
         public readonly FrameReader AllExtractedFramesReader;
   
+        public int LAST_FRAME_TO_LOAD { get {
+                Video lastVideo = Videos[Videos.Count - 1];
+                return lastVideo.Frames[lastVideo.Frames.Count - 1].ID;
+            }
+        }
 
         /// <summary>
         /// Loads selected frames into memory and initializes reader of all extracted frames.
