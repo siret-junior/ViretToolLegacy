@@ -90,20 +90,21 @@ namespace ViretTool
             // filter changed events
             // default value can be set like...
             //      filterBW.DefaultValue = 0.5;
-            //filterBW.DefaultValue = 0.2;
-            //filterBW.FilterChangedEvent += (state, value) => {
-            //    DisableInput();
-            //    mRankingEngine.SetBlackAndWhiteFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
-            //    mRankingEngine.SetBlackAndWhiteFilterMask((float)value);
-            //    EnableInput();
-            //};
+            filterBW.DefaultValue = 90;
+            filterBW.FilterChangedEvent += (state, value) => {
+                DisableInput();
+                mRankingEngine.SetBlackAndWhiteFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
+                mRankingEngine.SetBlackAndWhiteFilterMask((float)value);
+                EnableInput();
+            };
 
-            //filterPercentageOfBlack.FilterChangedEvent += (state, value) => {
-            //    DisableInput();
-            //    mRankingEngine.SetPercentageOfBlackColorFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
-            //    mRankingEngine.SetPercentageOfBlackColorFilterMask((float)value);
-            //    EnableInput();
-            //};
+            filterPercentageOfBlack.DefaultValue = 65;
+            filterPercentageOfBlack.FilterChangedEvent += (state, value) => {
+                DisableInput();
+                mRankingEngine.SetPercentageOfBlackColorFilter(state != FilterControl.FilterState.Off, state == FilterControl.FilterState.N);
+                mRankingEngine.SetPercentageOfBlackColorFilterMask((float)value);
+                EnableInput();
+            };
 
 
             // model filters
@@ -142,7 +143,7 @@ namespace ViretTool
             mRankingEngine.VideoAggregateFilterMaxFrames = 15;
 
             keywordSearchTextBox.Init(mDataset, new string[] {
-                "GoogLeNet", "YFCC100M"
+                "GoogLeNet", "YFCC100M", "Audio"
             });
 
 
@@ -582,8 +583,8 @@ namespace ViretTool
             mFrameSelectionController.ResetSelection();
             mFrameSelectionController.SubmitSelectionSemanticModel();
 
-            //filterBW.Reset();
-            //filterPercentageOfBlack.Reset();
+            filterBW.Reset();
+            filterPercentageOfBlack.Reset();
 
             keywordSearchControlBar.Clear();
             sketchCanvasControlBar.Clear();
@@ -592,6 +593,12 @@ namespace ViretTool
             // log message
             string message = "Reset of all models and their controls.";
             Logger.LogInfo(semanticModelDisplay, message);
+        }
+
+        private void filtersClearButton_Click(object sender, RoutedEventArgs e) {
+            // TODO: without reranking in between
+            filterBW.Reset();
+            filterPercentageOfBlack.Reset();
         }
 
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)

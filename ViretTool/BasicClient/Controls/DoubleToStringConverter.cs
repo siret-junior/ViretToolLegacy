@@ -12,6 +12,10 @@ namespace ViretTool.BasicClient {
     public sealed class DoubleToStringConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             double doubleType = ((double)value);
+
+            if (parameter != null && (string)parameter == "ZeroOne")
+                return (doubleType / 100).ToString("0.00");
+
             return doubleType.ToString("0.0") + "%";
         }
 

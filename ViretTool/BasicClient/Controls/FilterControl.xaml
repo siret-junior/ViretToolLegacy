@@ -59,12 +59,12 @@
 
         <Slider Grid.Column="1"
                 VerticalAlignment="Center" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}}, Mode=TwoWay, Path=Value}"
-                Maximum="1" PreviewMouseUp="Slider_MouseUp"/>
+                Minimum="1" Maximum="99" PreviewMouseUp="Slider_MouseUp"/>
         <TextBlock TextAlignment="Right"
                    Width="40"
                    VerticalAlignment="Center"
                    Grid.Column="2"
-                   Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}}, Mode=TwoWay, Path=Value, Converter={StaticResource doubleConverter}}" />
+                   Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FilterControl}}, Mode=TwoWay, Path=Value, Converter={StaticResource doubleConverter}, ConverterParameter=ZeroOne}" />
 
 
         <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="0,2,0,2">

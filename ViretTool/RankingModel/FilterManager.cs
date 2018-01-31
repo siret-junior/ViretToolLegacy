@@ -52,8 +52,8 @@ namespace ViretTool.RankingModel.FilterModels
             if (mColorRankingFilter.Enabled) maskFilters.Add(mColorRankingFilter.Mask);
             if (mVectorRankingFilter.Enabled) maskFilters.Add(mVectorRankingFilter.Mask);
 
-            if (mBlackAndWhiteFilter.Enabled) maskFilters.Add(mBlackAndWhiteFilter.Mask);
-            if (mPercentageOfBlackColorFilter.Enabled) maskFilters.Add(mPercentageOfBlackColorFilter.Mask);
+            if (mBlackAndWhiteFilter.Enabled) maskFilters.Add(mBlackAndWhiteFilter.GetActualMask());
+            if (mPercentageOfBlackColorFilter.Enabled) maskFilters.Add(mPercentageOfBlackColorFilter.GetActualMask());
 
             if (maskFilters.Count == 0) return mDataset.Frames;
 
@@ -80,6 +80,7 @@ namespace ViretTool.RankingModel.FilterModels
             return rankedFrames;
         }
 
+        // WARNING NOT USED !!!
         public List<RankedFrame> ApplyFiltersAndSort(List<RankedFrame> unfilteredRankedFrames)
         {
             // apply mask filters

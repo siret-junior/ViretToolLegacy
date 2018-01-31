@@ -40,8 +40,23 @@
                         Click="clearAllButton_Click"/>
             </Grid>
 
-            <!--<control:FilterControl x:Name="filterBW" FilterName="B/W"/>
-            <control:FilterControl x:Name="filterPercentageOfBlack" FilterName="% of Black"/>-->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0"
+                       Background="DarkGray"
+                       FontWeight="Bold"
+                       Content="Filters" />
+
+                <Button Grid.Column="1"
+                        Click="filtersClearButton_Click"
+                        Content="Clear" />
+            </Grid>
+
+            <control:FilterControl x:Name="filterBW" FilterName="B/W"/>
+            <control:FilterControl x:Name="filterPercentageOfBlack" FilterName="% of Black"/>
             
             <control:ModelControl x:Name="keywordSearchControlBar" ModelName="Keyword"/>
             <control:KeywordSearchControl x:Name="keywordSearchTextBox"/>

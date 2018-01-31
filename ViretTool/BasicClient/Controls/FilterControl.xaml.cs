@@ -63,14 +63,14 @@ namespace ViretTool.BasicClient {
         }
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e) {
-            FilterChangedEvent?.Invoke(State, Value);
+            FilterChangedEvent?.Invoke(State, Value/100d);
         }
 
         private void Slider_MouseUp(object sender, MouseButtonEventArgs e) {
             if (State == FilterState.Off) {
                 State = FilterState.Y;
             }
-            FilterChangedEvent?.Invoke(State, Value);
+            FilterChangedEvent?.Invoke(State, Value/100d);
         }
     }
 }

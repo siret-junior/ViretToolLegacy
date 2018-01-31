@@ -27,8 +27,8 @@ namespace ViretTool.RankingModel.FilterModels.MaskFilters
         {
             if (!System.IO.File.Exists(frameAttributeFileName))
             {
-                if (dataset.UseOldDatasetID)
-                    return;
+                //if (dataset.UseOldDatasetID)
+                //    return;
 
                 throw new Exception("Filter was not created to " + frameAttributeFileName);
             }
@@ -58,7 +58,7 @@ namespace ViretTool.RankingModel.FilterModels.MaskFilters
             // set mask using the threshold
             bool[] mask = Mask;
             Parallel.For(0, mask.Length, i =>
-                mask[i] = mFrameAttribute[i] < threshold);
+                mask[i] = mFrameAttribute[i] > threshold);
 
             Mask = mask; // sets also inverted mask
         }
