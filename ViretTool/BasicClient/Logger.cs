@@ -21,7 +21,7 @@ namespace ViretTool.BasicClient
         public Logger(string filename)
         {
             mLogWriter = new StreamWriter(File.Open(filename, FileMode.Append, FileAccess.Write, FileShare.Read));
-            mLogWriter.WriteLine("####  Log started at " 
+            mLogWriter.WriteLine("####  Log started at "
                 + GetCurrentTime() + "  #################################################");
         }
 
@@ -88,6 +88,49 @@ namespace ViretTool.BasicClient
         public void Dispose()
         {
             ((IDisposable)mLogWriter).Dispose();
+        }
+    }
+
+    public class VBSLogger
+    {
+        private char[] mDefinedActions;
+        private StringBuilder mLog;
+        private DateTime mLogCreationTime;
+        private string mToolID;
+
+        public VBSLogger(string toolID)
+        {
+            mDefinedActions = "KAOCEMSFPBTX".ToCharArray();
+            mToolID = toolID;
+            ResetLog();
+        }
+
+        public void ResetLog()
+        { 
+            mLog = new StringBuilder();
+            mLog.Append(mToolID);
+            mLogCreationTime = DateTime.Now;
+        }
+
+        public string AppendTimeAndGetLogString()
+        {
+            mLog.Append(";time " + DateTime.Now.ToString("H:mm:ss"));
+            return mLog.ToString();
+        }
+
+        public void AppendActionIncludeTimeParameter(char action, bool add, string parameters = "")
+        {
+            action = char.ToUpper(action);
+            if (!mDefinedActions.Contains(action))
+                throw new Exception("Unknown VBSLog action " + action);
+
+            if (add) mLog.Append(";" + action);
+            else mLog.Append(";-" + action);
+
+            if (parameters != "") parameters = "," + parameters;
+            parameters = "(" + DateTime.Now.Subtract(mLogCreationTime).TotalSeconds.ToString("0") + "s" + parameters + ")";
+
+            mLog.Append(parameters);
         }
     }
 }
