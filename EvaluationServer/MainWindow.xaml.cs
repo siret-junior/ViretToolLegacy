@@ -50,8 +50,10 @@ namespace VitretTool.EvaluationServer {
             //    "..\\..\\..\\TestData\\TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
 
             var dataset = new ViretTool.DataModel.Dataset(
-                "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
-                "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
+                "D:\\ViretTool-2018-01-30-JDI\\TRECVid\\TRECVid-4fps-100x75.thumb",
+                "D:\\ViretTool-2018-01-30-JDI\\TRECVid\\TRECVid-4fps-selected-100x75.thumb",
+                "D:\\ViretTool-2018-01-30-JDI\\TRECVid\\TRECVid-4fps-selected.topology",
+                700);
 
             //ConvertFrameIdsToTimestamps.Convert(dataset,
             //    "..\\..\\..\\EvaluationServer\\ExampleData\\fps.for_generation_only",

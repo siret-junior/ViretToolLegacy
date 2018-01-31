@@ -49,13 +49,8 @@ namespace VitretTool.EvaluationServer {
             t.Started = false;
             t.Finished = false;
 
-            if (File.Exists("Tasks/finished" + t.TaskId + ".txt")) {
-                t.Started = true;
-                t.Finished = true;
-            } else {
-                t.mStreamWriter = new StreamWriter("Tasks/finished" + t.TaskId + ".txt", false);
-                t.mStreamWriter.AutoFlush = true;
-            }
+            t.mStreamWriter = new StreamWriter("Tasks/finished" + t.TaskId + ".txt", true);
+            t.mStreamWriter.AutoFlush = true;
 
             return t;
         }
