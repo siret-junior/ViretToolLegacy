@@ -10,28 +10,44 @@ using ViretTool.DataModel;
 
 namespace BlackAndWhiteFilter {
     class Program {
+        // CONFIGURATION OF threshold USED ON 31. 1. 2018 IS 32
 
         /// <param name="selectedFramesFilename"></param>
         /// <param name="allExtractedFramesFilename"></param>
         /// <param name="thresholdForBlackColor"></param>
         static void Main(string[] args) {
             if (args.Length != 3) {
-                Console.WriteLine("invalid arguments\n1: selected frames filename\n2: all extracted frames filename\n3: black color selection threshold");
+                Console.WriteLine("invalid arguments\n1: all extracted frames filename\n2: selected frames filename\n3: black color selection threshold");
                 return;
             }
 
             int threshold = int.Parse(args[2]);
-            var dataset = new ViretTool.DataModel.Dataset(args[0], args[1]);
+            // TODO: Dataset should support loading only one file (eg. AllFrames only without SelectedFrames and TopologyFile)
+            var dataset = new ViretTool.DataModel.Dataset(args[0], args[1], "");
 
             // prepare arrays with statistics for each frame
             float[] bwDeltaValues = new float[dataset.Frames.Count];
             float[] pbValues = new float[dataset.Frames.Count];
+
+            float maxRGBDelta = 0;
             for (int i = 0; i < dataset.Frames.Count; i++)
             {
+                if (i%100==0) Console.Write("\rExtracting filters {0}/{1}.", i + 1, dataset.Frames.Count);
+
                 Tuple<float, float> statistics = ComputeColorStatistics(dataset.Frames[i].ActualBitmap, threshold);
+                if (statistics.Item1 > maxRGBDelta) maxRGBDelta = statistics.Item1;
+
                 bwDeltaValues[i] = statistics.Item1;
                 pbValues[i] = statistics.Item2;
             }
+
+            // Normalization to 0 - 1
+            // Inversion to stay consistent with idea "bigger number -> more black"
+            for (int i = 0; i < dataset.Frames.Count; i++) {
+                bwDeltaValues[i] = 1 - bwDeltaValues[i]/maxRGBDelta;
+            }
+
+            Console.WriteLine("\rFilters extracted, saving them.");
 
             // store arrays
             // TODO - use constants for filenames
