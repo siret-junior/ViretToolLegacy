@@ -53,7 +53,7 @@ namespace ViretTool.RankingModel.SimilarityModels {
             //}
             if (query == null) {
                 //if (!mLoadTask.IsCompleted || query == null) {
-                return new Tuple<int, List<RankedFrame>>(0, RankedFrame.InitializeResultList(mDataset.Frames));
+                return null;
             }
 
             return GetRankedFrames(query);
