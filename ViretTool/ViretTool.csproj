@@ -119,6 +119,7 @@
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\IDFLoader.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNFeatures\FloatVectorModel.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordModel.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\ListComparer.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\RankedFrameKW.cs" />
     <Compile Include="Utils\Submission.cs" />
     <Compile Include="Utils\TextSearch\AhoCorasick.cs" />
