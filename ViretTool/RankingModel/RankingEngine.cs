@@ -200,7 +200,9 @@ namespace ViretTool.RankingModel
 
         public void UpdateKeywordModelRankingAndFilterMask(List<List<int>> queryKeyword, string source)
         {
-            mSimilarityManager.UpdateKeywordModelRanking(queryKeyword, source);
+            // TODO: Use if you want :)
+            // You can set filter based on this but be carefull, it is exact number but in the ThresholdFilter, we filter database based on random sample...
+            int numberOfNotNullKeywords = mSimilarityManager.UpdateKeywordModelRanking(queryKeyword, source);
 
             SetFilterThresholdForKeywordModel(mPercentageOfDatabaseKeyword);
         }

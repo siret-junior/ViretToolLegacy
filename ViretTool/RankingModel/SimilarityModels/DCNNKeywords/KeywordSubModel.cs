@@ -47,13 +47,13 @@ namespace ViretTool.RankingModel.SimilarityModels {
 
         #region Rank Methods
 
-        public List<RankedFrame> RankFramesBasedOnQuery(List<List<int>> query) {
+        public Tuple<int, List<RankedFrame>> RankFramesBasedOnQuery(List<List<int>> query) {
             //if (mLoadTask.IsFaulted) {
             //    throw mLoadTask.Exception.InnerException;
             //}
             if (query == null) {
                 //if (!mLoadTask.IsCompleted || query == null) {
-                return RankedFrame.InitializeResultList(mDataset.Frames);
+                return new Tuple<int, List<RankedFrame>>(0, RankedFrame.InitializeResultList(mDataset.Frames));
             }
 
             return GetRankedFrames(query);
@@ -134,7 +134,7 @@ namespace ViretTool.RankingModel.SimilarityModels {
 
         #region (Private) List Unions & Multiplications
 
-        private List<RankedFrame> GetRankedFrames(List<List<int>> ids) {
+        private Tuple<int, List<RankedFrame>> GetRankedFrames(List<List<int>> ids) {
             List<RankedFrame> res = RankedFrame.InitializeResultList(mDataset.Frames);
 
             List<Dictionary<int, float>> clauses = ResolveClauses(ids);
@@ -144,7 +144,7 @@ namespace ViretTool.RankingModel.SimilarityModels {
                 res[pair.Key] = new RankedFrame(mDataset.Frames[pair.Key], pair.Value);
             }
             
-            return res;
+            return new Tuple<int, List<RankedFrame>>(query.Count, res);
         }
 
 
