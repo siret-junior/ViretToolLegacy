@@ -115,12 +115,11 @@
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\Label.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\LabelProvider.cs" />
     <Compile Include="BasicClient\Controls\KeywordSearch\Suggestion\SuggestionProvider.cs" />
-    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\BufferedByteStream.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\IDFLoader.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNFeatures\FloatVectorModel.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordModel.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\ListComparer.cs" />
-    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\RankedFrameKW.cs" />
+    <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordSearchFrame.cs" />
     <Compile Include="Utils\Submission.cs" />
     <Compile Include="Utils\TextSearch\AhoCorasick.cs" />
     <Compile Include="RankingModel\SimilarityManager.cs" />
