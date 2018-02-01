@@ -124,26 +124,26 @@ namespace ViretTool.RankingModel
 
         public void SetBlackAndWhiteFilter(bool enable, bool useInvertedMask)
         {
-            mFilterManager.SetBlackAndWhiteFilter(enable, useInvertedMask);
-            ComputeFilteredRankedSortedResult();
+            if (mFilterManager.SetBlackAndWhiteFilter(enable, useInvertedMask))
+                ComputeFilteredRankedSortedResult();
         }
 
         public void SetBlackAndWhiteFilterMask(float maxAllowedDeltaRGB)
         {
-            mFilterManager.SetBlackAndWhiteFilterMask(maxAllowedDeltaRGB);
-            ComputeFilteredRankedSortedResult();
+            if (mFilterManager.SetBlackAndWhiteFilterMask(maxAllowedDeltaRGB))
+                ComputeFilteredRankedSortedResult();
         }
 
         public void SetPercentageOfBlackColorFilter(bool enable, bool useInvertedMask)
         {
-            mFilterManager.SetPercentageOfBlackColorFilter(enable, useInvertedMask);
-            ComputeFilteredRankedSortedResult();
+            if (mFilterManager.SetPercentageOfBlackColorFilter(enable, useInvertedMask))
+                ComputeFilteredRankedSortedResult();
         }
 
         public void SetPercentageOfBlackColorFilterMask(float maxAllowedPercentageOfBlackColor)
         {
-            mFilterManager.SetPercentageOfBlackColorFilterMask(maxAllowedPercentageOfBlackColor);
-            ComputeFilteredRankedSortedResult();
+            if (mFilterManager.SetPercentageOfBlackColorFilterMask(maxAllowedPercentageOfBlackColor))
+                ComputeFilteredRankedSortedResult();
         }
 
         #endregion

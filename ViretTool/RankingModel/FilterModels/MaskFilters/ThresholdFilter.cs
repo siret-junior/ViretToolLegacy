@@ -9,6 +9,7 @@ namespace ViretTool.RankingModel.FilterModels.MaskFilters
     class ThresholdFilter : MaskFilter
     {
         private float[] mFrameAttribute;
+        public float Threshold { get; private set; }
 
         public ThresholdFilter(DataModel.Dataset dataset, float[] frameAttribute) : base(dataset, new bool[dataset.Frames.Count])
         {
@@ -52,6 +53,7 @@ namespace ViretTool.RankingModel.FilterModels.MaskFilters
 
         public void SetMaskTo(float threshold)
         {
+            Threshold = threshold;
             if (mFrameAttribute == null)
                 return;
 

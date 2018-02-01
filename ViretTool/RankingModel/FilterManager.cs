@@ -181,26 +181,38 @@ namespace ViretTool.RankingModel.FilterModels
 
         #region --[ ThresholdFilters ]--
 
-        public void SetBlackAndWhiteFilter(bool enable, bool useInvertedMask)
+        public bool SetBlackAndWhiteFilter(bool enable, bool useInvertedMask)
         {
+            if (mBlackAndWhiteFilter.Enabled == enable && mBlackAndWhiteFilter.UseInvertedMask == useInvertedMask) return false;
+
             mBlackAndWhiteFilter.Enabled = enable;
             mBlackAndWhiteFilter.UseInvertedMask = useInvertedMask;
+            return true;
         }
 
-        public void SetBlackAndWhiteFilterMask(float maxAllowedDeltaRGB)
+        public bool SetBlackAndWhiteFilterMask(float maxAllowedDeltaRGB)
         {
+            if (mBlackAndWhiteFilter.Threshold == maxAllowedDeltaRGB) return false;
+
             mBlackAndWhiteFilter.SetMaskTo(maxAllowedDeltaRGB);
+            return true;
         }
 
-        public void SetPercentageOfBlackColorFilter(bool enable, bool useInvertedMask)
+        public bool SetPercentageOfBlackColorFilter(bool enable, bool useInvertedMask)
         {
+            if (mPercentageOfBlackColorFilter.Enabled == enable && mPercentageOfBlackColorFilter.UseInvertedMask == useInvertedMask) return false;
+
             mPercentageOfBlackColorFilter.Enabled = enable;
             mPercentageOfBlackColorFilter.UseInvertedMask = useInvertedMask;
+            return true;
         }
 
-        public void SetPercentageOfBlackColorFilterMask(float maxAllowedPercentageOfBlackColor)
+        public bool SetPercentageOfBlackColorFilterMask(float maxAllowedPercentageOfBlackColor)
         {
+            if (mPercentageOfBlackColorFilter.Threshold == maxAllowedPercentageOfBlackColor) return false;
+
             mPercentageOfBlackColorFilter.SetMaskTo(maxAllowedPercentageOfBlackColor);
+            return true;
         }
 
         #endregion
