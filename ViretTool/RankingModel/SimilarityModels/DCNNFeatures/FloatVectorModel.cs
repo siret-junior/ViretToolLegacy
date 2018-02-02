@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -90,14 +91,22 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         public static float ComputeDistance(float[] vectorA, float[] vectorB)
         {
-            return L2Distance(vectorA, vectorB);
+            return CosineDistance(vectorA, vectorB);
+        }
+
+        private static float CosineDistance(float[] x, float[] y)
+        {
+            return 1 - CosineSimilarity(x, y);
         }
 
         private static float CosineSimilarity(float[] x, float[] y)
         {
-            double result = 0.0;
+            return CosineSimilaritySISD(x, y);
+        }
 
-            // TODO - use vector instructions
+        private static float CosineSimilaritySISD(float[] x, float[] y)
+        {
+            double result = 0.0;
 
             for (int i = 0; i < x.Length; i++)
             {
@@ -107,18 +116,36 @@ namespace ViretTool.RankingModel.SimilarityModels
             return Convert.ToSingle(result);
         }
 
-        private static float L2Distance(float[] x, float[] y)
+        private static float CosineSimilaritySIMD(float[] vector1, float[] vector2)
         {
-            double result = 0.0;
+            int chunkSize = Vector<float>.Count;
+            float result = 0f;
 
-            for (int i = 0; i < x.Length; i++)
+            Vector<float> vectorChunk1;
+            Vector<float> vectorChunk2;
+            for (var i = 0; i < vector1.Length; i += chunkSize)
             {
-                double difference = x[i] - y[i];
-                result += difference * difference;
+                vectorChunk1 = new Vector<float>(vector1, i);
+                vectorChunk2 = new Vector<float>(vector2, i);
+
+                result += Vector.Dot(vectorChunk1, vectorChunk2);
             }
 
-            return Convert.ToSingle(Math.Sqrt(result));
+            return result;
         }
+
+        //private static float L2Distance(float[] x, float[] y)
+        //{
+        //    double result = 0.0;
+
+        //    for (int i = 0; i < x.Length; i++)
+        //    {
+        //        double difference = x[i] - y[i];
+        //        result += difference * difference;
+        //    }
+
+        //    return Convert.ToSingle(Math.Sqrt(result));
+        //}
 
         private void LoadDescriptors()
         {
