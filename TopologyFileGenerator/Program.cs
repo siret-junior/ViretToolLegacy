@@ -12,7 +12,8 @@ namespace TopologyFileGenerator
         static void Main(string[] args)
         {
             string inputDirectory = Path.GetFullPath(args[0]);
-            string outputFile = Path.GetFullPath(args[1]);
+            string groupDirectory = Path.GetFullPath(args[1]);
+            string outputFile = Path.GetFullPath(args[2]);
 
             // TODO: group file
 
@@ -30,6 +31,14 @@ namespace TopologyFileGenerator
             List<int> videoFrameCounts;
             CountFramesAndVideos(inputDirectory, out frameCount, out videoCount, out videoFrameCounts);
 
+            // load groups
+            List<List<List<int>>> groups = LoadGroups(groupDirectory);
+            int groupCount = 0;
+            for (int iVideo = 0; iVideo < videoCount; iVideo++)
+            {
+                groupCount += groups[iVideo].Count;
+            }
+
             // load video directories
             string[] videoDirectories = Directory.GetDirectories(inputDirectory);
             Array.Sort(videoDirectories);
@@ -43,37 +52,44 @@ namespace TopologyFileGenerator
 
                 //**** create global instances  ****************************************
                 writer.Write(videoCount);
-                int groupCount = videoCount;// TODO group count
                 writer.Write(groupCount); 
                 writer.Write(frameCount);
 
 
                 //**** create local instances  ****************************************
                 // video groups
-                for (int i = 0; i < groupCount; i++)
+                for (int i = 0; i < videoCount; i++)
                 {
-                    writer.Write(1); // TODO
+                    writer.Write(groups[i].Count);
                 }
 
                 // video frames
                 for (int i = 0; i < videoCount; i++)
                 {
-                    writer.Write(Directory.GetFiles(videoDirectories[i]).Length);
+                    // number of frames in video directory
+                    int videoFrameCount = Directory.GetFiles(videoDirectories[i]).Length;
+                    writer.Write(videoFrameCount);
                 }
 
-                // group frames TODO
-                for (int i = 0; i < groupCount; i++)
+                // group frames
+                for (int iVideo = 0; iVideo < videoCount; iVideo++)
                 {
-                    writer.Write(Directory.GetFiles(videoDirectories[i]).Length);
+                    for (int iGroup = 0; iGroup < groups[iVideo].Count; iGroup++)
+                    {
+                        writer.Write(groups[iVideo][iGroup].Count);
+                    }
                 }
-
 
                 //**** load mappings (3 types)  ****************************************
                 // video <-> group
-                for (int i = 0; i < groupCount; i++)
+                int groupCounter = 0;
+                for (int iVideo = 0; iVideo < videoCount; iVideo++)
                 {
-                    writer.Write(i);    // TODO
-                    writer.Write(i);
+                    for (int i = 0; i < groups[iVideo].Count; i++)
+                    {
+                        writer.Write(iVideo);
+                        writer.Write(groupCounter++);
+                    }
                 }
 
                 // video <-> frame
@@ -88,22 +104,51 @@ namespace TopologyFileGenerator
                     }
                 }
 
-                // group <-> frame TODO
+                // group <-> frame
                 frameCounter = 0;
                 for (int iVideo = 0; iVideo < videoCount; iVideo++)
                 {
-                    int videoFrameCount = videoFrameCounts[iVideo];
-                    for (int i = 0; i < videoFrameCount; i++)
+                    for (int iGroup = 0; iGroup < groups[iVideo].Count; iGroup++)
                     {
-                        writer.Write(iVideo);
-                        writer.Write(frameCounter++);
+                        for (int iFrame = 0; iFrame < groups[iVideo][iGroup].Count; iFrame++)
+                        {
+                            writer.Write(iGroup);
+                            writer.Write(frameCounter++);
+                        }
                     }
                 }
             }
         }
 
+        private static List<List<List<int>>> LoadGroups(string groupDirectory)
+        {
+            string[] files = Directory.GetFiles(groupDirectory);
+            Array.Sort(files);
+            List<List<List<int>>> groups = new List<List<List<int>>>();
 
+            for (int i = 0; i < files.Length; i++)
+            {
+                List<List<int>> videoGroups = new List<List<int>>();
+                groups.Add(videoGroups);
 
+                using (StreamReader reader = new StreamReader(files[i]))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        List<int> group = new List<int>();
+                        videoGroups.Add(group);
+
+                        string[] frameIdTokens = line.Split(';');
+                        for (int iToken = 0; iToken < frameIdTokens.Length; iToken++)
+                        {
+                            group.Add(int.Parse(frameIdTokens[iToken]));
+                        }
+                    }
+                }
+            }
+            return groups;
+        }
 
         static byte[] GenerateFileHeader(string datasetIdAscii16BMax, DateTime timestamp)
         {

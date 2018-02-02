@@ -30,7 +30,7 @@ namespace ViretTool.DataModel
         /// </summary>
         public readonly byte[] DatasetFileHeader;
         public readonly int DatasetID;
-        public readonly bool UseOldDatasetID = true; // for compatibility with old DatasetID        
+        public readonly bool UseOldDatasetID = false; // for compatibility with old DatasetID        
 
         /// <summary>
         /// Reader used to read all extracted frames from a binary file lazily.
@@ -96,7 +96,7 @@ namespace ViretTool.DataModel
                     //**** create local instances  ****************************************
                     // video groups
                     int[] videoGroupCounts = new int[videoCount];
-                    for (int i = 0; i < groupCount; i++)
+                    for (int i = 0; i < videoCount; i++)
                     {
                         videoGroupCounts[i] = topologyReader.ReadInt32();
                     }
@@ -139,12 +139,12 @@ namespace ViretTool.DataModel
                         }
                     }
 
-                    // group <-> frame TODO
+                    // group <-> frame
                     Tuple<int, int>[] groupFrameMappings = new Tuple<int, int>[frameCount];
-                    for (int iVideo = 0; iVideo < videoCount; iVideo++)
+                    for (int iGroup = 0; iGroup < groupCount; iGroup++)
                     {
-                        int videoFrameCount = videoFrameCounts[iVideo];
-                        for (int i = 0; i < videoFrameCount; i++)
+                        int groupFrameCount = groupFrameCounts[iGroup];
+                        for (int i = 0; i < groupFrameCount; i++)
                         {
                             int groupId = topologyReader.ReadInt32();
                             int frameId = topologyReader.ReadInt32();
@@ -164,13 +164,13 @@ namespace ViretTool.DataModel
                     // each video
                     for (int iVideo = 0; iVideo < videoCount; iVideo++)
                     {
-                        Video video = new Video(this, (iVideo + TRECVID_VIDEO_ID_OFFSET).ToString("00000") + ".mp4", iVideo);
+                        Video video = new Video(iVideo, this, (iVideo + TRECVID_VIDEO_ID_OFFSET).ToString("00000") + ".mp4");
                         Videos.Add(video);
 
                         // each group in the video
                         for (int iGroup = 0; iGroup < videoGroupCounts[iVideo]; iGroup++)
                         {
-                            Group group = new Group(video, globalGroupId);
+                            Group group = new Group(globalGroupId, video);
                             video.AddGroup(group);
                             Groups.Add(group);
 
@@ -190,7 +190,7 @@ namespace ViretTool.DataModel
                                 }
 
                                 // create frame instances
-                                Frame frame = new Frame(video, group, globalFrameId, frameNumber, jpgData);
+                                Frame frame = new Frame(globalFrameId, group, video, frameNumber, jpgData);
                                 group.AddFrame(frame);
                                 video.AddFrame(frame);
                                 Frames.Add(frame);
@@ -308,7 +308,7 @@ namespace ViretTool.DataModel
                 int frameNumber = allFramesRaw[i].Item2;
                 byte[] jpgThumbnail = allFramesRaw[i].Item3;
 
-                result[i] = new Frame(video, null, -1, frameNumber, jpgThumbnail);
+                result[i] = new Frame(-1, null, video, frameNumber, jpgThumbnail);
             }
 
             return result;
@@ -327,7 +327,7 @@ namespace ViretTool.DataModel
             for (int i = 0; i < maxVideoCount; i++)
             {
                 // create video and add to the video collection
-                Video video = new Video(this, (i + TRECVID_VIDEO_ID_OFFSET).ToString("00000") + ".mp4", i);
+                Video video = new Video(i, this, (i + TRECVID_VIDEO_ID_OFFSET).ToString("00000") + ".mp4");
                 Videos.Add(video);
 
                 // read video frames and add them to the video and the frame collection
@@ -338,7 +338,7 @@ namespace ViretTool.DataModel
                     int frameNumber = frameData.Item2;
                     byte[] jpgThumbnail = frameData.Item3;
 
-                    Frame frame = new Frame(video, null, frameCounter++, frameNumber, jpgThumbnail);
+                    Frame frame = new Frame(frameCounter++, null, video, frameNumber, jpgThumbnail);
                     video.AddFrame(frame);
                     Frames.Add(frame);
                 }

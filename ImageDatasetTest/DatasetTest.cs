@@ -29,7 +29,9 @@ namespace ImageDatasetTest
             Assert.IsTrue(File.Exists(KEYFRAMES_FILE),
                 "Keyframes file missing: " + KEYFRAMES_FILE);
 
-            Dataset dataset = new Dataset(KEYFRAMES_FILE, THUMBNAILS_FILE);
+            // TODO
+            //Dataset dataset = new Dataset(KEYFRAMES_FILE, THUMBNAILS_FILE);
+
             //List<BitmapSource> bitmaps = new List<BitmapSource>();
             //foreach (Frame frame in dataset.Frames)
             //{

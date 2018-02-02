@@ -16,7 +16,7 @@ namespace ViretTool.DataModel
         public readonly List<Frame> Frames;
 
         
-        public Video(Dataset videoDataset, string name, int videoID)
+        public Video(int videoID, Dataset videoDataset, string name)
         {
             VideoDataset = videoDataset;
             Name = name;
@@ -50,7 +50,7 @@ namespace ViretTool.DataModel
                 int frameNumber = frameData.Item2;
                 byte[] jpgThumbnail = frameData.Item3;
 
-                Frame frame = new Frame(this, null, -1, frameNumber, jpgThumbnail);
+                Frame frame = new Frame(-1, null, this, frameNumber, jpgThumbnail);
                 allExtractedFrames.Add(frame);
             }
 

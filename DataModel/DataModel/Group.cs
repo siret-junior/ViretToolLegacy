@@ -10,16 +10,15 @@ namespace ViretTool.DataModel
     {
         public readonly int GroupID;
 
-        public readonly Video Video;
+        public readonly Video FrameVideo;
         public readonly List<Frame> Frames;
         public Frame GroupFrame { get; protected set; }
         
 
-        public Group(Video video, int groupID/*, Frame groupFrame*/)
+        public Group(int groupID, Video frameVideo)
         {
-            Video = video;
+            FrameVideo = frameVideo;
             GroupID = groupID;
-            //GroupFrame = groupFrame;
 
             Frames = new List<Frame>();
         }
@@ -39,7 +38,7 @@ namespace ViretTool.DataModel
         public override string ToString()
         {
             return "ID: " + GroupID.ToString()
-                + ", Video ID: " + Video.VideoID.ToString("00000")
+                + ", Video ID: " + FrameVideo.VideoID.ToString("00000")
                 + ", frames: " + Frames.Count;
         }
     }

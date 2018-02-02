@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace ViretTool.DataModel {
     public class Frame {
         public Video FrameVideo { get; }
+        public Group FrameGroup { get; }
 
         /// <summary>
         /// The global identifier of the frame in a given dataset. For the set of selected frames S ranges from 0 to |S| - 1. ID is set to -1 for all extracted but not selected frames.
@@ -20,7 +21,7 @@ namespace ViretTool.DataModel {
 
         private byte[] mJPGThumbnail { get; }
 
-        public Frame(Video frameVideo, Group frameGroup, int id, int frameNumber, byte[] JPGThumbnail) {
+        public Frame(int id, Group frameGroup, Video frameVideo, int frameNumber, byte[] JPGThumbnail) {
             FrameVideo = frameVideo;
             ID = id;
             FrameNumber = frameNumber;
@@ -35,7 +36,8 @@ namespace ViretTool.DataModel {
         public override string ToString()
         {
             return "ID: " + ID.ToString() 
-                + ", frame: " + FrameNumber.ToString("00000") 
+                + ", frame: " + FrameNumber.ToString("00000")
+                + ", Group ID: " + FrameGroup.GroupID.ToString("00000")
                 + ", Video ID: " + FrameVideo.VideoID.ToString("00000");
         }
 
