@@ -86,6 +86,7 @@
       <DependentUpon>SemanticModelDisplay.xaml</DependentUpon>
     </Compile>
     <Compile Include="BasicClient\Logger.cs" />
+    <Compile Include="BasicClient\RandomScenePlayer.cs" />
     <Compile Include="BasicClient\Settings.cs" />
     <Compile Include="BasicClient\SketchCanvas.xaml.cs">
       <DependentUpon>SketchCanvas.xaml</DependentUpon>
