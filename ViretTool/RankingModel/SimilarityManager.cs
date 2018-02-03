@@ -113,7 +113,7 @@ namespace ViretTool.RankingModel.SimilarityModels
             Tuple<int, List<RankedFrame>> res = mKeywordModel.RankFramesBasedOnQuery(queryKeyword, source);
             if (res != null) {
                 mKeywordBasedRanking = res.Item2;
-                MaxNormalizeRanking(mKeywordBasedRanking);
+                if (mKeywordBasedRanking != null) MaxNormalizeRanking(mKeywordBasedRanking);
                 return res.Item1;
             }
             return -1;
