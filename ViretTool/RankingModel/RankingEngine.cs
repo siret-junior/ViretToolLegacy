@@ -24,6 +24,8 @@ namespace ViretTool.RankingModel
         public delegate void RankedResultEventHandler(List<RankedFrame> rankedResult);
         public event RankedResultEventHandler RankingChangedEvent;
 
+        public bool ComputeResult { get; set; }
+
         private double mPercentageOfDatabaseKeyword = 0.5;
         private double mPercentageOfDatabaseColor = 0.975;
         private double mPercentageOfDatabaseSemantic = 0.5;
@@ -37,6 +39,7 @@ namespace ViretTool.RankingModel
         {
             mSimilarityManager = similarityManager;
             mFilterManager = filterManager;
+            ComputeResult = true;
         }
 
         public void ResetEngine()
@@ -61,6 +64,9 @@ namespace ViretTool.RankingModel
         /// </summary>
         private void ComputeFilteredRankedSortedResult()
         {
+            if (!ComputeResult)
+                return;
+
             List<DataModel.Frame> filteredFrames = mFilterManager.GetMaskFilteredFrames();
 
             List<RankedFrame> aggregatedRankingResult =

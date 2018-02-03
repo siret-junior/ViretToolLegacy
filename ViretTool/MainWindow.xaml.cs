@@ -31,11 +31,17 @@ namespace ViretTool
         private Submission mSubmissionClient;
         private Settings mSettings = Settings.LoadSettings();
 
+        private RandomScenePlayer mRandomScenePlayer;
+        private VBSLogger mVBSLogger;
+
         private Cursor mPreviousCursor;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            // TODO - use unique toolID
+            mVBSLogger = new VBSLogger("1");
 
             // prepare data model
             //mDataset = new DataModel.Dataset("..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb", "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
@@ -110,7 +116,9 @@ namespace ViretTool
             // model filters
             keywordSearchControlBar.DefaultValue = 50;
             keywordSearchControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
+                mRankingEngine.ComputeResult = false;
                 mRankingEngine.SortByKeyword = useForSorting;
+                mRankingEngine.ComputeResult = true;
                 mRankingEngine.SetFilterThresholdForKeywordModel(value);
             };
             keywordSearchControlBar.ModelClearedEvent += () => {
@@ -119,7 +127,9 @@ namespace ViretTool
 
             sketchCanvasControlBar.DefaultValue = 90;
             sketchCanvasControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
+                mRankingEngine.ComputeResult = false;
                 mRankingEngine.SortByColor = useForSorting;
+                mRankingEngine.ComputeResult = true;
                 mRankingEngine.SetFilterThresholdForColorModel(value);
             };
             sketchCanvasControlBar.ModelClearedEvent += () => {
@@ -128,7 +138,9 @@ namespace ViretTool
 
             semanticModelControlBar.DefaultValue = 70;
             semanticModelControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
+                mRankingEngine.ComputeResult = false;
                 mRankingEngine.SortBySemantic = useForSorting;
+                mRankingEngine.ComputeResult = true;
                 mRankingEngine.SetFilterThresholdForSemanticModel(value);
             };
             semanticModelControlBar.ModelClearedEvent += () => {
@@ -177,9 +189,11 @@ namespace ViretTool
                 {
                     if (query != null)
                     {
+                        mRankingEngine.ComputeResult = false;
                         semanticModelControlBar.UncheckMe();
                         sketchCanvasControlBar.UncheckMe();
                         keywordSearchControlBar.CheckMe();
+                        mRankingEngine.ComputeResult = true;
                     }
                     DisableInput();
 
@@ -220,9 +234,11 @@ namespace ViretTool
                 (sketch) => 
                 {
                     if (sketch.Count > 0) {
+                        mRankingEngine.ComputeResult = false;
                         keywordSearchControlBar.UncheckMe();
                         semanticModelControlBar.UncheckMe();
                         sketchCanvasControlBar.CheckMe();
+                        mRankingEngine.ComputeResult = true;
                     }
                     DisableInput();
                     mRankingEngine.UpdateColorModelRankingAndFilterMask(sketch);
@@ -296,9 +312,11 @@ namespace ViretTool
                     // Zavolanim ModelSettingChangedEvent na semanticModelControlBar to nezobrazi vysledek
                     if (frameSelection.Count > 0)
                     {
+                        mRankingEngine.ComputeResult = false;
                         keywordSearchControlBar.UncheckMe();
                         sketchCanvasControlBar.UncheckMe();
                         semanticModelControlBar.CheckMe();
+                        mRankingEngine.ComputeResult = true;
                     }
                     DisableInput();
                     semanticModelDisplay.DisplayFrames(frameSelection);
@@ -439,22 +457,10 @@ namespace ViretTool
             // set first display
             mRankingEngine.GenerateSequentialRanking();
 
-            // TODO remove
-            TestButton.Click += TestButton_Click;
+            // TODO - show mRandomScenePlayer.ReturnSearchedItemPosition
+            mRandomScenePlayer = new RandomScenePlayer(mDataset, TestButton, 200);
+            
             TestButton.Height = 350;
-        }
-
-        private DataModel.Frame mSearchedFrame = null;
-        private void TestButton_Click(object sender, RoutedEventArgs e)
-        {
-            Random r = new Random();
-            mSearchedFrame = mDataset.Frames[r.Next() % mDataset.Frames.Count];
-            //TestLabel.Content = mSearchedFrame.ID.ToString();
-            TestButton.Content = new Image
-            {
-                Source = mSearchedFrame.Bitmap,
-                VerticalAlignment = VerticalAlignment.Top
-            };
         }
 
         //private void ShowRank(List<RankedFrame> result)
@@ -578,6 +584,7 @@ namespace ViretTool
         private void clearAllButton_Click(object sender, RoutedEventArgs e)
         {
             // TODO: without reranking in between
+            mRankingEngine.ComputeResult = false;
             keywordSearchTextBox.Clear();
             sketchCanvas.Clear();
             mFrameSelectionController.ResetSelection();
@@ -588,7 +595,12 @@ namespace ViretTool
 
             keywordSearchControlBar.Clear();
             sketchCanvasControlBar.Clear();
+            mRankingEngine.ComputeResult = true;
+
             semanticModelControlBar.Clear();
+
+            // TODO - is it OK/enough to set to null??
+            TestButton.Content = null;
 
             // log message
             string message = "Reset of all models and their controls.";

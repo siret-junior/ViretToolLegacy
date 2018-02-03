@@ -110,6 +110,16 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         public int UpdateKeywordModelRanking(List<List<int>> queryKeyword, string source)
         {
+            if (queryKeyword == null)
+            {
+                mKeywordBasedRanking = null; return -1;
+            }
+            
+            if (queryKeyword.Count == 0)
+            {
+                mKeywordBasedRanking = null; return -1;
+            }
+
             Tuple<int, List<RankedFrame>> res = mKeywordModel.RankFramesBasedOnQuery(queryKeyword, source);
             if (res != null) {
                 mKeywordBasedRanking = res.Item2;
