@@ -9,25 +9,25 @@ namespace ViretTool.RankingModel.FilterModels
     class VideoAggregateFilter : FlowFilter
     {
         // TODO: check constraints
-        public int MaxFramesPerVideo { get; set; }
+        public int MaxGroupsPerVideo { get; set; }
 
         public VideoAggregateFilter(DataModel.Dataset dataset) : base(dataset)
         {
-            MaxFramesPerVideo = int.MaxValue;
+            MaxGroupsPerVideo = int.MaxValue;
         }
 
         public override List<RankedFrame> ApplyFilter(List<RankedFrame> rankedFrames)
         {
-            int[] hitCounter = new int[mDataset.Videos.Count];
+            int[] groupHitCounter = new int[mDataset.Groups.Count];
             List<RankedFrame> filteredResult = new List<RankedFrame>(rankedFrames.Count);
 
             for (int i = 0; i < rankedFrames.Count; i++)
             {
-                int videoId = rankedFrames[i].Frame.FrameVideo.VideoID;
-                if (hitCounter[videoId] < MaxFramesPerVideo)
+                int groupId = rankedFrames[i].Frame.FrameGroup.GroupID;
+                if (groupHitCounter[groupId] < MaxGroupsPerVideo)
                 {
                     filteredResult.Add(rankedFrames[i]);
-                    hitCounter[videoId]++;
+                    groupHitCounter[groupId]++;
                 }
             }
 

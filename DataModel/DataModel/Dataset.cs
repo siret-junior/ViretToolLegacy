@@ -88,69 +88,18 @@ namespace ViretTool.DataModel
                     DatasetFileHeader = topologyReader.ReadBytes(36);
 
                     //**** create global instances  ****************************************
-                    int videoCount = topologyReader.ReadInt32();
-                    int groupCount = topologyReader.ReadInt32();
-                    int frameCount = topologyReader.ReadInt32();
+                    int videoCount, groupCount, frameCount;
+                    CreateGlobalInstances(topologyReader, out videoCount, out groupCount, out frameCount);
 
 
                     //**** create local instances  ****************************************
                     // video groups
-                    int[] videoGroupCounts = new int[videoCount];
-                    for (int i = 0; i < videoCount; i++)
-                    {
-                        videoGroupCounts[i] = topologyReader.ReadInt32();
-                    }
-
-                    // video frames
-                    int[] videoFrameCounts = new int[videoCount];
-                    for (int i = 0; i < videoCount; i++)
-                    {
-                        videoFrameCounts[i] = topologyReader.ReadInt32();
-                    }
-
-                    // group frames TODO
-                    int[] groupFrameCounts = new int[groupCount];
-                    for (int i = 0; i < groupCount; i++)
-                    {
-                        groupFrameCounts[i] = topologyReader.ReadInt32();
-                    }
+                    int[] videoGroupCounts, videoFrameCounts, groupFrameCounts;
+                    CreateLocalDistances(topologyReader, videoCount, groupCount, out videoGroupCounts, out videoFrameCounts, out groupFrameCounts);
 
 
                     //**** load mappings (3 types)  ****************************************
-                    // video <-> group
-                    Tuple<int, int>[] videoGroupMappings = new Tuple<int, int>[groupCount];
-                    for (int i = 0; i < groupCount; i++)
-                    {
-                        int videoId = topologyReader.ReadInt32();
-                        int groupId = topologyReader.ReadInt32();
-                        videoGroupMappings[i] = new Tuple<int, int>(videoId, groupId);
-                    }
-
-                    // video <-> frame
-                    Tuple<int, int>[] videoFrameMappings = new Tuple<int, int>[frameCount];
-                    for (int iVideo = 0; iVideo < videoCount; iVideo++)
-                    {
-                        int videoFrameCount = videoFrameCounts[iVideo];
-                        for (int i = 0; i < videoFrameCount; i++)
-                        {
-                            int videoId = topologyReader.ReadInt32();
-                            int frameId = topologyReader.ReadInt32();
-                            videoFrameMappings[frameId] = new Tuple<int, int>(videoId, frameId);
-                        }
-                    }
-
-                    // group <-> frame
-                    Tuple<int, int>[] groupFrameMappings = new Tuple<int, int>[frameCount];
-                    for (int iGroup = 0; iGroup < groupCount; iGroup++)
-                    {
-                        int groupFrameCount = groupFrameCounts[iGroup];
-                        for (int i = 0; i < groupFrameCount; i++)
-                        {
-                            int groupId = topologyReader.ReadInt32();
-                            int frameId = topologyReader.ReadInt32();
-                            groupFrameMappings[frameId] = new Tuple<int, int>(groupId, frameId);
-                        }
-                    }
+                    LoadMappings(topologyReader, videoCount, groupCount, frameCount, videoFrameCounts, groupFrameCounts);
 
 
 
@@ -162,52 +111,229 @@ namespace ViretTool.DataModel
                     int globalGroupId = 0;
                     int globalFrameId = 0;
                     // each video
-                    for (int iVideo = 0; iVideo < videoCount; iVideo++)
-                    {
-                        Video video = new Video(iVideo, this, (iVideo + TRECVID_VIDEO_ID_OFFSET).ToString("00000") + ".mp4");
-                        Videos.Add(video);
-
-                        // each group in the video
-                        for (int iGroup = 0; iGroup < videoGroupCounts[iVideo]; iGroup++)
-                        {
-                            Group group = new Group(globalGroupId, video);
-                            video.AddGroup(group);
-                            Groups.Add(group);
-
-                            // each frame in the group
-                            for (int iFrame = 0; iFrame < groupFrameCounts[globalGroupId]; iFrame++)
-                            {
-                                // load raw frame data from separate thumbnail file
-                                Tuple<int, int, byte[]> thumbnailFrame = selectedFramesReader.ReadFrameAt(globalFrameId);
-                                int videoId = thumbnailFrame.Item1;
-                                int frameNumber = thumbnailFrame.Item2;
-                                byte[] jpgData = thumbnailFrame.Item3;
-
-                                // check for consistency
-                                if (videoId != video.VideoID)
-                                {
-                                    throw new IOException("Video ID mismatch!");
-                                }
-
-                                // create frame instances
-                                Frame frame = new Frame(globalFrameId, group, video, frameNumber, jpgData);
-                                group.AddFrame(frame);
-                                video.AddFrame(frame);
-                                Frames.Add(frame);
-
-                                globalFrameId++;
-                            }
-                            globalGroupId++;
-                        }
-                    }
+                    FillInstances(selectedFramesReader, videoCount, videoGroupCounts, groupFrameCounts, ref globalGroupId, ref globalFrameId);
 
 
 
+#if DEBUG
+                    TestDataset(Videos, Groups, Frames);
+#endif
                 }
             }
             
         }
 
+        private void TestDataset(List<Video> videos, List<Group> groups, List<Frame> frames)
+        {
+            // check videos for null reference
+            for (int iVideo = 0; iVideo < Videos.Count; iVideo++)
+            {
+                if (Videos[iVideo] == null)
+                {
+                    throw new NullReferenceException("Video ID: " + iVideo + " is null!");
+                }
+            }
+
+            // check groups for null reference
+            for (int iGroup = 0; iGroup < Groups.Count; iGroup++)
+            {
+                if (Groups[iGroup] == null)
+                {
+                    throw new NullReferenceException("Group ID: " + iGroup + " is null!");
+                }
+            }
+
+            // check videos for null reference
+            for (int iFrame = 0; iFrame < Frames.Count; iFrame++)
+            {
+                if (Frames[iFrame] == null)
+                {
+                    throw new NullReferenceException("Frame ID: " + iFrame + " is null!");
+                }
+            }
+
+            /************************************************************************************/
+
+
+            // check local instances
+            for (int iVideo = 0; iVideo < Videos.Count; iVideo++)
+            {
+                Video video = Videos[iVideo];
+
+                // check video groups
+                List<Group> videoGroups = video.Groups;
+                for (int iGroup = 0; iGroup < videoGroups.Count; iGroup++)
+                {
+                    Group group = videoGroups[iGroup];
+                    if (group == null)
+                    {
+                        throw new NullReferenceException("Video " + iVideo + ", Group " + iGroup + " is null!");
+                    }
+                    if (group.FrameVideo == null)
+                    {
+                        throw new NullReferenceException("Video " + iVideo + ", Group " + iGroup + " PARENT is null!");
+                    }
+
+                    // check group frames
+                    List<Frame> groupFrames = group.Frames;
+                    for (int iFrame = 0; iFrame < groupFrames.Count; iFrame++)
+                    {
+                        Frame frame = groupFrames[iFrame];
+                        if (frame == null)
+                        {
+                            throw new NullReferenceException(
+                                "Video " + iVideo
+                                + ", Group " + iGroup
+                                + ", Frame " + iFrame
+                                + " is null!");
+                        }
+
+                        if (frame.FrameGroup == null)
+                        {
+                            throw new NullReferenceException(
+                                "Video " + iVideo
+                                + ", Group " + iGroup
+                                + ", Frame " + iFrame
+                                + " PARENT is null!");
+                        }
+                    }
+                }
+
+                // check video frames
+                List<Frame> videoFrames = video.Frames;
+                for (int iFrame = 0; iFrame < videoFrames.Count; iFrame++)
+                {
+                    Frame frame = videoFrames[iFrame];
+                    if (frame == null)
+                    {
+                        throw new NullReferenceException(
+                            "Video " + iVideo
+                            + ", Frame " + iFrame
+                            + " is null!");
+                    }
+
+                    if (frame.FrameVideo == null)
+                    {
+                        throw new NullReferenceException(
+                            "Video " + iVideo
+                            + ", Frame " + iFrame
+                            + " PARENT is null!");
+                    }
+                }
+            }
+
+
+        }
+
+        private void FillInstances(FrameReader selectedFramesReader, int videoCount, int[] videoGroupCounts, int[] groupFrameCounts, ref int globalGroupId, ref int globalFrameId)
+        {
+            for (int iVideo = 0; iVideo < videoCount; iVideo++)
+            {
+                Video video = new Video(iVideo, this, (iVideo + TRECVID_VIDEO_ID_OFFSET).ToString("00000") + ".mp4");
+                Videos.Add(video);
+
+                // each group in the video
+                for (int iGroup = 0; iGroup < videoGroupCounts[iVideo]; iGroup++)
+                {
+                    Group group = new Group(globalGroupId, video);
+                    video.AddGroup(group);
+                    Groups.Add(group);
+
+                    // each frame in the group
+                    for (int iFrame = 0; iFrame < groupFrameCounts[globalGroupId]; iFrame++)
+                    {
+                        // load raw frame data from separate thumbnail file
+                        Tuple<int, int, byte[]> thumbnailFrame = selectedFramesReader.ReadFrameAt(globalFrameId);
+                        int videoId = thumbnailFrame.Item1;
+                        int frameNumber = thumbnailFrame.Item2;
+                        byte[] jpgData = thumbnailFrame.Item3;
+
+                        // check for consistency
+                        if (videoId != video.VideoID)
+                        {
+                            throw new IOException("Video ID mismatch!");
+                        }
+
+                        // create frame instances
+                        Frame frame = new Frame(globalFrameId, group, video, frameNumber, jpgData);
+                        group.AddFrame(frame);
+                        video.AddFrame(frame);
+                        Frames.Add(frame);
+
+                        globalFrameId++;
+                    }
+                    globalGroupId++;
+                }
+            }
+        }
+
+        private static void LoadMappings(BinaryReader topologyReader, int videoCount, int groupCount, int frameCount, int[] videoFrameCounts, int[] groupFrameCounts)
+        {
+            // video <-> group
+            Tuple<int, int>[] videoGroupMappings = new Tuple<int, int>[groupCount];
+            for (int i = 0; i < groupCount; i++)
+            {
+                int videoId = topologyReader.ReadInt32();
+                int groupId = topologyReader.ReadInt32();
+                videoGroupMappings[i] = new Tuple<int, int>(videoId, groupId);
+            }
+
+            // video <-> frame
+            Tuple<int, int>[] videoFrameMappings = new Tuple<int, int>[frameCount];
+            for (int iVideo = 0; iVideo < videoCount; iVideo++)
+            {
+                int videoFrameCount = videoFrameCounts[iVideo];
+                for (int i = 0; i < videoFrameCount; i++)
+                {
+                    int videoId = topologyReader.ReadInt32();
+                    int frameId = topologyReader.ReadInt32();
+                    videoFrameMappings[frameId] = new Tuple<int, int>(videoId, frameId);
+                }
+            }
+
+            // group <-> frame
+            Tuple<int, int>[] groupFrameMappings = new Tuple<int, int>[frameCount];
+            for (int iGroup = 0; iGroup < groupCount; iGroup++)
+            {
+                int groupFrameCount = groupFrameCounts[iGroup];
+                for (int i = 0; i < groupFrameCount; i++)
+                {
+                    int groupId = topologyReader.ReadInt32();
+                    int frameId = topologyReader.ReadInt32();
+                    groupFrameMappings[frameId] = new Tuple<int, int>(groupId, frameId);
+                }
+            }
+        }
+
+        private static void CreateLocalDistances(BinaryReader topologyReader, int videoCount, int groupCount, out int[] videoGroupCounts, out int[] videoFrameCounts, out int[] groupFrameCounts)
+        {
+            videoGroupCounts = new int[videoCount];
+            for (int i = 0; i < videoCount; i++)
+            {
+                videoGroupCounts[i] = topologyReader.ReadInt32();
+            }
+
+            // video frames
+            videoFrameCounts = new int[videoCount];
+            for (int i = 0; i < videoCount; i++)
+            {
+                videoFrameCounts[i] = topologyReader.ReadInt32();
+            }
+
+            // group frames TODO
+            groupFrameCounts = new int[groupCount];
+            for (int i = 0; i < groupCount; i++)
+            {
+                groupFrameCounts[i] = topologyReader.ReadInt32();
+            }
+        }
+
+        private static void CreateGlobalInstances(BinaryReader topologyReader, out int videoCount, out int groupCount, out int frameCount)
+        {
+            videoCount = topologyReader.ReadInt32();
+            groupCount = topologyReader.ReadInt32();
+            frameCount = topologyReader.ReadInt32();
+        }
 
         public static byte[] GenerateDatasetFileHeader(string datasetIdAscii16BMax, DateTime timestamp)
         {

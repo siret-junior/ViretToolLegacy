@@ -23,20 +23,26 @@
                 Stroke="Transparent"
                 StrokeThickness="4" />
 
-            <!--
-            <Label Name="label" 
+
+            <Label Name="videoLabel" 
                    FontSize="8"
                    Padding="1"
                    Background="Transparent"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top" />
-            <Label Name="labelFrame" 
+            <Label Name="groupLabel" 
+                   FontSize="8"
+                   Padding="1"
+                   Background="Transparent"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center" />
+            <Label Name="frameLabel" 
                    FontSize="8"
                    Padding="1"
                    Background="LightSkyBlue"
                    HorizontalAlignment="Right"
                    VerticalAlignment="Top" />
-            -->
+            
 
 
             <Grid Name="displayButtons"

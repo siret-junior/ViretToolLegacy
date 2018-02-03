@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define LABELS
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,14 +35,20 @@ namespace ViretTool.BasicClient
                 if (value != null)
                 {
                     image.Source = mFrame.Bitmap;
-                    //label.Content = mFrame.ID.ToString();
-                    //label.Content = mFrame.FrameVideo.VideoID;
-                    //labelFrame.Content = mFrame.FrameNumber;
+#if LABELS
+                    videoLabel.Content = mFrame.FrameVideo.VideoID.ToString();
+                    groupLabel.Content = mFrame.FrameGroup.GroupID.ToString();
+                    frameLabel.Content = mFrame.ID.ToString();
+#endif
                 }
                 else
                 {
                     image.Source = null;
-                    //label.Content = null;
+#if LABELS
+                    videoLabel.Content = null;
+                    groupLabel.Content = null;
+                    frameLabel.Content = null;
+#endif
                 }
                 mVideoFrames = null;
                 LeftScrollHelper.Visibility = Visibility.Hidden;
