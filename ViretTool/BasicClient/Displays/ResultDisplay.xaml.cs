@@ -25,7 +25,11 @@ namespace ViretTool.BasicClient
         const double DESIRED_ASPECT_RATIO = 3.0 / 4.0;
 
         int nColumns = 10;
-        
+        const int SMALL_DISPLAY_COLUMNS = 10;
+        const int LARGE_DISPLAY_COLUMNS = 30;
+
+        bool mSortDisplay = false;
+
         // TODO: add context frames
 
         private List<RankedFrame> mResultFrames = null;
@@ -149,9 +153,18 @@ namespace ViretTool.BasicClient
             List<RankedFrame> framesToDisplay = mResultFrames.GetRange(offset, count);
 
             // TODO: semantic/color sorting of displayed items on a page
+            DisplayArrangement arrangementType;
+            if (mSortDisplay)
+            {
+                arrangementType = DisplayArrangement.Semantic;
+            }
+            else
+            {
+                arrangementType = DisplayArrangement.Ranking;
+            }
+
             RankedFrame[,] arrangedDisplay 
-                = DisplayArranger.ArrangeDisplay(framesToDisplay, mDisplayRows, mDisplayCols, 
-                DisplayArrangement.Ranking);
+                = DisplayArranger.ArrangeDisplay(framesToDisplay, mDisplayRows, mDisplayCols, arrangementType);
 
             // display frames
             int iterator = 0;
@@ -258,6 +271,28 @@ namespace ViretTool.BasicClient
         private void lastPageButton_Click(object sender, RoutedEventArgs e)
         {
             DisplayPage(mResultFrames.Count / DisplayedFrames.Length);
+        }
+
+        private void smallDisplay_Click(object sender, RoutedEventArgs e)
+        {
+            nColumns = SMALL_DISPLAY_COLUMNS;
+            FitDisplayToGridDimensions();
+        }
+
+        private void largeDisplay_Click(object sender, RoutedEventArgs e)
+        {
+            nColumns = LARGE_DISPLAY_COLUMNS;
+            FitDisplayToGridDimensions();
+        }
+
+        private void sortDisplayCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            mSortDisplay = true;
+        }
+
+        private void sortDisplayCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            mSortDisplay = false;
         }
 
         //private void displayGrid_MouseWheel(object sender, MouseWheelEventArgs e)
