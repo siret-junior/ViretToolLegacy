@@ -8,6 +8,8 @@
         xmlns:control = "clr-namespace:ViretTool.BasicClient"
         mc:Ignorable="d"
         Title="ViretTool"
+        Width="1280"
+        Height="1080"
         WindowStartupLocation="CenterScreen" 
         WindowState="Maximized"
         WindowStyle="None"
@@ -67,11 +69,24 @@
             <control:SketchCanvas x:Name="sketchCanvas"/>
             <!--<control:ColorModelDisplay x:Name="colorModelDisplay" Height="50"/>-->
 
-            <control:ModelControl x:Name="semanticModelControlBar" ModelName="Semantic"/>
+            <control:ModelControl x:Name="semanticModelControlBar" ModelName="Semantic" />
             <control:SemanticModelDisplay x:Name="semanticModelDisplay" Height="150" Margin="0,0,0.2,0"/>
             
             <!--<Label x:Name="TestLabel" Content=""></Label>-->
-            <Button Height="200" x:Name="TestButton" VerticalContentAlignment="Top"></Button>
+            <Grid Background="DarkGray">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0"
+                   FontWeight="Bold"
+                   Content="Position:" />
+
+                <Label x:Name="trainingSearchLabel"
+                    Grid.Column="1" />
+            </Grid>
+            <Button Height="200" x:Name="TestButton" VerticalContentAlignment="Top" />
         </StackPanel>
 
         <GridSplitter Grid.Column="1" 

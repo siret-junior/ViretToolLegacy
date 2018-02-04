@@ -35,12 +35,20 @@ namespace ViretTool.BasicClient
             string result = "";
             if (mSearchedFrame != null)
             {
+                // find first video frame
                 for (int i = 0; i < resultList.Count; i++)
                     if (resultList[i].Frame.FrameVideo.VideoID == mSearchedFrame.FrameVideo.VideoID)
                     {
                         result = "video: " + i; break;
                     }
 
+                // find first group frame
+                for (int i = 0; i < resultList.Count; i++)
+                    if (resultList[i].Frame.FrameGroup.GroupID == mSearchedFrame.FrameGroup.GroupID)
+                    {
+                        result += ", group: " + i; break;
+                    }
+                // try to find the frame if not filtered
                 for (int i = 0; i < resultList.Count; i++)
                     if (resultList[i].Frame.FrameVideo.VideoID == mSearchedFrame.FrameVideo.VideoID)
                         if ((resultList[i].Frame.FrameNumber >= mSearchedFrame.FrameNumber - mSceneLength / 2)
@@ -49,7 +57,7 @@ namespace ViretTool.BasicClient
                             result += ", frame:" + i; return result;
                         }
 
-                result += " frame filtered";
+                result += ", frame filtered";
             }
 
             return result;

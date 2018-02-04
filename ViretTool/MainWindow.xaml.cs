@@ -377,11 +377,25 @@ namespace ViretTool
             #endregion
 
 
+
+            // TODO - show mRandomScenePlayer.ReturnSearchedItemPosition
+            mRandomScenePlayer = new RandomScenePlayer(mDataset, TestButton, 200);
+
+
             // ranking model output visualization
             mRankingEngine.RankingChangedEvent += 
                 (rankedResult) =>
                 {
                     //ShowRank(rankedResult);
+                    if (rankedResult != null && rankedResult.Count > 0)
+                    {
+                        string trainingSearchString = mRandomScenePlayer.ReturnSearchedItemPosition(rankedResult);
+                        trainingSearchLabel.Content = trainingSearchString;
+                    }
+                    else
+                    {
+                        trainingSearchLabel.Content = "";
+                    }
 
                     resultDisplay.ResultFrames = rankedResult;
                     //mFrameSelectionController.ResetSelection();
@@ -457,8 +471,6 @@ namespace ViretTool
             // set first display
             mRankingEngine.GenerateSequentialRanking();
 
-            // TODO - show mRandomScenePlayer.ReturnSearchedItemPosition
-            mRandomScenePlayer = new RandomScenePlayer(mDataset, TestButton, 200);
             
             TestButton.Height = 350;
         }
