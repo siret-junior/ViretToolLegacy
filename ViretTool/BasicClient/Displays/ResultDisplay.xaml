@@ -38,6 +38,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
@@ -84,32 +85,43 @@
                     Checked="showFilteredVideosCheckbox_Checked"
                     Unchecked="showFilteredVideosCheckbox_Unchecked"
                     />
-                
+
+                <CheckBox
+                    Name="Max3FromVideoCheckbox"
+                    Grid.Column="4"
+                    Content="Max 3 from video"
+                    IsChecked="false"
+                    Margin="5,8,5,8"
+                    Checked="Max3FromVideoCheckbox_Checked"
+                    Unchecked="Max3FromVideoCheckbox_Unchecked"
+                    />
+
+
                 <Button
                     Name="sequentialDisplayButton"
-                    Grid.Column="4"
+                    Grid.Column="5"
                     Click="sequentialDisplayButton_Click"
                     Content="/ Sequential /" />
                 <Button
                     Name="randomDisplayButton"
-                    Grid.Column="5"
+                    Grid.Column="6"
                     Click="randomDisplayButton_Click"
                     Content="# Random #" />
                 
                 <Button
                     Name="firstPageButton"
-                    Grid.Column="6"
+                    Grid.Column="7"
                     Click="firstPageButton_Click"
                     Content="&lt;&lt; First" />
                 <Button
                     Name="previousPageButton"
-                    Grid.Column="7"
+                    Grid.Column="8"
                     Click="previousPageButton_Click"
                     Content="&lt; Previous" />
 
                 <Label
                     Name="currentPageNumber" 
-                    Grid.Column="8"
+                    Grid.Column="9"
                     Background="White"
                     VerticalContentAlignment="Center"
                     HorizontalContentAlignment="Left"
@@ -117,12 +129,12 @@
 
                 <Button
                     Name="nextPageButton"
-                    Grid.Column="9"
+                    Grid.Column="10"
                     Click="nextPageButton_Click"
                     Content="Next &gt;" />
                 <Button
                     Name="lastPageButton"
-                    Grid.Column="10"
+                    Grid.Column="11"
                     Click="lastPageButton_Click"
                     Content="Last &gt;&gt;" />
 

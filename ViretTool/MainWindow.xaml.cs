@@ -507,6 +507,17 @@ namespace ViretTool
                         mRankingEngine.AddVideoToFilterList(selectedVideo);
                     }
                 };
+            resultDisplay.Max3FromVideoEnabledEvent +=
+                () =>
+                {
+                    mRankingEngine.VideoAggregateFilterMaxFrames = 3;
+
+                };
+            resultDisplay.Max3FromVideoDisabledEvent +=
+                () =>
+                {
+                    mRankingEngine.VideoAggregateFilterMaxFrames = 15;
+                };
 
             // set first display
             mRankingEngine.GenerateSequentialRanking();

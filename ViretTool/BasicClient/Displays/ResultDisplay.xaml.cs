@@ -214,6 +214,9 @@ namespace ViretTool.BasicClient
         public event DisplayEventHandler ShowFilteredVideosDisabledEvent;
         public event DisplayEventHandler FilterSelectedVideoEvent;
 
+        public event DisplayEventHandler Max3FromVideoEnabledEvent;
+        public event DisplayEventHandler Max3FromVideoDisabledEvent;
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string propertyName)
         {
@@ -319,6 +322,16 @@ namespace ViretTool.BasicClient
         private void filterVideoButton_Click(object sender, RoutedEventArgs e)
         {
             FilterSelectedVideoEvent?.Invoke();
+        }
+
+        private void Max3FromVideoCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            Max3FromVideoEnabledEvent?.Invoke();
+        }
+
+        private void Max3FromVideoCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Max3FromVideoDisabledEvent?.Invoke();
         }
 
         //private void displayGrid_MouseWheel(object sender, MouseWheelEventArgs e)

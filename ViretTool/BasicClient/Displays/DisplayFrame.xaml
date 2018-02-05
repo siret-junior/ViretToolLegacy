@@ -52,7 +52,7 @@
                   Height="16"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Bottom"
-                  Opacity="1"
+                  Opacity="0.5"
                   Visibility="Hidden">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />

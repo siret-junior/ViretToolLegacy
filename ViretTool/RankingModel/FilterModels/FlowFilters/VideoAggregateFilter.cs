@@ -23,13 +23,17 @@ namespace ViretTool.RankingModel.FilterModels
         public override List<RankedFrame> ApplyFilter(List<RankedFrame> rankedFrames)
         {
             int[] groupHitCounter = new int[mDataset.Groups.Count];
+            int[] videoHitCounter = new int[mDataset.Groups.Count];
             List<RankedFrame> filteredResult = new List<RankedFrame>(rankedFrames.Count);
 
             for (int i = 0; i < rankedFrames.Count; i++)
             {
                 RankedFrame rankedFrame = rankedFrames[i];
                 int groupId = rankedFrame.Frame.FrameGroup.GroupID;
-                if (groupHitCounter[groupId] < MaxGroupsPerVideo
+                int videoId = rankedFrame.Frame.FrameVideo.VideoID;
+
+                if (videoHitCounter[videoId] < MaxGroupsPerVideo &&
+                    (groupHitCounter[groupId] < 1)
                     && (!mVideoFilterEnabled || !mVideoFilterHashset.Contains(rankedFrame.Frame.FrameVideo.VideoID)))
                 {
                     filteredResult.Add(rankedFrames[i]);
