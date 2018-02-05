@@ -27,22 +27,24 @@
             <Label Name="videoLabel" 
                    FontSize="8"
                    Padding="1"
-                   Background="Transparent"
+                   Background="LightSkyBlue"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top" />
             <Label Name="groupLabel" 
                    FontSize="8"
                    Padding="1"
-                   Background="Transparent"
+                   Background="LightSkyBlue"
                    HorizontalAlignment="Left"
+                   Visibility="Hidden"
                    VerticalAlignment="Center" />
             <Label Name="frameLabel" 
                    FontSize="8"
                    Padding="1"
                    Background="LightSkyBlue"
                    HorizontalAlignment="Right"
+                   Visibility="Hidden"
                    VerticalAlignment="Top" />
-            
+
 
 
             <Grid Name="displayButtons"
