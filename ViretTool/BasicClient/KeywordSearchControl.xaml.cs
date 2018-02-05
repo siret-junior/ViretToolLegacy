@@ -38,10 +38,12 @@ namespace ViretTool.BasicClient {
         public void Clear()
         {
             suggestionTextBox.ClearQuery();
+            VBSLogger.AppendActionIncludeTimeParameter('K', false);
         }
 
         private void textClearButton_Click(object sender, RoutedEventArgs e) {
             suggestionTextBox.ClearQuery();
+            VBSLogger.AppendActionIncludeTimeParameter('K', false);
         }
 
         public void Init(DataModel.Dataset dataset, string[] annotationSources) {

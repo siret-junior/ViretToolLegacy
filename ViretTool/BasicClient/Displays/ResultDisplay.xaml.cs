@@ -255,32 +255,38 @@ namespace ViretTool.BasicClient
 
         private void firstPageButton_Click(object sender, RoutedEventArgs e)
         {
+            VBSLogger.AppendActionIncludeTimeParameter('P', true);
             DisplayPage(0);
         }
 
         private void previousPageButton_Click(object sender, RoutedEventArgs e)
         {
+            VBSLogger.AppendActionIncludeTimeParameter('P', true);
             DisplayPage(mPage - 1);
         }
 
         private void nextPageButton_Click(object sender, RoutedEventArgs e)
         {
+            VBSLogger.AppendActionIncludeTimeParameter('P', true);
             DisplayPage(mPage + 1);
         }
 
         private void lastPageButton_Click(object sender, RoutedEventArgs e)
         {
+            VBSLogger.AppendActionIncludeTimeParameter('P', true);
             DisplayPage(mResultFrames.Count / DisplayedFrames.Length);
         }
 
         private void smallDisplay_Click(object sender, RoutedEventArgs e)
         {
+            VBSLogger.AppendActionIncludeTimeParameter('B', true);
             nColumns = SMALL_DISPLAY_COLUMNS;
             FitDisplayToGridDimensions();
         }
 
         private void largeDisplay_Click(object sender, RoutedEventArgs e)
         {
+            VBSLogger.AppendActionIncludeTimeParameter('B', true);
             nColumns = LARGE_DISPLAY_COLUMNS;
             FitDisplayToGridDimensions();
         }

@@ -93,44 +93,55 @@ namespace ViretTool.BasicClient
 
     public class VBSLogger
     {
+        private static readonly VBSLogger Instance = new VBSLogger("0");
+        private static object logLock = new object();
+
         private char[] mDefinedActions;
         private StringBuilder mLog;
         private DateTime mLogCreationTime;
         private string mToolID;
 
+        static VBSLogger()
+        {
+            Instance = new VBSLogger("0");
+        }
+
+
         public VBSLogger(string toolID)
         {
             mDefinedActions = "KAOCEMSFPBTX".ToCharArray();
             mToolID = toolID;
-            ResetLog();
-        }
-
-        public void ResetLog()
-        { 
             mLog = new StringBuilder();
             mLog.Append(mToolID);
             mLogCreationTime = DateTime.Now;
         }
 
-        public string AppendTimeAndGetLogString()
+        public static void ResetLog()
         {
-            mLog.Append(";time " + DateTime.Now.ToString("H:mm:ss"));
-            return mLog.ToString();
+            Instance.mLog = new StringBuilder();
+            Instance.mLog.Append(Instance.mToolID);
+            Instance.mLogCreationTime = DateTime.Now;
         }
 
-        public void AppendActionIncludeTimeParameter(char action, bool add, string parameters = "")
+        public static string AppendTimeAndGetLogString()
+        {
+            Instance.mLog.Append(";time " + DateTime.Now.ToString("H:mm:ss"));
+            return Instance.mLog.ToString();
+        }
+
+        public static void AppendActionIncludeTimeParameter(char action, bool add, string parameters = "")
         {
             action = char.ToUpper(action);
-            if (!mDefinedActions.Contains(action))
+            if (!Instance.mDefinedActions.Contains(action))
                 throw new Exception("Unknown VBSLog action " + action);
 
-            if (add) mLog.Append(";" + action);
-            else mLog.Append(";-" + action);
+            if (add) Instance.mLog.Append(";" + action);
+            else Instance.mLog.Append(";-" + action);
 
             if (parameters != "") parameters = "," + parameters;
-            parameters = "(" + DateTime.Now.Subtract(mLogCreationTime).TotalSeconds.ToString("0") + "s" + parameters + ")";
+            parameters = "(" + DateTime.Now.Subtract(Instance.mLogCreationTime).TotalSeconds.ToString("0") + "s" + parameters + ")";
 
-            mLog.Append(parameters);
+            Instance.mLog.Append(parameters);
         }
     }
 }

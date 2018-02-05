@@ -189,11 +189,16 @@ namespace ViretTool
                 {
                     if (query != null)
                     {
+                        VBSLogger.AppendActionIncludeTimeParameter('K', true);
                         mRankingEngine.ComputeResult = false;
                         semanticModelControlBar.UncheckMe();
                         sketchCanvasControlBar.UncheckMe();
                         keywordSearchControlBar.CheckMe();
                         mRankingEngine.ComputeResult = true;
+                    }
+                    else
+                    {
+                        VBSLogger.AppendActionIncludeTimeParameter('K', false);
                     }
                     DisableInput();
 
@@ -233,12 +238,18 @@ namespace ViretTool
             sketchCanvas.SketchChangedEvent += 
                 (sketch) => 
                 {
-                    if (sketch.Count > 0) {
+                    if (sketch.Count > 0)
+                    {
+                        VBSLogger.AppendActionIncludeTimeParameter('C', true);
                         mRankingEngine.ComputeResult = false;
                         keywordSearchControlBar.UncheckMe();
                         semanticModelControlBar.UncheckMe();
                         sketchCanvasControlBar.CheckMe();
                         mRankingEngine.ComputeResult = true;
+                    }
+                    else
+                    {
+                        VBSLogger.AppendActionIncludeTimeParameter('C', false);
                     }
                     DisableInput();
                     mRankingEngine.UpdateColorModelRankingAndFilterMask(sketch);
@@ -312,11 +323,16 @@ namespace ViretTool
                     // Zavolanim ModelSettingChangedEvent na semanticModelControlBar to nezobrazi vysledek
                     if (frameSelection.Count > 0)
                     {
+                        VBSLogger.AppendActionIncludeTimeParameter('S', true);
                         mRankingEngine.ComputeResult = false;
                         keywordSearchControlBar.UncheckMe();
                         sketchCanvasControlBar.UncheckMe();
                         semanticModelControlBar.CheckMe();
                         mRankingEngine.ComputeResult = true;
+                    }
+                    else
+                    {
+                        VBSLogger.AppendActionIncludeTimeParameter('S', false);
                     }
                     DisableInput();
                     semanticModelDisplay.DisplayFrames(frameSelection);
@@ -354,6 +370,7 @@ namespace ViretTool
             resultDisplay.DisplayRandomItemsRequestedEvent += 
                 () =>
                 {
+                    VBSLogger.AppendActionIncludeTimeParameter('B', true);
                     DisableInput();
                     mRankingEngine.GenerateRandomRanking();
                     EnableInput();
@@ -365,6 +382,7 @@ namespace ViretTool
             resultDisplay.DisplaySequentialItemsRequestedEvent +=
                 () =>
                 {
+                    VBSLogger.AppendActionIncludeTimeParameter('B', true);
                     DisableInput();
                     mRankingEngine.GenerateSequentialRanking();
                     EnableInput();
@@ -563,10 +581,10 @@ namespace ViretTool
             mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
 
             // logging
-            string currentTask = GetCurrentTaskId();
+            //string currentTask = GetCurrentTaskId();
 
             // log message
-            string message = currentTask + ", frame submitted: "
+            string message = /*currentTask + */", frame submitted: "
                     + "(Frame ID:" + frame.ID
                     + ", Video:" + frame.FrameVideo.VideoID
                     + ", Number:" + frame.FrameNumber + ")";
@@ -595,6 +613,7 @@ namespace ViretTool
 
         private void clearAllButton_Click(object sender, RoutedEventArgs e)
         {
+            //VBSLogger.AppendActionIncludeTimeParameter('X', true);
             // TODO: without reranking in between
             mRankingEngine.ComputeResult = false;
             keywordSearchTextBox.Clear();
@@ -617,6 +636,7 @@ namespace ViretTool
             // log message
             string message = "Reset of all models and their controls.";
             Logger.LogInfo(semanticModelDisplay, message);
+            VBSLogger.ResetLog();
         }
 
         private void filtersClearButton_Click(object sender, RoutedEventArgs e) {
