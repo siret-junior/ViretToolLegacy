@@ -113,6 +113,8 @@ namespace ViretTool.Utils {
                 string URI = VBS_URL + list;
                 var response = await mClient.GetAsync(URI);
 
+                Logger.LogInfo(this, "Submission: " + URI);
+
                 //will throw an exception if not successful
                 //response.EnsureSuccessStatusCode();
 

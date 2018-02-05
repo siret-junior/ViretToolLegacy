@@ -26,7 +26,7 @@ namespace ViretTool.BasicClient
 
         int nColumns = 10;
         const int SMALL_DISPLAY_COLUMNS = 10;
-        const int LARGE_DISPLAY_COLUMNS = 30;
+        const int LARGE_DISPLAY_COLUMNS = 16;
 
         bool mSortDisplay = false;
 
@@ -277,20 +277,7 @@ namespace ViretTool.BasicClient
             DisplayPage(mResultFrames.Count / DisplayedFrames.Length);
         }
 
-        private void smallDisplay_Click(object sender, RoutedEventArgs e)
-        {
-            VBSLogger.AppendActionIncludeTimeParameter('B', true);
-            nColumns = SMALL_DISPLAY_COLUMNS;
-            FitDisplayToGridDimensions();
-        }
-
-        private void largeDisplay_Click(object sender, RoutedEventArgs e)
-        {
-            VBSLogger.AppendActionIncludeTimeParameter('B', true);
-            nColumns = LARGE_DISPLAY_COLUMNS;
-            FitDisplayToGridDimensions();
-        }
-
+        
         private void sortDisplayCheckbox_Checked(object sender, RoutedEventArgs e)
         {
             mSortDisplay = true;
@@ -299,6 +286,20 @@ namespace ViretTool.BasicClient
         private void sortDisplayCheckbox_Unchecked(object sender, RoutedEventArgs e)
         {
             mSortDisplay = false;
+        }
+
+        private void largeDisplayCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            VBSLogger.AppendActionIncludeTimeParameter('B', true);
+            nColumns = LARGE_DISPLAY_COLUMNS;
+            FitDisplayToGridDimensions();
+        }
+
+        private void largeDisplayCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            VBSLogger.AppendActionIncludeTimeParameter('B', true);
+            nColumns = SMALL_DISPLAY_COLUMNS;
+            FitDisplayToGridDimensions();
         }
 
         //private void displayGrid_MouseWheel(object sender, MouseWheelEventArgs e)

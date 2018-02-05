@@ -50,50 +50,48 @@
                 <CheckBox
                     Name="sortDisplayCheckbox"
                     Grid.Column="0"
-                    Content="Sort display"
+                    Content="Sort items"
                     IsChecked="false"
+                    Margin="0,8,0,0"
                     Checked="sortDisplayCheckbox_Checked"
                     Unchecked="sortDisplayCheckbox_Unchecked"
-                    /> 
+                    />
 
-                <Button
-                    Name="smallDisplay"
+                <CheckBox
+                    Name="largeDisplayCheckbox"
                     Grid.Column="1"
-                    Click="smallDisplay_Click"
-                    Content="Small display" />
-                <Button
-                    Name="largeDisplay"
-                    Grid.Column="2"
-                    Click="largeDisplay_Click"
-                    Content="Large display" />
-
-
+                    Content="Large display"
+                    IsChecked="false"
+                    Margin="0,8,0,0"
+                    Checked="largeDisplayCheckbox_Checked"
+                    Unchecked="largeDisplayCheckbox_Unchecked"
+                    />
 
                 <Button
                     Name="sequentialDisplayButton"
-                    Grid.Column="3"
+                    Grid.Column="2"
                     Click="sequentialDisplayButton_Click"
                     Content="/ Sequential /" />
                 <Button
                     Name="randomDisplayButton"
-                    Grid.Column="4"
+                    Grid.Column="3"
                     Click="randomDisplayButton_Click"
                     Content="# Random #" />
                 
                 <Button
                     Name="firstPageButton"
-                    Grid.Column="5"
+                    Grid.Column="4"
                     Click="firstPageButton_Click"
                     Content="&lt;&lt; First" />
                 <Button
                     Name="previousPageButton"
-                    Grid.Column="6"
+                    Grid.Column="5"
                     Click="previousPageButton_Click"
                     Content="&lt; Previous" />
 
                 <Label
                     Name="currentPageNumber" 
-                    Grid.Column="7"
+                    Grid.Column="6"
                     Background="White"
                     VerticalContentAlignment="Center"
                     HorizontalContentAlignment="Left"
@@ -101,12 +99,12 @@
 
                 <Button
                     Name="nextPageButton"
-                    Grid.Column="8"
+                    Grid.Column="7"
                     Click="nextPageButton_Click"
                     Content="Next &gt;" />
                 <Button
                     Name="lastPageButton"
-                    Grid.Column="9"
+                    Grid.Column="8"
                     Click="lastPageButton_Click"
                     Content="Last &gt;&gt;" />
 
