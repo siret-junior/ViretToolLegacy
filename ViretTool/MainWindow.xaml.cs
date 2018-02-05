@@ -165,6 +165,7 @@ namespace ViretTool
             
             // initialize submission client
             mSubmissionClient = new Submission();
+            mSubmissionClient.Connect("dummy", 80, "dummy");
             //mSubmissionClient.Connect(mSettings.IPAddress, mSettings.Port, mSettings.TeamName);
             mSettings.SettingsChangedEvent +=
                 (settings) =>
