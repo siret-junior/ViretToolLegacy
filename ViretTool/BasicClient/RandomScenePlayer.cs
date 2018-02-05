@@ -84,6 +84,12 @@ namespace ViretTool.BasicClient
             mDispatcherTimer.Start();
         }
 
+        public void Reset()
+        {
+            mDispatcherTimer.Stop();
+            mButton.Content = null;
+        }
+
         private int mTickCounter;
         private void ShowImage(object sender, EventArgs e)
         {

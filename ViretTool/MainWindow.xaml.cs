@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ViretTool.BasicClient;
+using ViretTool.DataModel;
 using ViretTool.RankingModel;
 using ViretTool.RankingModel.FilterModels;
 using ViretTool.RankingModel.SimilarityModels;
@@ -35,6 +36,8 @@ namespace ViretTool
         private VBSLogger mVBSLogger;
 
         private Cursor mPreviousCursor;
+
+        private Video selectedVideo = null;
 
         public MainWindow()
         {
@@ -483,9 +486,27 @@ namespace ViretTool
             //colorModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             semanticModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
 
+
             #endregion
 
-
+            resultDisplay.ShowFilteredVideosEnabledEvent +=
+                () =>
+                {
+                    mRankingEngine.DisableVideoFilter();
+                };
+            resultDisplay.ShowFilteredVideosDisabledEvent +=
+                () =>
+                {
+                    mRankingEngine.EnableVideoFilter();
+                };
+            resultDisplay.FilterSelectedVideoEvent +=
+                () =>
+                {
+                    if (selectedVideo != null)
+                    {
+                        mRankingEngine.AddVideoToFilterList(selectedVideo);
+                    }
+                };
 
             // set first display
             mRankingEngine.GenerateSequentialRanking();
@@ -598,6 +619,7 @@ namespace ViretTool
         private void LogVideoDisplayed(DataModel.Frame frame)
         {
             videoDisplay.DisplayFrameVideo(frame);
+            selectedVideo = frame.FrameVideo;
 
             // log message
             string message = "Video displayed: "
@@ -631,13 +653,15 @@ namespace ViretTool
 
             semanticModelControlBar.Clear();
 
+            mRankingEngine.ResetVideoFilter();
+
             // TODO - is it OK/enough to set to null??
-            TestButton.Content = null;
+            //TestButton.Background = Brushes.LightGray;
+            mRandomScenePlayer.Reset();
 
             // log message
             string message = "Reset of all models and their controls.";
             Logger.LogInfo(semanticModelDisplay, message);
-            VBSLogger.ResetLog();
         }
 
         private void filtersClearButton_Click(object sender, RoutedEventArgs e) {
@@ -696,6 +720,20 @@ namespace ViretTool
                     + ", TeamName:" + mSettings.TeamName
                     + "), Is connected: " + mSubmissionClient.IsConnected.ToString();
             Logger.LogInfo(semanticModelDisplay, message);
+        }
+
+        //private void filterVideoButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (selectedVideo != null)
+        //    {
+        //        mRankingEngine.AddVideoToFilterList(selectedVideo);
+        //    }
+        //}
+
+        private void resetButton_Click(object sender, RoutedEventArgs e)
+        {
+            clearAllButton_Click(this, null);
+            VBSLogger.ResetLog();
         }
     }
 

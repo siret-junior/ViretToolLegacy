@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using ViretTool.DataModel;
 using ViretTool.RankingModel.FilterModels;
 using ViretTool.RankingModel.SimilarityModels;
 
@@ -122,6 +123,28 @@ namespace ViretTool.RankingModel
             { return mFilterManager.VideoAggregateFilterMaxFrames; }
             set
             { mFilterManager.VideoAggregateFilterMaxFrames = value; ComputeFilteredRankedSortedResult(); }
+        }
+
+        public void AddVideoToFilterList(int videoId)
+        {
+            mFilterManager.AddVideoToFilterList(videoId);
+        }
+        public void AddVideoToFilterList(Video video)
+        {
+            mFilterManager.AddVideoToFilterList(video);
+        }
+        public void EnableVideoFilter()
+        {
+            mFilterManager.EnableVideoFilter();
+        }
+        public void DisableVideoFilter()
+        {
+            mFilterManager.DisableVideoFilter();
+        }
+
+        public void ResetVideoFilter()
+        {
+            mFilterManager.ResetVideoFilter();
         }
 
         #endregion

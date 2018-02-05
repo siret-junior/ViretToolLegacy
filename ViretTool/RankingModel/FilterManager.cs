@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ViretTool.DataModel;
 using ViretTool.RankingModel.FilterModels.MaskFilters;
 
 namespace ViretTool.RankingModel.FilterModels
@@ -132,6 +133,29 @@ namespace ViretTool.RankingModel.FilterModels
             { return mVideoAggregateFilter.MaxGroupsPerVideo; }
             set
             { mVideoAggregateFilter.MaxGroupsPerVideo = value; }
+        }
+
+        public void AddVideoToFilterList(int videoId)
+        {
+            mVideoAggregateFilter.AddVideoToFilterList(videoId);
+        }
+        public void AddVideoToFilterList(Video video)
+        {
+            mVideoAggregateFilter.AddVideoToFilterList(video);
+        }
+
+        public void EnableVideoFilter()
+        {
+            mVideoAggregateFilter.EnableVideoFilter();
+        }
+        public void DisableVideoFilter()
+        {
+            mVideoAggregateFilter.DisableVideoFilter();
+        }
+
+        public void ResetVideoFilter()
+        {
+            mVideoAggregateFilter.ResetVideoFilter();
         }
 
         #endregion

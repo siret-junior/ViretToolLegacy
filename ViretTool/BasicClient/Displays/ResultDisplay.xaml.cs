@@ -210,6 +210,10 @@ namespace ViretTool.BasicClient
         public event DisplayEventHandler DisplaySequentialItemsRequestedEvent;
         public event DisplayEventHandler DisplayChangedEvent;
 
+        public event DisplayEventHandler ShowFilteredVideosEnabledEvent;
+        public event DisplayEventHandler ShowFilteredVideosDisabledEvent;
+        public event DisplayEventHandler FilterSelectedVideoEvent;
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string propertyName)
         {
@@ -300,6 +304,21 @@ namespace ViretTool.BasicClient
             VBSLogger.AppendActionIncludeTimeParameter('B', true);
             nColumns = SMALL_DISPLAY_COLUMNS;
             FitDisplayToGridDimensions();
+        }
+
+        private void showFilteredVideosCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            ShowFilteredVideosDisabledEvent?.Invoke();
+        }
+
+        private void showFilteredVideosCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            ShowFilteredVideosEnabledEvent?.Invoke();
+        }
+
+        private void filterVideoButton_Click(object sender, RoutedEventArgs e)
+        {
+            FilterSelectedVideoEvent?.Invoke();
         }
 
         //private void displayGrid_MouseWheel(object sender, MouseWheelEventArgs e)

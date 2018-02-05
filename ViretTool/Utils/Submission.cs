@@ -30,6 +30,7 @@ namespace ViretTool.Utils {
         public string TeamName { get; private set; }
 
         public async void Connect(string ip, int port, string teamName = null) {
+            mClient = new HttpClient();
             IPAddress ip_;
             if (!IPAddress.TryParse(ip, out ip_)) return;
 

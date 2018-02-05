@@ -27,6 +27,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 
                 <Button x:Name="settingsButton"
@@ -34,8 +35,15 @@
                         Height="32"
                         Content="Settings"
                         Click="settingsButton_Click"/>
-                <Button x:Name="clearAllButton"
+                <Button x:Name="resetButton"
                         Grid.Column="1"
+                        Height="32"
+                        Foreground="White"
+                        Background="Black"
+                        Content="Reset"
+                        Click="resetButton_Click"/>
+                <Button x:Name="clearAllButton"
+                        Grid.Column="2"
                         Height="32"
                         Background="LightCoral"
                         Content="Clear all"
@@ -116,11 +124,24 @@
                 <GridSplitter.Template>
                     <ControlTemplate TargetType="{x:Type GridSplitter}">
                         <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
                             <Label 
+                                Grid.Column="0"
                                 Background="DarkGray"
                                 FontWeight="Bold"
                                 FontSize="14"
                                 Content="Selected video:" />
+                            <!--
+                            <Button 
+                                Name="filterVideoButton"
+                                Grid.Column="1"
+                                Content="Filter video" 
+                                Padding="5,0,5,0" 
+                                Click="filterVideoButton_Click"/>-->
                         </Grid>
                     </ControlTemplate>
                 </GridSplitter.Template>
