@@ -230,8 +230,16 @@ namespace ViretTool.BasicClient
                 {
                     mArea = value;
 
-                    if (mArea) SearchRadiusEllipse.Stroke = FillEllipse.Fill;
-                    else SearchRadiusEllipse.Stroke = Brushes.LightGray;
+                    if (mArea)
+                    {
+                        SearchRadiusEllipse.Stroke = FillEllipse.Fill;
+                        SearchRadiusEllipse.StrokeThickness = 3;
+                    }
+                    else
+                    {
+                        SearchRadiusEllipse.Stroke = Brushes.LightGray;
+                        SearchRadiusEllipse.StrokeThickness = 1;
+                    }
                 }
             }
 
@@ -306,7 +314,7 @@ namespace ViretTool.BasicClient
                 foreach (ColorPoint CP in colorPoints)
                 {
                     double value = (CP.Position.X - p.X) * (CP.Position.X - p.X) / (CP.SearchRadiusX * CP.SearchRadiusX) + (CP.Position.Y - p.Y) * (CP.Position.Y - p.Y) / (CP.SearchRadiusY * CP.SearchRadiusY);
-                    if (value > 0.8 && value < 1.3)
+                    if (value > 0.6 && value < 1.4)
                         return CP;
                 }
 
