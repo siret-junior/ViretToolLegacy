@@ -78,7 +78,7 @@
                 <CheckBox
                     Name="showFilteredVideosCheckbox"
                     Grid.Column="3"
-                    Content="Show filtered videos"
+                    Content="Hide filtered videos"
                     IsChecked="false"
                     Margin="5,8,5,8"
                     Checked="showFilteredVideosCheckbox_Checked"
