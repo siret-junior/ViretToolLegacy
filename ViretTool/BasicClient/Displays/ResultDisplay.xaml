@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ViretTool.BasicClient"
              mc:Ignorable="d" 
-             d:DesignHeight="900" d:DesignWidth="900">
+             d:DesignHeight="900" d:DesignWidth="1100">
     <Grid Background="DarkGray">
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
@@ -15,7 +15,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="900" />
+                <ColumnDefinition Width="1100" />
             </Grid.ColumnDefinitions>
 
 
