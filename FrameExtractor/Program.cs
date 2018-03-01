@@ -252,7 +252,7 @@ namespace FrameExtractor
                 string fileTo = Path.Combine(copyToDirectory,
                     "v" + videoId.ToString("00000") 
                     + "_f" + frameId.ToString("00000")
-                    + "_" + second.ToString("0000.00") + "sec"
+                    + "_" + second.ToString("0000.00", CultureInfo.InvariantCulture) + "sec"
                     + "." + extension);
 
                 // ffmpeg -start_number 0 not working fix
