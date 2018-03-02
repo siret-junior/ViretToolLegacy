@@ -32,7 +32,8 @@ namespace TopologyFileGenerator
             CountFramesAndVideos(inputDirectory, out frameCount, out videoCount, out videoFrameCounts);
 
             // load groups
-            List<List<List<int>>> groups = LoadGroups(groupDirectory);
+            //List<List<List<int>>> groups = LoadGroups(groupDirectory);
+            List<List<List<int>>> groups = LoadIdentityGroups(videoFrameCounts);
             int groupCount = 0;
             for (int iVideo = 0; iVideo < videoCount; iVideo++)
             {
@@ -118,6 +119,25 @@ namespace TopologyFileGenerator
                     }
                 }
             }
+        }
+
+        private static List<List<List<int>>> LoadIdentityGroups(List<int> videoFrameCounts)
+        {
+            List<List<List<int>>> groups = new List<List<List<int>>>();
+
+            for (int i = 0; i < videoFrameCounts.Count; i++)
+            {
+                List<List<int>> videoGroups = new List<List<int>>();
+                groups.Add(videoGroups);
+
+                for (int j = 0; j < videoFrameCounts[i]; j++)
+                {
+                    List<int> group = new List<int>();
+                    videoGroups.Add(group);
+                    group.Add(j);
+                }
+            }
+            return groups;
         }
 
         private static List<List<List<int>>> LoadGroups(string groupDirectory)
