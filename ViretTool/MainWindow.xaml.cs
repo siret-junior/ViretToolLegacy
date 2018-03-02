@@ -163,7 +163,7 @@ namespace ViretTool
             mRankingEngine.VideoAggregateFilterMaxFrames = 15;
 
             keywordSearchTextBox.Init(mDataset, new string[] {
-                "GoogLeNet", "YFCC100M", "Audio"
+                "GoogLeNet"//, "YFCC100M", "Audio"
             });
 
 

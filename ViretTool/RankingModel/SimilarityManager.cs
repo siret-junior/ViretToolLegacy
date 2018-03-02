@@ -46,9 +46,9 @@ namespace ViretTool.RankingModel.SimilarityModels
             mColorSignatureModel = new ColorSignatureModel(mDataset);
             mKeywordModel = new KeywordModel(mDataset, new Tuple<string, bool>[] {
                 //                     Source Name, Use IDF
-                new Tuple<string, bool>("GoogLeNet", true),
-                new Tuple<string, bool>("YFCC100M", false),
-                new Tuple<string, bool>("Audio", false)
+                new Tuple<string, bool>("GoogLeNet", false)//true),
+                //new Tuple<string, bool>("YFCC100M", false),
+                //new Tuple<string, bool>("Audio", false)
             });
 
             Reset();
