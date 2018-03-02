@@ -77,12 +77,17 @@ namespace ViretTool
             //    "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
             //    "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
 
-            const int MAX_VIDEO_COUNT = 700;
+            //const int MAX_VIDEO_COUNT = 700;
+            //mDataset = new DataModel.Dataset(
+            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb",
+            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected-100x75.thumb",
+            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected.topology",
+            //    MAX_VIDEO_COUNT);
+            
             mDataset = new DataModel.Dataset(
-                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb",
-                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected-100x75.thumb",
-                "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected.topology",
-                MAX_VIDEO_COUNT);
+                "..\\..\\..\\TestData\\CT24\\CT24-4fps-100x75.thumb",
+                "..\\..\\..\\TestData\\CT24\\CT24-4fps-selected-100x75.thumb",
+                "..\\..\\..\\TestData\\CT24\\CT24-4fps-selected.topology");
 
 
             // initialize ranking engine

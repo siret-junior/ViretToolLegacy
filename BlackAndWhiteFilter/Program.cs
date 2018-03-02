@@ -16,14 +16,19 @@ namespace BlackAndWhiteFilter {
         /// <param name="allExtractedFramesFilename"></param>
         /// <param name="thresholdForBlackColor"></param>
         static void Main(string[] args) {
-            if (args.Length != 3) {
-                Console.WriteLine("invalid arguments\n1: all extracted frames filename\n2: selected frames filename\n3: black color selection threshold");
+            if (args.Length != 4) {
+                Console.WriteLine(
+                    "invalid arguments\n" +
+                    "1: all extracted frames filename\n" +
+                    "2: selected frames filename\n" +
+                    "3: topology filename\n" +
+                    "4: black color selection threshold");
                 return;
             }
 
-            int threshold = int.Parse(args[2]);
+            int threshold = int.Parse(args[3]);
             // TODO: Dataset should support loading only one file (eg. AllFrames only without SelectedFrames and TopologyFile)
-            var dataset = new ViretTool.DataModel.Dataset(args[0], args[1], "");
+            var dataset = new ViretTool.DataModel.Dataset(args[0], args[1], args[2]);
 
             // prepare arrays with statistics for each frame
             float[] bwDeltaValues = new float[dataset.Frames.Count];
