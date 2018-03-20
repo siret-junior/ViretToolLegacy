@@ -18,7 +18,8 @@ namespace TopologyFileGenerator
             // TODO: group file
 
 
-            byte[] header = GenerateFileHeader("CT24", new DateTime(2018, 03, 02, 00, 00, 00));
+            //byte[] header = GenerateFileHeader("TRECVid", new DateTime(2018, 01, 26, 10, 00, 00));
+            byte[] header = GenerateFileHeader("CT24", new DateTime(2018, 03, 02, 02, 00, 00));
 
             //if(File.Exists(outputFile))
             //{
