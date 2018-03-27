@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -83,12 +84,18 @@ namespace ViretTool
             //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected-100x75.thumb",
             //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected.topology",
             //    MAX_VIDEO_COUNT);
-            
-            mDataset = new DataModel.Dataset(
-                "..\\..\\..\\TestData\\CT24\\CT24-4fps-100x75.thumb",
-                "..\\..\\..\\TestData\\CT24\\CT24-4fps-selected-100x75.thumb",
-                "..\\..\\..\\TestData\\CT24\\CT24-4fps-selected.topology");
 
+            //mDataset = new DataModel.Dataset(
+            //    "..\\..\\..\\TestData\\CT24\\CT24-4fps-100x75.thumb",
+            //    "..\\..\\..\\TestData\\CT24\\CT24-4fps-selected-100x75.thumb",
+            //    "..\\..\\..\\TestData\\CT24\\CT24-4fps-selected.topology");
+
+            //mDataset = new DataModel.Dataset(
+            //        "..\\..\\..\\TestData\\Trailers\\Trailers-8fps-100x75.thumb",
+            //        "..\\..\\..\\TestData\\Trailers\\Trailers-8fps-selected-100x75.thumb",
+            //        "..\\..\\..\\TestData\\Trailers\\Trailers-8fps-selected.topology");
+
+            mDataset = FromConfigFile("ViretToolConfig.txt");
 
             // initialize ranking engine
             SimilarityManager similarityManager = new SimilarityManager(mDataset);
@@ -529,6 +536,43 @@ namespace ViretTool
 
             
             TestButton.Height = 350;
+        }
+
+
+        private Dataset FromConfigFile(string configFile)
+        {
+            string thumbnailsAllFile;
+            string thumbnailsSelectedFile;
+            string topologyFile;
+
+            // load config file
+            try
+            {
+                using (StreamReader reader = new StreamReader(configFile))
+                {
+                    thumbnailsAllFile = reader.ReadLine();
+                    thumbnailsSelectedFile = reader.ReadLine();
+                    topologyFile = reader.ReadLine();
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = "Error reading config file: " + configFile;
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                throw new IOException(message);
+            }
+
+            // load database object
+            try
+            {
+                return new Dataset(thumbnailsAllFile, thumbnailsSelectedFile, topologyFile);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error creating database file using config: " + configFile;
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                throw new IOException(message);
+            }
         }
 
         //private void ShowRank(List<RankedFrame> result)
