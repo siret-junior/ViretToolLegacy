@@ -42,7 +42,7 @@ namespace ViretTool.BasicClient
 
             List<DataModel.Frame> framesToDisplay = frame.FrameVideo.Frames;
 
-            framesToDisplay = ReduceFrameSet(framesToDisplay, maxFramesToDisplay);
+            framesToDisplay = ReduceFrameSet(framesToDisplay, maxFramesToDisplay, frame);
             //DataModel.Frame[] allFrames = frame.FrameVideo.VideoDataset.ReadAllVideoFrames(frame.FrameVideo);
             //List<DataModel.Frame> framesToDisplay = new List<DataModel.Frame>(allFrames.Length / 8);
             //for (int i = 0; i < allFrames.Length; i += 8)
@@ -56,6 +56,7 @@ namespace ViretTool.BasicClient
             for (int i = 0; i < DisplayedFrames.Length; i++)
             {
                 DisplayedFrames[i].Frame = null;
+                DisplayedFrames[i].IsSelected = false;
             }
 
             // resize display
@@ -67,25 +68,38 @@ namespace ViretTool.BasicClient
             for (int i = 0; i < framesToDisplay.Count; i++)
             {
                 DisplayedFrames[i].Frame = framesToDisplay[i];
+                if (DisplayedFrames[i].Frame == frame)
+                {
+                    DisplayedFrames[i].IsSelected = true;
+                }
             }
-
-            UpdateSelectionVisualization();
         }
 
 
-        private List<DataModel.Frame> ReduceFrameSet(List<DataModel.Frame> frames, int maxFrames)
+        private List<DataModel.Frame> ReduceFrameSet(List<DataModel.Frame> frames, int maxFrames, DataModel.Frame sourceFrame)
         {
             if (frames.Count <= maxFrames)
             {
                 return frames;
             }
-
+            
             List<DataModel.Frame> result = new List<DataModel.Frame>();
+            bool wasSourceFrameAdded = false;
+
             for (int i = 0; i < maxFrames; i++)
             {
                 int index = (int)(((double)i / maxFrames) * frames.Count);
+
+                if (!wasSourceFrameAdded && frames[index].FrameNumber >= sourceFrame.FrameNumber)
+                {
+                    result.Add(sourceFrame);
+                    wasSourceFrameAdded = true;
+                    continue;
+                }
+
                 result.Add(frames[index]);
             }
+            
             return result;
         }
     }
