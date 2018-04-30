@@ -25,7 +25,7 @@ namespace ViretTool.RankingModel.SimilarityModels
 #if LEGACY
         private readonly ByteVectorModel mVectorModel; // TODO: add generic vector model
 #else
-        private readonly FloatVectorModel mVectorModel; // TODO: add generic vector model
+        public readonly FloatVectorModel mVectorModel; // TODO: add generic vector model
 #endif
         private List<RankedFrame> mVectorBasedRanking;
 

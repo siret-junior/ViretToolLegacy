@@ -102,6 +102,9 @@ namespace ViretTool
             FilterManager filterManager = new FilterManager(mDataset);
             mRankingEngine = new RankingEngine(similarityManager, filterManager);
 
+            timeFrameDisplay.SimilarityModel = similarityManager.mVectorModel;
+            timeFrameDisplay.Dataset = mDataset;
+
             // initialize selection controller
             mFrameSelectionController = new FrameSelectionController();
 
@@ -432,6 +435,7 @@ namespace ViretTool
                     }
 
                     resultDisplay.ResultFrames = rankedResult;
+                    timeFrameDisplay.ResultFrames = rankedResult;
                     //mFrameSelectionController.ResetSelection();
 
                     // build query objects string

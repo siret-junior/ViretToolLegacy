@@ -114,7 +114,12 @@
 
             <control:ResultDisplay 
                 x:Name="resultDisplay" 
-                Grid.Row="0" />
+                Grid.Row="0"
+                Visibility="Hidden"/>
+            <control:TimeFrameDisplay 
+                x:Name="timeFrameDisplay" 
+                Grid.Row="0"
+                Background="AliceBlue"/>
             <GridSplitter 
                 Grid.Row="1" 
                 Background="DarkGray"

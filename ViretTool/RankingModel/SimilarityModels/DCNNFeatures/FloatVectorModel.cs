@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace ViretTool.RankingModel.SimilarityModels
 {
-    class FloatVectorModel
+    public class FloatVectorModel
     {
         private readonly DataModel.Dataset mDataset;
 
         /// <summary>
         /// Extracted features from DCNN, normalized to |v| = 1 and each dimension globally quantized to byte
         /// </summary>
-        private List<float[]> mFloatVectors;
+        public List<float[]> mFloatVectors;
 
         private int mVectorDimension;
 
