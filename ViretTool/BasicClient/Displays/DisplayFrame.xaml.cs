@@ -22,7 +22,7 @@ namespace ViretTool.BasicClient
     /// </summary>
     public partial class DisplayFrame : UserControl
     {
-        public DisplayControl ParentDisplay { get; private set; }
+        public IDisplayControl ParentDisplay { get; private set; }
 
         private DataModel.Frame mFrame = null;
         public DataModel.Frame Frame
@@ -88,7 +88,7 @@ namespace ViretTool.BasicClient
         }
         private int mDisplayedVideoFrameId = -1;
 
-        public DisplayFrame(DisplayControl parentDisplay)
+        public DisplayFrame(IDisplayControl parentDisplay)
         {
             InitializeComponent();
             ParentDisplay = parentDisplay;

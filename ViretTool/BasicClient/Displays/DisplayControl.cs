@@ -8,7 +8,7 @@ using System.Windows.Controls.Primitives;
 
 namespace ViretTool.BasicClient
 {
-    public class DisplayControl : UserControl
+    public class DisplayControl : UserControl, IDisplayControl
     {
         protected int mDisplayCols;
         protected int mDisplayRows;
@@ -73,10 +73,7 @@ namespace ViretTool.BasicClient
         }
 
         #region --[ Events ]--
-
-        public delegate void FrameSelectionEventHandler(DataModel.Frame selectedFrame);
-        public delegate void SubmitSelectionEventHandler();
-
+        
         public event FrameSelectionEventHandler AddingToSelectionEvent;
         public void RaiseAddingToSelectionEvent(DataModel.Frame selectedFrame)
         {

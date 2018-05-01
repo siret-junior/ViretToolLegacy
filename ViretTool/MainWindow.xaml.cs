@@ -449,7 +449,14 @@ namespace ViretTool
 
 
             #region --[ Frame selection ]--
-            
+
+            timeFrameDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            timeFrameDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            //resultDisplay.ResettingSelectionEvent += mFrameSelectionController.ResetSelection;
+            //resultDisplay.SelectionColorSearchEvent += mFrameSelectionController.SubmitSelectionColorModel;
+            timeFrameDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            timeFrameDisplay.SubmittingToServerEvent += OpenSubmitWindow;
+
             // frame selection events
             resultDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
             resultDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
@@ -486,6 +493,7 @@ namespace ViretTool
                 {
                     resultDisplay.SelectedFrames = selectedFrames;
                     videoDisplay.SelectedFrames = selectedFrames;
+                    timeFrameDisplay.SelectedFrames = selectedFrames;
                     //colorModelDisplay.SelectedFrames = selectedFrames;
                     semanticModelDisplay.DisplayFrames(selectedFrames);
                     semanticModelDisplay.SelectedFrames = selectedFrames;

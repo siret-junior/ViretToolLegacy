@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViretTool.DataModel;
 using ViretTool.RankingModel;
 
 namespace ViretTool.BasicClient {
@@ -20,12 +21,14 @@ namespace ViretTool.BasicClient {
     /// </summary>
     public partial class TimeFrame : UserControl {
 
-        public TimeFrame(RankedTimeFrame rankedTimeFrame) {
+        private List<DisplayFrame> DisplayFrames = new List<DisplayFrame>();
+        
+        public TimeFrame(IDisplayControl disp, RankedTimeFrame rankedTimeFrame) {
             InitializeComponent();
-            Fill(rankedTimeFrame);
+            Fill(disp, rankedTimeFrame);
         }
 
-        private void Fill(RankedTimeFrame rankedTimeFrame) {
+        private void Fill(IDisplayControl disp, RankedTimeFrame rankedTimeFrame) {
             SingleTimeFrame timeFrame;
             DisplayFrame displayedFrame;
             frameGrid.Children.Clear();
@@ -37,8 +40,10 @@ namespace ViretTool.BasicClient {
 
             rankedTimeFrame.LeftFrames.Reverse();
             foreach (var t in rankedTimeFrame.LeftFrames) {
-                displayedFrame = new DisplayFrame(null);
+                displayedFrame = new DisplayFrame(disp);
                 displayedFrame.Frame = t.Item1;
+
+                DisplayFrames.Add(displayedFrame);
 
                 timeFrame = new SingleTimeFrame(displayedFrame, t.Item2, SingleTimeFrame.Position.Left);
                 frameGrid.Children.Add(timeFrame);
@@ -48,17 +53,26 @@ namespace ViretTool.BasicClient {
             border.BorderBrush = Brushes.Blue;
             border.BorderThickness = new Thickness(2);
 
-            displayedFrame = new DisplayFrame(null);
+            displayedFrame = new DisplayFrame(disp);
             displayedFrame.Frame = rankedTimeFrame.RankedFrame.Frame;
+            DisplayFrames.Add(displayedFrame);
             border.Child = displayedFrame;
             frameGrid.Children.Add(border);
 
             foreach (var t in rankedTimeFrame.RightFrames) {
-                displayedFrame = new DisplayFrame(null);
+                displayedFrame = new DisplayFrame(disp);
                 displayedFrame.Frame = t.Item1;
+
+                DisplayFrames.Add(displayedFrame);
 
                 timeFrame = new SingleTimeFrame(displayedFrame, t.Item2, SingleTimeFrame.Position.Right);
                 frameGrid.Children.Add(timeFrame);
+            }
+        }
+
+        public void UpdateSelection(List<DataModel.Frame> selectedFrames) {
+            foreach (var item in DisplayFrames) {
+                item.IsSelected = selectedFrames.Contains(item.Frame);
             }
         }
     }

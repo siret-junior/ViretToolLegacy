@@ -19,7 +19,7 @@ namespace ViretTool.BasicClient {
     /// <summary>
     /// Interaction logic for TimeFrameDisplay.xaml
     /// </summary>
-    public partial class TimeFrameDisplay : UserControl {
+    public partial class TimeFrameDisplay : UserControl, IDisplayControl {
         public TimeFrameDisplay() {
             InitializeComponent();
         }
@@ -37,6 +37,21 @@ namespace ViretTool.BasicClient {
         public static readonly DependencyProperty ThresholdProperty = DependencyProperty.Register("Threshold", typeof(double), typeof(TimeFrameDisplay), new FrameworkPropertyMetadata(0.3d));
         public static readonly DependencyProperty TypeProperty = DependencyProperty.Register("Type", typeof(ThresholdType), typeof(TimeFrameDisplay), new FrameworkPropertyMetadata(ThresholdType.Similarity));
 
+        private List<DataModel.Frame> mSelectedFrames = new List<DataModel.Frame>();
+        public List<DataModel.Frame> SelectedFrames {
+            get { return mSelectedFrames; }
+            set {
+                mSelectedFrames = value;
+                UpdateSelectionVisualization();
+            }
+        }
+
+        protected void UpdateSelectionVisualization() {
+            foreach (var item in timeFrameGrid.Children) {
+                TimeFrame tf = item as TimeFrame;
+                tf.UpdateSelection(SelectedFrames);
+            }
+        }
 
         public int Page {
             get { return (int)GetValue(PageProperty); }
@@ -90,7 +105,7 @@ namespace ViretTool.BasicClient {
 
         private void AggregateUpTo(int numberOfTimeFrames) {
             int i = 0;
-            while (aggregatedUpTo < numberOfTimeFrames && i < mResultFrames.Count) {
+            while (aggregatedUpTo < numberOfTimeFrames && mResultFrames != null && i < mResultFrames.Count) {
                 if (!mUsedIndices.Contains(mResultFrames[i].Frame.ID)) {
                     mUsedIndices.Add(mResultFrames[i].Frame.ID);
 
@@ -99,10 +114,6 @@ namespace ViretTool.BasicClient {
 
                     mTimeFrames.Add(new RankedTimeFrame(mResultFrames[i], lf, rf, mDisplayWidth));
                     aggregatedUpTo++;
-                } else {
-                    if (Dataset.Frames[mResultFrames[i].Frame.ID].FrameVideo.VideoID == 12) {
-                        System.Diagnostics.Debug.WriteLine("indice from vid 12: " + i.ToString());
-                    }
                 }
                 i++;
             }
@@ -119,10 +130,11 @@ namespace ViretTool.BasicClient {
             int count = (aggregatedUpTo - offset < DisplaySize) ? aggregatedUpTo - offset : DisplaySize;
 
             for (int i = offset; i < offset + count; i++) {
-                var tf = new TimeFrame(mTimeFrames[i]);
+                var tf = new TimeFrame(this, mTimeFrames[i]);
                 timeFrameGrid.Children.Add(tf);
             }
             this.UpdateLayout();
+            UpdateSelectionVisualization();
         }
 
         private List<Tuple<DataModel.Frame, int>> CalcTimeFrame(RankedFrame f, int dir) {
@@ -161,5 +173,43 @@ namespace ViretTool.BasicClient {
                 DisplayPage(Page);
             }
         }
+
+        public event FrameSelectionEventHandler AddingToSelectionEvent;
+        public void RaiseAddingToSelectionEvent(DataModel.Frame selectedFrame) {
+            AddingToSelectionEvent?.Invoke(selectedFrame);
+        }
+
+        public event FrameSelectionEventHandler RemovingFromSelectionEvent;
+        public void RaiseRemovingFromSelectionEvent(DataModel.Frame selectedFrame) {
+            RemovingFromSelectionEvent?.Invoke(selectedFrame);
+        }
+
+        public event SubmitSelectionEventHandler ResettingSelectionEvent;
+        public void RaiseResettingSelectionEvent() {
+            ResettingSelectionEvent?.Invoke();
+        }
+
+        //public event SubmitSelectionEventHandler SelectionColorSearchEvent;
+        //public void RaiseSelectionColorSearchEvent()
+        //{
+        //    SelectionColorSearchEvent?.Invoke();
+        //}
+
+        public event SubmitSelectionEventHandler SelectionSemanticSearchEvent;
+        public void RaiseSelectionSemanticSearchEvent() {
+            SelectionSemanticSearchEvent?.Invoke();
+        }
+
+        public event FrameSelectionEventHandler DisplayingFrameVideoEvent;
+        public void RaiseDisplayingFrameVideoEvent(DataModel.Frame selectedFrame) {
+            DisplayingFrameVideoEvent?.Invoke(selectedFrame);
+        }
+
+
+        public event FrameSelectionEventHandler SubmittingToServerEvent;
+        public void RaiseSubmittingToServerEvent(DataModel.Frame submittedFrame) {
+            SubmittingToServerEvent?.Invoke(submittedFrame);
+        }
+
     }
 }

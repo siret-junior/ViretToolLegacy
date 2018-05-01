@@ -20,9 +20,11 @@ namespace ViretTool.BasicClient {
     public partial class SingleTimeFrame : UserControl {
 
         public enum Position { Left, Right };
+        public DisplayFrame DisplayedFrame;
 
         public SingleTimeFrame(DisplayFrame displayedFrame, int count, Position pos) {
             InitializeComponent();
+            DisplayedFrame = displayedFrame;
 
             if (count > 0) {
                 ColumnDefinition c1 = new ColumnDefinition();
