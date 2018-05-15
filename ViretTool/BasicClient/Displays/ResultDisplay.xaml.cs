@@ -195,6 +195,21 @@ namespace ViretTool.BasicClient
             RaiseDisplayChangedEvent();
         }
 
+        public void SeekToFrame(DataModel.Frame frameToSeekTo)
+        {
+            if (frameToSeekTo == null)
+            {
+                return;
+            }
+
+            int frameIndex = ResultFrames.FindIndex(rankedFrame => rankedFrame.Frame == frameToSeekTo);
+            if (frameIndex > 0)
+            {
+                int page = frameIndex / ItemsPerPage;
+                DisplayPage(page);
+            }
+        }
+
         public void IncrementDisplay(int nPages)
         {
             DisplayPage(mPage + nPages);

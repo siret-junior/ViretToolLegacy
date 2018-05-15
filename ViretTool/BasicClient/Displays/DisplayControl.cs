@@ -12,6 +12,7 @@ namespace ViretTool.BasicClient
     {
         protected int mDisplayCols;
         protected int mDisplayRows;
+        protected int ItemsPerPage { get { return mDisplayCols * mDisplayRows; } }
 
         private DisplayFrame[] mDisplayedFrames;
         public DisplayFrame[] DisplayedFrames

@@ -23,32 +23,57 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0">
-            <Grid>
+            <Grid x:Name="settingsButtonsGrid">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <Button x:Name="settingsButton"
                         Grid.Column="0"
                         Height="32"
                         Content="Settings"
                         Click="settingsButton_Click"/>
-                <Button x:Name="resetButton"
-                        Grid.Column="1"
-                        Height="32"
-                        Foreground="White"
-                        Background="Black"
-                        Content="Reset"
-                        Click="resetButton_Click"/>
                 <Button x:Name="clearAllButton"
-                        Grid.Column="2"
+                        Grid.Column="1"
                         Height="32"
                         Background="LightCoral"
                         Content="Clear all"
                         Click="clearAllButton_Click"/>
             </Grid>
+
+
+
+            <Label Grid.Column="0"
+                       Background="DarkGray"
+                       FontWeight="Bold"
+                       Content="Display" />
+
+            <Grid x:Name="displayButtonsGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="gridDisplayButton"
+                        Grid.Column="0"
+                        Height="32"
+                        Content="Grid"
+                        Foreground="Black"
+                        Background="GreenYellow"
+                        
+                        Margin="5, 5, 2.5, 5"
+                        Click="gridDisplayButton_Click"/>
+                <Button x:Name="timelineDisplayButton"
+                        Grid.Column="1"
+                        Height="32"
+                        Foreground="Black"
+                        Background="DodgerBlue"
+                        Content="Timeline (frame??)"
+                        Margin=" 2.5, 5, 5, 5"
+                        Click="timelineDisplayButton_Click"/>
+            </Grid>
+
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -107,9 +132,9 @@
 
         <Grid Grid.Column="2" >
             <Grid.RowDefinitions>
-                <RowDefinition Height="4*" />
+                <RowDefinition Height="*" />
                 <RowDefinition Height="32" />
-                <RowDefinition Height="1*" />
+                <RowDefinition Height="0" />
             </Grid.RowDefinitions>
 
             <control:ResultDisplay 
@@ -120,6 +145,7 @@
                 x:Name="timeFrameDisplay" 
                 Grid.Row="0"
                 Background="AliceBlue"/>
+            
             <GridSplitter 
                 Grid.Row="1" 
                 Background="DarkGray"
@@ -151,7 +177,8 @@
                     </ControlTemplate>
                 </GridSplitter.Template>
             </GridSplitter>
-                <control:VideoDisplay 
+            
+            <control:VideoDisplay 
                 x:Name="videoDisplay" 
                 Grid.Row="2" />
         </Grid>

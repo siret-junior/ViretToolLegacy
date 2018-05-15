@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ViretTool.BasicClient;
+using ViretTool.BasicClient.Displays;
 using ViretTool.DataModel;
 using ViretTool.RankingModel;
 using ViretTool.RankingModel.FilterModels;
@@ -47,11 +48,7 @@ namespace ViretTool
             // TODO - use unique toolID
             mVBSLogger = new VBSLogger("1");
 
-            // prepare data model
-            //mDataset = new DataModel.Dataset("..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb", "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
-
-            //mDataset = new DataModel.Dataset("..\\..\\..\\TestData\\TRECVid\\TRECVid-KF-100x75.thumb", "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb");
-
+            // TODO: what the hell is this for and why is it not properly commented in a separate method?
             //StringBuilder SB = new StringBuilder(); int c = 0;
             //foreach (DataModel.Frame f in mDataset.Frames)
             //{
@@ -70,30 +67,7 @@ namespace ViretTool
             //}
             //Clipboard.SetText(SB.ToString());
 
-            //mDataset = new DataModel.Dataset(
-            //    "..\\..\\..\\TestData\\TRECVid700v\\TRECVid700v-KF-100x75.thumb",
-            //    "..\\..\\..\\TestData\\TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
-
-            //mDataset = new DataModel.Dataset(
-            //    "TRECVid700v\\TRECVid700v-KF-100x75.thumb",
-            //    "TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
-
-            //const int MAX_VIDEO_COUNT = 700;
-            //mDataset = new DataModel.Dataset(
-            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-100x75.thumb",
-            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected-100x75.thumb",
-            //    "..\\..\\..\\TestData\\TRECVid\\TRECVid-4fps-selected.topology",
-            //    MAX_VIDEO_COUNT);
-
-            //mDataset = new DataModel.Dataset(
-            //    "..\\..\\..\\TestData\\CT24\\CT24-4fps-100x75.thumb",
-            //    "..\\..\\..\\TestData\\CT24\\CT24-4fps-selected-100x75.thumb",
-            //    "..\\..\\..\\TestData\\CT24\\CT24-4fps-selected.topology");
-
-            //mDataset = new DataModel.Dataset(
-            //        "..\\..\\..\\TestData\\Trailers\\Trailers-8fps-100x75.thumb",
-            //        "..\\..\\..\\TestData\\Trailers\\Trailers-8fps-selected-100x75.thumb",
-            //        "..\\..\\..\\TestData\\Trailers\\Trailers-8fps-selected.topology");
+            
 
             mDataset = FromConfigFile("ViretToolConfig.txt");
 
@@ -447,6 +421,19 @@ namespace ViretTool
                     Logger.LogInfo(mRankingEngine, message);
                 };
 
+            // reset selection when result changes
+            mRankingEngine.RankingChangedEvent +=
+                (rankedResult) =>
+                {
+                    GlobalItemSelector.SelectedFrame = null;
+                };
+
+            // item selection
+            GlobalItemSelector.SelectedFrameChangedEvent +=
+                (frame) =>
+                {
+                    resultDisplay.SeekToFrame(frame);
+                };
 
             #region --[ Frame selection ]--
 
@@ -806,6 +793,18 @@ namespace ViretTool
         {
             clearAllButton_Click(this, null);
             VBSLogger.ResetLog();
+        }
+
+        private void gridDisplayButton_Click(object sender, RoutedEventArgs e)
+        {
+            resultDisplay.Visibility = Visibility.Visible;
+            timeFrameDisplay.Visibility = Visibility.Hidden;
+        }
+
+        private void timelineDisplayButton_Click(object sender, RoutedEventArgs e)
+        {
+            timeFrameDisplay.Visibility = Visibility.Visible;
+            resultDisplay.Visibility = Visibility.Hidden;
         }
     }
 

@@ -71,6 +71,7 @@
       <DependentUpon>ModelControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="BasicClient\Controls\RadioEnumToBooleanConverter.cs" />
+    <Compile Include="BasicClient\Displays\GlobalItemSelector.cs" />
     <Compile Include="BasicClient\Displays\IDisplayControl.cs" />
     <Compile Include="BasicClient\Displays\TimeFrameDisplay\RankedTimeFrame.cs" />
     <Compile Include="BasicClient\Displays\TimeFrameDisplay\SingleTimeFrame.xaml.cs">

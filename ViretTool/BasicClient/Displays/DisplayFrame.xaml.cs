@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViretTool.BasicClient.Displays;
 
 namespace ViretTool.BasicClient
 {
@@ -125,6 +126,7 @@ namespace ViretTool.BasicClient
                 if (e.LeftButton == MouseButtonState.Pressed && ParentDisplay != null)
                 {
                     ParentDisplay.RaiseDisplayingFrameVideoEvent(Frame);
+                    GlobalItemSelector.SelectedFrame = Frame;
                 }
             }
         }
