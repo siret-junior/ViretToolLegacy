@@ -38,7 +38,7 @@ namespace ViretTool.BasicClient
             // clear display
             for (int i = 0; i < DisplayedFrames.Length; i++)
             {
-                DisplayedFrames[i].Frame = null;
+                DisplayedFrames[i].Clear();
             }
 
             // skip if nothing to show

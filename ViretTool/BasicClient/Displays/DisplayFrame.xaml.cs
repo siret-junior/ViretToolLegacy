@@ -57,6 +57,12 @@ namespace ViretTool.BasicClient
             }
         }
 
+        public void Clear() {
+            Frame = null;
+            IsSelected = false;
+            IsGlobalSelectedFrame = false;
+        }
+
         private bool mIsSelected = false;
         public bool IsSelected
         {
@@ -70,6 +76,19 @@ namespace ViretTool.BasicClient
                     mIsSelected = value;
                     UpdateSelectionVisualization();
                 }
+            }
+        }
+
+        private bool mIsGlobalSelectedFrame = false;
+        public bool IsGlobalSelectedFrame { get {
+                return mIsGlobalSelectedFrame;
+            } set {
+                if (value) {
+                    selectedItemRectangle.BorderThickness = new Thickness(2);
+                } else if (mIsGlobalSelectedFrame) {
+                    selectedItemRectangle.BorderThickness = new Thickness(0);
+                }
+                mIsGlobalSelectedFrame = value;
             }
         }
 
@@ -125,8 +144,10 @@ namespace ViretTool.BasicClient
             {
                 if (e.LeftButton == MouseButtonState.Pressed && ParentDisplay != null)
                 {
-                    ParentDisplay.RaiseDisplayingFrameVideoEvent(Frame);
-                    GlobalItemSelector.SelectedFrame = Frame;
+                    if (!(ParentDisplay is VideoDisplay)) {
+                        ParentDisplay.RaiseDisplayingFrameVideoEvent(Frame);
+                        GlobalItemSelector.SelectedFrame = Frame;
+                    }
                 }
             }
         }

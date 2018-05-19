@@ -83,6 +83,12 @@ namespace ViretTool
             mFrameSelectionController = new FrameSelectionController();
 
 
+            GlobalItemSelector.Displays.Add(resultDisplay);
+            GlobalItemSelector.Displays.Add(timeFrameDisplay);
+            GlobalItemSelector.VideoDisplay = videoDisplay;
+            GlobalItemSelector.Activate(resultDisplay);
+
+
             #region --[ Filter events ]--
 
             // filter changed events
@@ -397,6 +403,7 @@ namespace ViretTool
             mRankingEngine.RankingChangedEvent += 
                 (rankedResult) =>
                 {
+                    GlobalItemSelector.SelectedFrame = null;
                     //ShowRank(rankedResult);
                     if (rankedResult != null && rankedResult.Count > 0)
                     {
@@ -419,20 +426,6 @@ namespace ViretTool
                     string message = "Ranking updated, "
                          + resultSize + " ranked frames returned.";
                     Logger.LogInfo(mRankingEngine, message);
-                };
-
-            // reset selection when result changes
-            mRankingEngine.RankingChangedEvent +=
-                (rankedResult) =>
-                {
-                    GlobalItemSelector.SelectedFrame = null;
-                };
-
-            // item selection
-            GlobalItemSelector.SelectedFrameChangedEvent +=
-                (frame) =>
-                {
-                    resultDisplay.SeekToFrame(frame);
                 };
 
             #region --[ Frame selection ]--
@@ -494,6 +487,7 @@ namespace ViretTool
             // show frame video on video display
             resultDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             videoDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
+            timeFrameDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             //colorModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             semanticModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
 
@@ -691,6 +685,7 @@ namespace ViretTool
         private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             resultDisplay.UpdateDisplayGrid();
+            timeFrameDisplay.UpdateDisplayGrid();
         }
 
         private void clearAllButton_Click(object sender, RoutedEventArgs e)
@@ -797,14 +792,12 @@ namespace ViretTool
 
         private void gridDisplayButton_Click(object sender, RoutedEventArgs e)
         {
-            resultDisplay.Visibility = Visibility.Visible;
-            timeFrameDisplay.Visibility = Visibility.Hidden;
+            GlobalItemSelector.Activate(resultDisplay);
         }
 
         private void timelineDisplayButton_Click(object sender, RoutedEventArgs e)
         {
-            timeFrameDisplay.Visibility = Visibility.Visible;
-            resultDisplay.Visibility = Visibility.Hidden;
+            GlobalItemSelector.Activate(timeFrameDisplay);
         }
     }
 

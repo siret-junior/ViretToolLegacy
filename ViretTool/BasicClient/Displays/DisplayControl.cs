@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using ViretTool.BasicClient.Displays;
 
 namespace ViretTool.BasicClient
 {
@@ -13,6 +14,13 @@ namespace ViretTool.BasicClient
         protected int mDisplayCols;
         protected int mDisplayRows;
         protected int ItemsPerPage { get { return mDisplayCols * mDisplayRows; } }
+
+        private bool UseGlobalSelected = false;
+
+        public DisplayControl() {}
+        public DisplayControl(bool useGlobalSelected) {
+            UseGlobalSelected = useGlobalSelected;
+        }
 
         private DisplayFrame[] mDisplayedFrames;
         public DisplayFrame[] DisplayedFrames
@@ -47,6 +55,12 @@ namespace ViretTool.BasicClient
                     DisplayedFrames[i].IsSelected = SelectedFrames.Contains(DisplayedFrames[i].Frame);
                 }
             }
+            if (UseGlobalSelected && GlobalItemSelector.SelectedFrame != null && DisplayedFrames != null) {
+                for (int i = 0; i < DisplayedFrames.Length; i++) {
+                    DisplayedFrames[i].IsGlobalSelectedFrame = GlobalItemSelector.SelectedFrame == DisplayedFrames[i].Frame;
+                }
+            }
+            
         }
 
         protected void ResizeDisplay(int nRows, int nCols, UniformGrid displayGrid)

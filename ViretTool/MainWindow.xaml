@@ -144,7 +144,7 @@
             <control:TimeFrameDisplay 
                 x:Name="timeFrameDisplay" 
                 Grid.Row="0"
-                Background="AliceBlue"/>
+                Visibility="Hidden"/>
             
             <GridSplitter 
                 Grid.Row="1" 

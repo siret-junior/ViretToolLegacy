@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViretTool.BasicClient.Displays;
 using ViretTool.DataModel;
 using ViretTool.RankingModel;
 
@@ -19,19 +21,21 @@ namespace ViretTool.BasicClient {
     /// <summary>
     /// Interaction logic for TimeFrameDisplay.xaml
     /// </summary>
-    public partial class TimeFrameDisplay : UserControl, IDisplayControl {
+    public partial class TimeFrameDisplay : UserControl, IDisplayControl, IMainDisplay {
         public TimeFrameDisplay() {
             InitializeComponent();
+            ClearAndResize();
         }
         public Dataset Dataset;
         public RankingModel.SimilarityModels.FloatVectorModel SimilarityModel;
         private List<RankedFrame> mResultFrames = null;
         private List<RankedTimeFrame> mTimeFrames = null;
-        private HashSet<int> mUsedIndices = null;
+        private Dictionary<int, int> mUsedIndices = null;
         private int aggregatedUpTo = 0;
-        private int mDisplayWidth = 4;
-
+        private int aggregatedUpTo_ResultIndex = 0;
         public enum ThresholdType { Similarity, Time }
+
+        TimeFrame[] UITimeFrames;
 
         public static readonly DependencyProperty PageProperty = DependencyProperty.Register("Page", typeof(int), typeof(TimeFrameDisplay), new FrameworkPropertyMetadata(0));
         public static readonly DependencyProperty ThresholdProperty = DependencyProperty.Register("Threshold", typeof(double), typeof(TimeFrameDisplay), new FrameworkPropertyMetadata(0.3d));
@@ -43,13 +47,6 @@ namespace ViretTool.BasicClient {
             set {
                 mSelectedFrames = value;
                 UpdateSelectionVisualization();
-            }
-        }
-
-        protected void UpdateSelectionVisualization() {
-            foreach (var item in timeFrameGrid.Children) {
-                TimeFrame tf = item as TimeFrame;
-                tf.UpdateSelection(SelectedFrames);
             }
         }
 
@@ -68,15 +65,6 @@ namespace ViretTool.BasicClient {
             set { SetValue(ThresholdProperty, value); }
         }
 
-        public int DisplaySize {
-            get { return timeFrameGrid.Rows; }
-            set {
-                timeFrameGrid.Children.Clear();
-                timeFrameGrid.Rows = value;
-                DisplayPage(0);
-            }
-        }
-
         public List<RankedFrame> ResultFrames {
             get { return mResultFrames; }
             set {
@@ -84,57 +72,168 @@ namespace ViretTool.BasicClient {
                     return;
                 }
                 mResultFrames = value;
-                AggregateResult();
-                DisplayPage(0);
+                RefillNeeded = true;
+
+                if (GlobalItemSelector.ActiveDisplay == this) {
+                    AggregateResult();
+                    DisplayPage(0);
+                }
             }
         }
 
         private void ControlUIChanged(object sender, EventArgs e) {
-            timeFrameGrid.Children.Clear();
             AggregateResult();
-            DisplayPage(0);
+            if (GlobalItemSelector.SelectedFrame != null) {
+                SeekToFrame(GlobalItemSelector.SelectedFrame);
+            } else {
+                DisplayPage(0);
+            }
         }
 
         private void AggregateResult() {
             aggregatedUpTo = 0;
-            mUsedIndices = new HashSet<int>();
+            aggregatedUpTo_ResultIndex = 0;
+            mUsedIndices = new Dictionary<int, int>();
             mTimeFrames = new List<RankedTimeFrame>();
 
-            AggregateUpTo(DisplaySize);
+            AggregateUpTo(TimelinesPerPage);
         }
 
         private void AggregateUpTo(int numberOfTimeFrames) {
-            int i = 0;
+            int i = aggregatedUpTo_ResultIndex;
             while (aggregatedUpTo < numberOfTimeFrames && mResultFrames != null && i < mResultFrames.Count) {
-                if (!mUsedIndices.Contains(mResultFrames[i].Frame.ID)) {
-                    mUsedIndices.Add(mResultFrames[i].Frame.ID);
+                if (!mUsedIndices.ContainsKey(mResultFrames[i].Frame.ID)) {
+                    mUsedIndices.Add(mResultFrames[i].Frame.ID, aggregatedUpTo);
 
                     List<Tuple<DataModel.Frame, int>> lf = CalcTimeFrame(mResultFrames[i], -1);
                     List<Tuple<DataModel.Frame, int>> rf = CalcTimeFrame(mResultFrames[i], 1);
 
-                    mTimeFrames.Add(new RankedTimeFrame(mResultFrames[i], lf, rf, mDisplayWidth));
+                    mTimeFrames.Add(new RankedTimeFrame(mResultFrames[i], lf, rf, (ColumsPerTimeline - 1)/2));
                     aggregatedUpTo++;
                 }
                 i++;
             }
+            aggregatedUpTo_ResultIndex = i;
         }
 
 
-        public void DisplayPage(int page) {
-            pageTextBox.Text = page.ToString();
+        private void SeekToFrame(DataModel.Frame selectedFrame) {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
 
-            AggregateUpTo((page + 1) * DisplaySize);
+            while (true) {
+                if (mUsedIndices.ContainsKey(selectedFrame.ID)) {
+                    int timelinePosition = mUsedIndices[selectedFrame.ID];
+                    GlobalItemSelector.SelectedFrame = mTimeFrames[timelinePosition].RankedFrame.Frame;
 
-            timeFrameGrid.Children.Clear();
-            int offset = page * DisplaySize;
-            int count = (aggregatedUpTo - offset < DisplaySize) ? aggregatedUpTo - offset : DisplaySize;
+                    DisplayPage(timelinePosition / TimelinesPerPage, updateSelected:false);
+                    return;
+                }
 
-            for (int i = offset; i < offset + count; i++) {
-                var tf = new TimeFrame(this, mTimeFrames[i]);
-                timeFrameGrid.Children.Add(tf);
+                if (stopWatch.ElapsedMilliseconds > 1000) {
+                    MessageBox.Show("Frame seek takes more than 1 second, showing first page.", "It takes soo long :(",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    DisplayPage(0, updateSelected: false);
+                    return;
+                }
+
+                AggregateUpTo(aggregatedUpTo + TimelinesPerPage * 2);
+            }
+        }
+
+
+        const double DESIRED_ASPECT_RATIO = 3.0 / 4.0;
+        int mTimelinesPerRow = 1;
+        int TimelinesPerRow {
+            get {
+                return mTimelinesPerRow;
+            }
+        }
+        int TimelinesPerPage {
+            get {
+                return TimelinesPerRow * timeFrameGrid.Rows;
+            }
+        }
+        int Size = 11;
+        int ColumsPerTimeline {
+            get {
+                for (int i = 1; i < 18; i+=2) {
+                    if (TimelinesPerRow * i >= Size)
+                        return i;
+                }
+                return Size;
+            }
+        }
+        int Colums {
+            get {
+                return ColumsPerTimeline * TimelinesPerRow;
+            }
+        }
+        int Rows {
+            get {
+                double desiredFrameHeight = timeFrameGrid.ActualWidth / Colums * DESIRED_ASPECT_RATIO;
+                int rows = (int)((timeFrameGrid.ActualHeight + desiredFrameHeight / 2) / desiredFrameHeight);
+                return Math.Max(rows, 1);
+            }
+        }
+
+        bool RefillNeeded = true;
+
+        public void ClearAndResize() {
+            RefillNeeded = true;
+            // TODO: custom nColumns from the GUI
+            if (UITimeFrames == null || UITimeFrames.Length != TimelinesPerRow * Rows || timeFrameGrid.Rows != Rows) {
+                timeFrameGrid.Children.Clear();
+                timeFrameGrid.Rows = Rows;
+                timeFrameGrid.Columns = TimelinesPerRow;
+
+                UITimeFrames = new TimeFrame[TimelinesPerPage];
+                for (int i = 0; i < TimelinesPerPage; i++) {
+                    UITimeFrames[i] = new TimeFrame(this, ColumsPerTimeline);
+                    timeFrameGrid.Children.Add(UITimeFrames[i]);
+                }
+            } else {
+                for (int i = 0; i < TimelinesPerPage; i++) {
+                    UITimeFrames[i].Clear();
+                }
+            }
+        }
+
+
+        protected void UpdateSelectionVisualization() {
+            foreach (var item in UITimeFrames) {
+                item.UpdateSelection(SelectedFrames);
+            }
+        }
+
+
+        public void DisplayPage(int page, bool updateSelected = true) {
+            ClearAndResize();
+
+            //pageTextBox.Text = page.ToString();
+            if (page < 0) {
+                page = 0;
+            }
+            AggregateUpTo((page + 1) * TimelinesPerPage);
+
+            if ((page + 1) * TimelinesPerPage > aggregatedUpTo) {
+                page = (aggregatedUpTo - 1) / TimelinesPerPage;
+            }
+
+            int offset = page * TimelinesPerPage;
+            int count = (aggregatedUpTo - offset < TimelinesPerPage) ? aggregatedUpTo - offset : TimelinesPerPage;
+            Page = page;
+
+            if (updateSelected) {
+                GlobalItemSelector.SelectedFrame = mTimeFrames[offset].RankedFrame.Frame;
+            }
+            for (int i = offset, j = 0; i < offset + count; i++, j++) {
+                UITimeFrames[j].Set(mTimeFrames[i]);
             }
             this.UpdateLayout();
             UpdateSelectionVisualization();
+
+            RefillNeeded = false;
         }
 
         private List<Tuple<DataModel.Frame, int>> CalcTimeFrame(RankedFrame f, int dir) {
@@ -145,6 +244,7 @@ namespace ViretTool.BasicClient {
             int thrIndex = 0;
             var ret = new List<Tuple<DataModel.Frame, int>>();
 
+            int mDisplayWidth = (ColumsPerTimeline - 1) / 2;
             for (; i >= 0 && i < Dataset.Frames.Count && Dataset.Frames[i].FrameVideo.VideoID == vID; i += dir) {
                 double d = 0;
                 if (Type == ThresholdType.Similarity) {
@@ -154,7 +254,8 @@ namespace ViretTool.BasicClient {
                     d = Math.Abs(Dataset.Frames[fID].FrameNumber - Dataset.Frames[i].FrameNumber);
                     d = d / 99;
                 }
-                mUsedIndices.Add(i);
+                if (!mUsedIndices.ContainsKey(i))
+                    mUsedIndices.Add(i, aggregatedUpTo);
 
                 if (Threshold < d) {
                     ret.Add(new Tuple<DataModel.Frame, int>(Dataset.Frames[i], Math.Abs(fID - i) - 1));
@@ -166,13 +267,13 @@ namespace ViretTool.BasicClient {
             return ret;
         }
 
-        private void pageTextBox_KeyUp(object sender, KeyEventArgs e) {
-            int page = 0;
-            if (e.Key == Key.Enter && int.TryParse(pageTextBox.Text, out page)) {
-                Page = page;
-                DisplayPage(Page);
-            }
-        }
+        //private void pageTextBox_KeyUp(object sender, KeyEventArgs e) {
+        //    int page = 0;
+        //    if (e.Key == Key.Enter && int.TryParse(pageTextBox.Text, out page)) {
+        //        Page = page;
+        //        DisplayPage(Page);
+        //    }
+        //}
 
         public event FrameSelectionEventHandler AddingToSelectionEvent;
         public void RaiseAddingToSelectionEvent(DataModel.Frame selectedFrame) {
@@ -211,5 +312,50 @@ namespace ViretTool.BasicClient {
             SubmittingToServerEvent?.Invoke(submittedFrame);
         }
 
+        public void DisplaySelected() {
+            Visibility = Visibility.Visible;
+            if (RefillNeeded) {
+                AggregateResult();
+                DisplayPage(0, updateSelected: false);
+            }
+            if (GlobalItemSelector.SelectedFrame != null) {
+                SeekToFrame(GlobalItemSelector.SelectedFrame);
+            }
+        }
+
+        public void DisplayHidden() {
+            Visibility = Visibility.Hidden;
+        }
+
+        public void SelectedFrameChanged(DataModel.Frame selectedFrame) {
+            UpdateSelectionVisualization();
+        }
+
+        internal void UpdateDisplayGrid() {
+            ClearAndResize();
+            if (GlobalItemSelector.ActiveDisplay == this) {
+                if (GlobalItemSelector.SelectedFrame != null) {
+                    SeekToFrame(GlobalItemSelector.SelectedFrame);
+                } else {
+                    DisplayPage(0);
+                }
+            }
+        }
+
+        private void nextPageButton_Click(object sender, RoutedEventArgs e) {
+            DisplayPage(Page + 1);
+        }
+
+        private void previousPageButton_Click(object sender, RoutedEventArgs e) {
+            DisplayPage(Page - 1);
+        }
+
+        private void firstPageButton_Click(object sender, RoutedEventArgs e) {
+            DisplayPage(0);
+        }
+
+        private void lastPageButton_Click(object sender, RoutedEventArgs e) {
+            DisplayPage(mResultFrames.Count);
+        }
     }
 }

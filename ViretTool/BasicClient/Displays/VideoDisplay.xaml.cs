@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViretTool.DataModel;
 using ViretTool.RankingModel;
 
 namespace ViretTool.BasicClient
@@ -25,12 +26,15 @@ namespace ViretTool.BasicClient
         private int mDisplayWidth = 16;
         private int maxFramesToDisplay = 16 * 10;
         
-        public VideoDisplay()
+        public VideoDisplay() : base(true)
         {
             InitializeComponent();
             ResizeDisplay(1, 1, displayGrid);
         }
 
+        internal void SelectedFrameChanged(DataModel.Frame selectedFrame) {
+            UpdateSelectionVisualization();
+        }
 
         public void DisplayFrameVideo(DataModel.Frame frame)
         {
@@ -55,8 +59,7 @@ namespace ViretTool.BasicClient
             // clear display
             for (int i = 0; i < DisplayedFrames.Length; i++)
             {
-                DisplayedFrames[i].Frame = null;
-                DisplayedFrames[i].IsSelected = false;
+                DisplayedFrames[i].Clear();
             }
 
             // resize display
@@ -68,9 +71,8 @@ namespace ViretTool.BasicClient
             for (int i = 0; i < framesToDisplay.Count; i++)
             {
                 DisplayedFrames[i].Frame = framesToDisplay[i];
-                if (DisplayedFrames[i].Frame == frame)
-                {
-                    DisplayedFrames[i].IsSelected = true;
+                if (DisplayedFrames[i].Frame == frame) {
+                    DisplayedFrames[i].IsGlobalSelectedFrame = true;
                 }
             }
         }

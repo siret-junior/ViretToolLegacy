@@ -9,6 +9,9 @@
     <Viewbox
         Name="viewBox"
         Stretch="Fill">
+        <Border x:Name="selectedItemRectangle"
+                BorderBrush="Yellow"
+                BorderThickness="0">
         <Grid 
             Background="White"
             MouseDown="Grid_MouseDown"
@@ -136,5 +139,6 @@
             </Grid>
 
         </Grid>
+        </Border>
     </Viewbox>
 </UserControl>

@@ -13,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViretTool.BasicClient.Displays;
+using ViretTool.DataModel;
 using ViretTool.RankingModel;
 
 namespace ViretTool.BasicClient
@@ -20,7 +22,7 @@ namespace ViretTool.BasicClient
     /// <summary>
     /// Interaction logic for Display.xaml
     /// </summary>
-    public partial class ResultDisplay : DisplayControl, INotifyPropertyChanged
+    public partial class ResultDisplay : DisplayControl, INotifyPropertyChanged, IMainDisplay
     {
         const double DESIRED_ASPECT_RATIO = 3.0 / 4.0;
 
@@ -47,8 +49,11 @@ namespace ViretTool.BasicClient
                     return;
                 }
                 mResultFrames = value;
-                DisplayPage(0);
-                UpdateSelectionVisualization();
+
+                if (GlobalItemSelector.ActiveDisplay == this) {
+                    DisplayPage(0);
+                    UpdateSelectionVisualization();
+                }
             }
         }
 
@@ -65,7 +70,7 @@ namespace ViretTool.BasicClient
         }
         
 
-        public ResultDisplay()
+        public ResultDisplay() : base(true)
         {
             InitializeComponent();
             DataContext = this;
@@ -92,7 +97,12 @@ namespace ViretTool.BasicClient
                 ResizeDisplay(nRows, nColumns, displayGrid);
 
                 // TODO: recompute correct page
-                DisplayPage(0);
+                if (GlobalItemSelector.SelectedFrame != null) {
+                    DisplayPage(0, updateSelected:false);
+                    SeekToFrame(GlobalItemSelector.SelectedFrame);
+                } else {
+                    DisplayPage(0);
+                }
             }
 
             string message = "Result display was resized to " + nColumns * nRows + "items (" 
@@ -104,14 +114,14 @@ namespace ViretTool.BasicClient
         {
             for (int i = 0; i < DisplayedFrames.Length; i++)
             {
-                DisplayedFrames[i].Frame = null;
+                DisplayedFrames[i].Clear();
             }
 
             string message = "Result display was cleared.";
             Logger.LogInfo(this, message);
         }
 
-        public void DisplayPage(int page)
+        public void DisplayPage(int page, bool updateSelected=true)
         {
             // display check
             int displaySize = DisplayedFrames.Length;
@@ -166,6 +176,10 @@ namespace ViretTool.BasicClient
             RankedFrame[,] arrangedDisplay 
                 = DisplayArranger.ArrangeDisplay(framesToDisplay, mDisplayRows, mDisplayCols, arrangementType);
 
+            if (updateSelected && arrangedDisplay[0,0] != null) {
+                GlobalItemSelector.SelectedFrame = arrangedDisplay[0, 0].Frame;
+            }
+
             // display frames
             int iterator = 0;
             string message = "Result display displayed page " + mPage + ", "
@@ -206,7 +220,7 @@ namespace ViretTool.BasicClient
             if (frameIndex > 0)
             {
                 int page = frameIndex / ItemsPerPage;
-                DisplayPage(page);
+                DisplayPage(page, updateSelected:false);
             }
         }
 
@@ -347,6 +361,25 @@ namespace ViretTool.BasicClient
         private void Max3FromVideoCheckbox_Unchecked(object sender, RoutedEventArgs e)
         {
             Max3FromVideoDisabledEvent?.Invoke();
+        }
+
+        public void DisplaySelected() {
+            Visibility = Visibility.Visible;
+            if (GlobalItemSelector.SelectedFrame != null) {
+                DisplayPage(0, updateSelected: false);
+                SeekToFrame(GlobalItemSelector.SelectedFrame);
+            } else {
+                DisplayPage(0);
+            }
+            UpdateSelectionVisualization();
+        }
+
+        public void DisplayHidden() {
+            Visibility = Visibility.Hidden;
+        }
+
+        public void SelectedFrameChanged(DataModel.Frame selectedFrame) {
+            UpdateSelectionVisualization();
         }
 
         //private void displayGrid_MouseWheel(object sender, MouseWheelEventArgs e)

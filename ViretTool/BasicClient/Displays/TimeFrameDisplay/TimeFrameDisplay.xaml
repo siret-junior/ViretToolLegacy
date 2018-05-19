@@ -24,6 +24,13 @@
             
             <StackPanel Orientation="Horizontal"
                         Grid.Column="0">
+                <Label 
+                    Background="DarkGray"
+                    FontWeight="Bold"
+                    FontSize="14"
+                    Content="Search results:"
+                    VerticalAlignment="Center"/>
+                
                 <StackPanel Orientation="Horizontal" Margin="10,0,10,0" VerticalAlignment="Center">
                     <RadioButton GroupName="TimelineThresholdType" IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TimeFrameDisplay}},
                         Mode=TwoWay, Path=Type, Converter={StaticResource enumConverter}, ConverterParameter=Similarity}" Checked="ControlUIChanged" Margin="0,0,5,0">Similarity</RadioButton>
@@ -39,10 +46,41 @@
                    VerticalAlignment="Center"
                    Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TimeFrameDisplay}}, Mode=TwoWay, Path=Threshold, Converter={StaticResource doubleConverter}, ConverterParameter=PercentageOff}" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"  Margin="10,0,10,0"
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                         Grid.Column="1">
-                <TextBox Text="0" VerticalAlignment="Center" Width="40" Padding="0,5,0,5" TextAlignment="Center" x:Name="pageTextBox"
-                         KeyUp="pageTextBox_KeyUp"/>
+                <Button
+                    Name="firstPageButton"
+                    Click="firstPageButton_Click"
+                    Width="80"
+                    Content="&lt;&lt; First" />
+                <Button
+                    Name="previousPageButton"
+                    Click="previousPageButton_Click"
+                    Width="80"
+                    Content="&lt; Previous" />
+
+                <Label
+                    Name="currentPageNumber"
+                    Background="White"
+                    Width="80"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Left"
+                    Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TimeFrameDisplay}}, Mode=TwoWay, Path=Page}" />
+
+                <Button
+                    Name="nextPageButton"
+                    Click="nextPageButton_Click"
+                    Width="80"
+                    Content="Next &gt;" />
+
+                <Button
+                    Name="lastPageButton"
+                    Width="80"
+                    Click="lastPageButton_Click"
+                    Content="Last &gt;&gt;" />
+
+                <!--<TextBox Text="0" VerticalAlignment="Center" Width="40" Padding="0,5,0,5" TextAlignment="Center" x:Name="pageTextBox"
+                         KeyUp="pageTextBox_KeyUp"/>-->
             </StackPanel>
         </Grid>
         
