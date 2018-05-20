@@ -34,7 +34,7 @@ namespace ViretTool
         private Submission mSubmissionClient;
         private Settings mSettings = Settings.LoadSettings();
 
-        private RandomScenePlayer mRandomScenePlayer;
+        //private RandomScenePlayer mRandomScenePlayer;
         private VBSLogger mVBSLogger;
 
         private Cursor mPreviousCursor;
@@ -397,7 +397,8 @@ namespace ViretTool
 
 
             // TODO - show mRandomScenePlayer.ReturnSearchedItemPosition
-            mRandomScenePlayer = new RandomScenePlayer(mDataset, TestButton, 200);
+            //mRandomScenePlayer = new RandomScenePlayer(mDataset, TestButton, 200);
+
 
 
             // ranking model output visualization
@@ -406,15 +407,15 @@ namespace ViretTool
                 {
                     GlobalItemSelector.SelectedFrame = null;
                     //ShowRank(rankedResult);
-                    if (rankedResult != null && rankedResult.Count > 0)
-                    {
-                        string trainingSearchString = mRandomScenePlayer.ReturnSearchedItemPosition(rankedResult);
-                        trainingSearchLabel.Content = trainingSearchString;
-                    }
-                    else
-                    {
-                        trainingSearchLabel.Content = "";
-                    }
+                    //if (rankedResult != null && rankedResult.Count > 0)
+                    //{
+                    //    string trainingSearchString = mRandomScenePlayer.ReturnSearchedItemPosition(rankedResult);
+                    //    trainingSearchLabel.Content = trainingSearchString;
+                    //}
+                    //else
+                    //{
+                    //    trainingSearchLabel.Content = "";
+                    //}
 
                     resultDisplay.ResultFrames = rankedResult;
                     timeFrameDisplay.ResultFrames = rankedResult;
@@ -529,8 +530,19 @@ namespace ViretTool
             mRankingEngine.GenerateSequentialRanking();
 
             
-            TestButton.Height = 350;
+            //TestButton.Height = 350;
+
+            AddHandler(DisplayFrame.OnEnterEvent, (RoutedEventHandler)DisplayFrameOnEnter);
         }
+
+        public void DisplayFrameOnEnter(object sender, RoutedEventArgs e) {
+            if (e == null) return;
+            var df = e.OriginalSource as DisplayFrame;
+            if (df == null || df.Frame == null) return;
+
+            playerDisplayFrame.Frame = df.Frame;
+        }
+
 
         private Dataset FromConfigFile(string configFile)
         {
@@ -711,7 +723,7 @@ namespace ViretTool
 
             // TODO - is it OK/enough to set to null??
             //TestButton.Background = Brushes.LightGray;
-            mRandomScenePlayer.Reset();
+            //mRandomScenePlayer.Reset();
 
             // log message
             string message = "Reset of all models and their controls.";

@@ -8,7 +8,8 @@
              d:DesignHeight="75" d:DesignWidth="100">
     <Viewbox
         Name="viewBox"
-        Stretch="Fill">
+        Stretch="Fill"
+        MouseEnter="viewBox_MouseEnter">
         <Border x:Name="selectedItemRectangle"
                 BorderBrush="Yellow"
                 BorderThickness="0">

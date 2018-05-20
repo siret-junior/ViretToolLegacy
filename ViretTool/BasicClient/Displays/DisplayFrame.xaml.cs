@@ -120,8 +120,18 @@ namespace ViretTool.BasicClient
             ParentDisplay = null;
         }
 
+        public static readonly RoutedEvent OnEnterEvent = EventManager.RegisterRoutedEvent("OnEnter", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(DisplayFrame));
 
-        
+        public event RoutedEventHandler OnEnter {
+            add { AddHandler(OnEnterEvent, value); }
+            remove { RemoveHandler(OnEnterEvent, value); }
+        }
+
+        private void viewBox_MouseEnter(object sender, MouseEventArgs e) {
+            RoutedEventArgs evargs = new RoutedEventArgs(OnEnterEvent, this);
+            RaiseEvent(evargs);
+        }
+
         private void UpdateSelectionVisualization()
         {
             switch (mIsSelected)
@@ -224,7 +234,7 @@ namespace ViretTool.BasicClient
             }
 
             // display buttons
-            if (Frame != null)
+            if (Frame != null && ParentDisplay != null)
             {
                 displayButtons.Visibility = Visibility.Visible;
             }
@@ -357,6 +367,6 @@ namespace ViretTool.BasicClient
 
             ParentDisplay.RaiseSubmittingToServerEvent(submittedFrame);
         }
-#endregion
+        #endregion
     }
 }

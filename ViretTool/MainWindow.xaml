@@ -22,7 +22,9 @@
             <ColumnDefinition Width="8*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0">
+        <StackPanel Grid.Column="0"
+                    HorizontalAlignment="Stretch">
+            
             <Grid x:Name="settingsButtonsGrid">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
@@ -80,7 +82,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                
+
                 <Label Grid.Column="0"
                        Background="DarkGray"
                        FontWeight="Bold"
@@ -94,7 +96,7 @@
 
             <control:FilterControl x:Name="filterBW" FilterName="B/W"/>
             <control:FilterControl x:Name="filterPercentageOfBlack" FilterName="% of Black"/>
-            
+
             <control:ModelControl x:Name="keywordSearchControlBar" ModelName="Keyword"/>
             <control:KeywordSearchControl x:Name="keywordSearchTextBox" Margin="2,0,2,0"/>
 
@@ -104,9 +106,14 @@
 
             <control:ModelControl x:Name="semanticModelControlBar" ModelName="Semantic" />
             <control:SemanticModelDisplay x:Name="semanticModelDisplay" Height="150" Margin="0,0,0.2,0"/>
-            
+
+            <Viewbox Stretch="Uniform">
+                <control:DisplayFrame x:Name="playerDisplayFrame"
+                                          Height="300"
+                                          Width="400"/>
+            </Viewbox>
             <!--<Label x:Name="TestLabel" Content=""></Label>-->
-            <Grid Background="DarkGray">
+            <!--<Grid Background="DarkGray">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -119,7 +126,7 @@
                 <Label x:Name="trainingSearchLabel"
                     Grid.Column="1" />
             </Grid>
-            <Button Height="200" x:Name="TestButton" VerticalContentAlignment="Top" />
+            <Button Height="200" x:Name="TestButton" VerticalContentAlignment="Top" />-->
         </StackPanel>
 
         <GridSplitter Grid.Column="1" 
