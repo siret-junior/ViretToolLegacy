@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViretTool.BasicClient.Displays;
 using ViretTool.DataModel;
 using ViretTool.RankingModel;
 
@@ -20,29 +21,48 @@ namespace ViretTool.BasicClient
     /// <summary>
     /// Interaction logic for VideoDisplay.xaml
     /// </summary>
-    public partial class VideoDisplay : DisplayControl
-    {
-        
+    public partial class VideoDisplay : DisplayControl {
+
         private int mDisplayWidth = 16;
         private int maxFramesToDisplay = 16 * 10;
-        
-        public VideoDisplay() : base(true)
-        {
+        public MainWindow ParentWindow;
+        private int LastVideoId = -1;
+
+        public VideoDisplay() : base(true) {
             InitializeComponent();
             ResizeDisplay(1, 1, displayGrid);
+        }
+
+        private bool mFrameReductionSampled = true;
+        public bool FrameReductionSampled {
+            get {
+                return mFrameReductionSampled;
+            }
+        }
+        public bool FrameReductionDense {
+            get {
+                return !mFrameReductionSampled;
+            }
         }
 
         internal void SelectedFrameChanged(DataModel.Frame selectedFrame) {
             UpdateSelectionVisualization();
         }
 
-        public void DisplayFrameVideo(DataModel.Frame frame)
+        public void DisplayFrameVideo(DataModel.Frame frame, bool doSwitch=true)
         {
             // skip if nothing to show
             if (frame == null)
             {
                 return;
             }
+
+            if (doSwitch && LastVideoId != frame.FrameVideo.VideoID) {
+                mFrameReductionSampled = true;
+                frameReductionDense.IsChecked = false;
+                frameReductionSampled.IsChecked = true;
+            }
+            LastVideoId = frame.FrameVideo.VideoID;
 
             List<DataModel.Frame> framesToDisplay = frame.FrameVideo.Frames;
 
@@ -73,6 +93,7 @@ namespace ViretTool.BasicClient
                 DisplayedFrames[i].Frame = framesToDisplay[i];
                 if (DisplayedFrames[i].Frame == frame) {
                     DisplayedFrames[i].IsGlobalSelectedFrame = true;
+                    DisplayedFrames[i].BringIntoView();
                 }
             }
         }
@@ -88,21 +109,51 @@ namespace ViretTool.BasicClient
             List<DataModel.Frame> result = new List<DataModel.Frame>();
             bool wasSourceFrameAdded = false;
 
-            for (int i = 0; i < maxFrames; i++)
-            {
-                int index = (int)(((double)i / maxFrames) * frames.Count);
+            if (mFrameReductionSampled) {
+                for (int i = 0; i < maxFrames; i++) {
+                    int index = (int)(((double)i / maxFrames) * frames.Count);
 
-                if (!wasSourceFrameAdded && frames[index].FrameNumber >= sourceFrame.FrameNumber)
-                {
-                    result.Add(sourceFrame);
-                    wasSourceFrameAdded = true;
-                    continue;
+                    if (!wasSourceFrameAdded && frames[index].FrameNumber >= sourceFrame.FrameNumber) {
+                        result.Add(sourceFrame);
+                        wasSourceFrameAdded = true;
+                        continue;
+                    }
+
+                    result.Add(frames[index]);
                 }
-
-                result.Add(frames[index]);
+            } else {
+                int firstFrame = Math.Max(frames[0].ID, sourceFrame.ID - maxFrames / 2);
+                int i = 0;
+                while (frames[i].ID < firstFrame) i++;
+                while (i < frames.Count && result.Count < maxFrames) {
+                    result.Add(frames[i]);
+                    i++;
+                }
             }
             
             return result;
+        }
+
+        private void hideVideoDisplay_Click(object sender, RoutedEventArgs e) {
+            var g = this.Parent as Grid;
+            g.RowDefinitions[2].Height = new GridLength(23, GridUnitType.Pixel);
+            g.UpdateLayout();
+
+            ParentWindow.GridSplitter_DragCompleted(null, null);
+        }
+
+        private void FrameReductionSampled_Checked(object sender, RoutedEventArgs e) {
+            mFrameReductionSampled = true;
+            if (GlobalItemSelector.SelectedFrame != null) {
+                DisplayFrameVideo(GlobalItemSelector.SelectedFrame);
+            }
+        }
+
+        private void FrameReductionDense_Checked(object sender, RoutedEventArgs e) {
+            mFrameReductionSampled = false;
+            if (GlobalItemSelector.SelectedFrame != null) {
+                DisplayFrameVideo(GlobalItemSelector.SelectedFrame, doSwitch:false);
+            }
         }
     }
 }

@@ -69,7 +69,7 @@
                         Height="32"
                         Foreground="Black"
                         Background="DodgerBlue"
-                        Content="Timeline (frame??)"
+                        Content="Timeline"
                         Margin=" 2.5, 5, 5, 5"
                         Click="timelineDisplayButton_Click"/>
             </Grid>
@@ -125,7 +125,8 @@
         <GridSplitter Grid.Column="1" 
                       Width="5" 
                       HorizontalAlignment="Stretch"
-                      Focusable="False">
+                      Focusable="False"
+                      DragCompleted="GridSplitter_DragCompleted">
             
         </GridSplitter>
 
@@ -133,8 +134,8 @@
         <Grid Grid.Column="2" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
-                <RowDefinition Height="32" />
-                <RowDefinition Height="0" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="23" />
             </Grid.RowDefinitions>
 
             <control:ResultDisplay 
@@ -147,12 +148,12 @@
                 Visibility="Hidden"/>
             
             <GridSplitter 
-                Grid.Row="1" 
-                Background="DarkGray"
+                Grid.Row="1"
+                Height="5"
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Stretch"
                 DragCompleted="GridSplitter_DragCompleted" >
-                <GridSplitter.Template>
+                <!--<GridSplitter.Template>
                     <ControlTemplate TargetType="{x:Type GridSplitter}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -166,21 +167,21 @@
                                 FontWeight="Bold"
                                 FontSize="14"
                                 Content="Selected video:" />
-                            <!--
+                            --><!--
                             <Button 
                                 Name="filterVideoButton"
                                 Grid.Column="1"
                                 Content="Filter video" 
                                 Padding="5,0,5,0" 
-                                Click="filterVideoButton_Click"/>-->
+                                Click="filterVideoButton_Click"/>--><!--
                         </Grid>
                     </ControlTemplate>
-                </GridSplitter.Template>
+                </GridSplitter.Template>-->
             </GridSplitter>
-            
+
             <control:VideoDisplay 
-                x:Name="videoDisplay" 
-                Grid.Row="2" />
+                    x:Name="videoDisplay"
+                    Grid.Row="2" />
         </Grid>
         
     </Grid>

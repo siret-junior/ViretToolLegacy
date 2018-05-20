@@ -382,6 +382,14 @@ namespace ViretTool.BasicClient
             UpdateSelectionVisualization();
         }
 
+        public void GoToPage(int page) {
+            if (page == int.MaxValue) {
+                DisplayPage(mResultFrames.Count / DisplayedFrames.Length);
+            } else {
+                DisplayPage(page);
+            }
+        }
+
         //private void displayGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         //{
         //    if (e.Delta > 0)

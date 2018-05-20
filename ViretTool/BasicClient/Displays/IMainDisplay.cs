@@ -11,5 +11,7 @@ namespace ViretTool.BasicClient.Displays {
         void DisplaySelected();
         void DisplayHidden();
         void SelectedFrameChanged(Frame selectedFrame);
+        void IncrementDisplay(int pages);
+        void GoToPage(int page);
     }
 }

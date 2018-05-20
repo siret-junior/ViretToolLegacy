@@ -6,14 +6,56 @@
              xmlns:local="clr-namespace:ViretTool.BasicClient"
              mc:Ignorable="d" 
              d:DesignHeight="240" d:DesignWidth="320">
-    
+
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="23" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0"
+              Background="DarkGray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+
+            <Label 
+                Grid.Column="0"
+                Background="DarkGray"
+                FontWeight="Bold"
+                Margin="5,0,5,0"
+                Padding="0,-2,0,2"
+                VerticalAlignment="Center"
+                Content="Selected video:" />
+
+            <StackPanel Orientation="Horizontal"
+                        Margin="10,0,10,0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Grid.Column="1">
+                <RadioButton GroupName="VideoFrameReductionType" Margin="0,0,5,0"
+                             IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:VideoDisplay}}, Mode=OneWay, Path=FrameReductionSampled}"
+                             Checked="FrameReductionSampled_Checked"
+                             x:Name="frameReductionSampled">Whole Video Sampled</RadioButton>
+                <RadioButton GroupName="VideoFrameReductionType"
+                             IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:VideoDisplay}}, Mode=OneWay, Path=FrameReductionDense}"
+                             Checked="FrameReductionDense_Checked"
+                             x:Name="frameReductionDense">Frames Around Selected Frame</RadioButton>
+            </StackPanel>
+            <Button Grid.Column="2"
+                    Name="hideVideoDisplay"
+                    Content="&#9660;  Hide"
+                    Click="hideVideoDisplay_Click"/>
+        </Grid>
+        
         <ScrollViewer
+            Grid.Row="1"
             Name="scrollViewer"
             VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <Viewbox Name = "viewBox" 
-                 Grid.Row="1"
                  Stretch = "Uniform">
                     <UniformGrid Name="displayGrid" />
                 </Viewbox>
@@ -21,4 +63,5 @@
 
         </ScrollViewer>
     </Grid>
+
 </local:DisplayControl>

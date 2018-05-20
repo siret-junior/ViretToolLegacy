@@ -88,6 +88,7 @@ namespace ViretTool
             GlobalItemSelector.VideoDisplay = videoDisplay;
             GlobalItemSelector.Activate(resultDisplay);
 
+            videoDisplay.ParentWindow = this;
 
             #region --[ Filter events ]--
 
@@ -531,7 +532,6 @@ namespace ViretTool
             TestButton.Height = 350;
         }
 
-
         private Dataset FromConfigFile(string configFile)
         {
             string thumbnailsAllFile;
@@ -682,7 +682,7 @@ namespace ViretTool
             Logger.LogInfo(this, message);
         }
 
-        private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        public void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             resultDisplay.UpdateDisplayGrid();
             timeFrameDisplay.UpdateDisplayGrid();
@@ -729,35 +729,43 @@ namespace ViretTool
             switch (e.Key)
             {
                 case Key.Home:
-                    resultDisplay.DisplayPage(0);
+                    GlobalItemSelector.ActiveDisplay.GoToPage(0);
+                    e.Handled = true;
                     break;
-                //case Key.End: // TODO
-                //    resultDisplay.DisplayPage(0);
-                //    break;
+                case Key.End:
+                    GlobalItemSelector.ActiveDisplay.GoToPage(int.MaxValue);
+                    e.Handled = true;
+                    break;
                 case Key.PageDown:
-                    resultDisplay.IncrementDisplay(10);
+                    GlobalItemSelector.ActiveDisplay.IncrementDisplay(10);
+                    e.Handled = true;
                     break;
                 case Key.PageUp:
-                    resultDisplay.IncrementDisplay(-10);
+                    GlobalItemSelector.ActiveDisplay.IncrementDisplay(-10);
+                    e.Handled = true;
                     break;
                 case Key.Right:
                     if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                     {
-                        resultDisplay.IncrementDisplay(10);
+                        GlobalItemSelector.ActiveDisplay.IncrementDisplay(10);
+                        e.Handled = true;
                     }
                     else
                     {
-                        resultDisplay.IncrementDisplay(1);
+                        GlobalItemSelector.ActiveDisplay.IncrementDisplay(1);
+                        e.Handled = true;
                     }
                     break;
                 case Key.Left:
                     if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                     {
-                        resultDisplay.IncrementDisplay(-10);
+                        GlobalItemSelector.ActiveDisplay.IncrementDisplay(-10);
+                        e.Handled = true;
                     }
                     else
                     {
-                        resultDisplay.IncrementDisplay(-1);
+                        GlobalItemSelector.ActiveDisplay.IncrementDisplay(-1);
+                        e.Handled = true;
                     }
                     break;
             }

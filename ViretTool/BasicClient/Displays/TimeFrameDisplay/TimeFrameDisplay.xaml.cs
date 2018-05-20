@@ -143,25 +143,23 @@ namespace ViretTool.BasicClient {
 
 
         const double DESIRED_ASPECT_RATIO = 3.0 / 4.0;
-        int mTimelinesPerRow = 1;
-        int TimelinesPerRow {
-            get {
-                return mTimelinesPerRow;
-            }
-        }
+        const int DEFAULT_SIZE = 11;
+        int TimelinesPerRow { get; set; } = 1;
         int TimelinesPerPage {
             get {
                 return TimelinesPerRow * timeFrameGrid.Rows;
             }
         }
-        int Size = 11;
+
+        int Size = DEFAULT_SIZE;
         int ColumsPerTimeline {
             get {
-                for (int i = 1; i < 18; i+=2) {
+                int i = 1;
+                for (; i < 18; i+=2) {
                     if (TimelinesPerRow * i >= Size)
                         return i;
                 }
-                return Size;
+                return i;
             }
         }
         int Colums {
@@ -181,7 +179,7 @@ namespace ViretTool.BasicClient {
 
         public void ClearAndResize() {
             RefillNeeded = true;
-            // TODO: custom nColumns from the GUI
+
             if (UITimeFrames == null || UITimeFrames.Length != TimelinesPerRow * Rows || timeFrameGrid.Rows != Rows) {
                 timeFrameGrid.Children.Clear();
                 timeFrameGrid.Rows = Rows;
@@ -190,7 +188,15 @@ namespace ViretTool.BasicClient {
                 UITimeFrames = new TimeFrame[TimelinesPerPage];
                 for (int i = 0; i < TimelinesPerPage; i++) {
                     UITimeFrames[i] = new TimeFrame(this, ColumsPerTimeline);
-                    timeFrameGrid.Children.Add(UITimeFrames[i]);
+                    if (TimelinesPerRow > 1 && i % TimelinesPerRow != TimelinesPerRow - 1) {
+                        var border = new Border();
+                        border.BorderBrush = Brushes.DarkGray;
+                        border.BorderThickness = new Thickness(0,0,5,0);
+                        border.Child = UITimeFrames[i];
+                        timeFrameGrid.Children.Add(border);
+                    } else {
+                        timeFrameGrid.Children.Add(UITimeFrames[i]);
+                    }
                 }
             } else {
                 for (int i = 0; i < TimelinesPerPage; i++) {
@@ -356,6 +362,70 @@ namespace ViretTool.BasicClient {
 
         private void lastPageButton_Click(object sender, RoutedEventArgs e) {
             DisplayPage(mResultFrames.Count);
+        }
+
+        private void timelinesPerRowUp_Click(object sender, RoutedEventArgs e) {
+            TimelinesPerRow += 1;
+            Size = DEFAULT_SIZE;
+            AggregateResult();
+            if (GlobalItemSelector.SelectedFrame != null) {
+                SeekToFrame(GlobalItemSelector.SelectedFrame);
+            } else {
+                DisplayPage(0);
+            }
+        }
+
+        private void timelinesPerRowDown_Click(object sender, RoutedEventArgs e) {
+            if (TimelinesPerRow == 1) return;
+            Size = DEFAULT_SIZE;
+            TimelinesPerRow -= 1;
+            AggregateResult();
+            if (GlobalItemSelector.SelectedFrame != null) {
+                SeekToFrame(GlobalItemSelector.SelectedFrame);
+            } else {
+                DisplayPage(0);
+            }
+        }
+
+        private void columsUp_Click(object sender, RoutedEventArgs e) {
+            int colums = ColumsPerTimeline;
+            if (colums >= 19) return;
+            while (ColumsPerTimeline == colums) {
+                Size++;
+            }
+
+            AggregateResult();
+            if (GlobalItemSelector.SelectedFrame != null) {
+                SeekToFrame(GlobalItemSelector.SelectedFrame);
+            } else {
+                DisplayPage(0);
+            }
+        }
+
+        private void columsDown_Click(object sender, RoutedEventArgs e) {
+            int colums = ColumsPerTimeline;
+            if (colums <= 3) return;
+            while (ColumsPerTimeline == colums) {
+                Size--;
+            }
+
+            AggregateResult();
+            if (GlobalItemSelector.SelectedFrame != null) {
+                SeekToFrame(GlobalItemSelector.SelectedFrame);
+            } else {
+                DisplayPage(0);
+            }
+        }
+
+        public void IncrementDisplay(int pages) {
+            DisplayPage(Page + pages);
+        }
+
+        public void GoToPage(int page) {
+            if (page == int.MaxValue) {
+                page = mResultFrames.Count;
+            }
+            DisplayPage(page);
         }
     }
 }
