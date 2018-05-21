@@ -85,7 +85,8 @@ namespace ViretTool
 
             GlobalItemSelector.Displays.Add(resultDisplay);
             GlobalItemSelector.Displays.Add(timeFrameDisplay);
-            GlobalItemSelector.VideoDisplay = videoDisplay;
+            GlobalItemSelector.SelectedFrameChangedEvent += videoDisplay.SelectedFrameChanged;
+            GlobalItemSelector.SelectedFrameChangedEvent += GlobalItemSelector_SelectedFrameChangedEvent;
             GlobalItemSelector.Activate(resultDisplay);
 
             videoDisplay.ParentWindow = this;
@@ -533,14 +534,45 @@ namespace ViretTool
             //TestButton.Height = 350;
 
             AddHandler(DisplayFrame.OnEnterEvent, (RoutedEventHandler)DisplayFrameOnEnter);
+            AddHandler(DisplayFrame.OnExitEvent, (RoutedEventHandler)DisplayFrameOnExit);
+        }
+
+        private void GlobalItemSelector_SelectedFrameChangedEvent(DataModel.Frame selectedFrame) {
+            if (selectedFrame != null) {
+                playerDisplayFrame.Frame = selectedFrame;
+                playerDisplayFrame.IsGlobalSelectedFrame = true;
+            } else {
+                playerDisplayFrame.Clear();
+            }
         }
 
         public void DisplayFrameOnEnter(object sender, RoutedEventArgs e) {
             if (e == null) return;
             var df = e.OriginalSource as DisplayFrame;
             if (df == null || df.Frame == null) return;
+            if (df.ParentDisplay == null) return;
 
+            playerDisplayFrame.Clear();
             playerDisplayFrame.Frame = df.Frame;
+        }
+
+        public void DisplayFrameOnExit(object sender, RoutedEventArgs e) {
+            if (e == null) return;
+            var df = e.OriginalSource as DisplayFrame;
+            if (df == null || df.Frame == null) return;
+
+            if (GlobalItemSelector.SelectedFrame != null) {
+                playerDisplayFrame.Frame = GlobalItemSelector.SelectedFrame;
+                playerDisplayFrame.IsGlobalSelectedFrame = true;
+            } else {
+                playerDisplayFrame.Clear();
+            }
+        }
+        
+        private void playerDisplayFrame_Submit(object sender, RoutedEventArgs e) {
+            if (playerDisplayFrame.Frame != null) {
+                OpenSubmitWindow(playerDisplayFrame.Frame);
+            }
         }
 
 
@@ -780,6 +812,12 @@ namespace ViretTool
                         e.Handled = true;
                     }
                     break;
+                case Key.G:
+                    gridDisplayButton_Click(null, null);
+                    break;
+                case Key.T:
+                    timelineDisplayButton_Click(null, null);
+                    break;
             }
         }
 
@@ -818,6 +856,10 @@ namespace ViretTool
         private void timelineDisplayButton_Click(object sender, RoutedEventArgs e)
         {
             GlobalItemSelector.Activate(timeFrameDisplay);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e) {
+
         }
     }
 

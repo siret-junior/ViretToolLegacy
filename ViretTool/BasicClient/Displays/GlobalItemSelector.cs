@@ -12,6 +12,9 @@ namespace ViretTool.BasicClient.Displays
     public class GlobalItemSelector {
         public static List<IMainDisplay> Displays = new List<IMainDisplay>();
 
+        public static event SelectedFrameChangedEventHandler SelectedFrameChangedEvent;
+        public delegate void SelectedFrameChangedEventHandler(DataModel.Frame selectedFrame);
+
         private static DataModel.Frame mSelectedFrame = null;
         public static DataModel.Frame SelectedFrame {
             get {
@@ -21,11 +24,9 @@ namespace ViretTool.BasicClient.Displays
             set {
                 mSelectedFrame = value;
                 ActiveDisplay.SelectedFrameChanged(SelectedFrame);
-                VideoDisplay.SelectedFrameChanged(SelectedFrame);
+                SelectedFrameChangedEvent?.Invoke(SelectedFrame);
             }
         }
-
-        public static VideoDisplay VideoDisplay = null;
 
         public static IMainDisplay ActiveDisplay { get; set; }
 

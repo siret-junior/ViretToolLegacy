@@ -33,7 +33,7 @@ namespace ViretTool.BasicClient
             ResizeDisplay(1, 1, displayGrid);
         }
 
-        private bool mFrameReductionSampled = true;
+        private bool mFrameReductionSampled = false;
         public bool FrameReductionSampled {
             get {
                 return mFrameReductionSampled;
@@ -58,9 +58,9 @@ namespace ViretTool.BasicClient
             }
 
             if (doSwitch && LastVideoId != frame.FrameVideo.VideoID) {
-                mFrameReductionSampled = true;
-                frameReductionDense.IsChecked = false;
-                frameReductionSampled.IsChecked = true;
+                mFrameReductionSampled = false;
+                frameReductionDense.IsChecked = true;
+                frameReductionSampled.IsChecked = false;
             }
             LastVideoId = frame.FrameVideo.VideoID;
 

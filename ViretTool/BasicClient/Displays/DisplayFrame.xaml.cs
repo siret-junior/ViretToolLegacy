@@ -121,14 +121,25 @@ namespace ViretTool.BasicClient
         }
 
         public static readonly RoutedEvent OnEnterEvent = EventManager.RegisterRoutedEvent("OnEnter", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(DisplayFrame));
+        public static readonly RoutedEvent OnExitEvent = EventManager.RegisterRoutedEvent("OnExit", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(DisplayFrame));
 
         public event RoutedEventHandler OnEnter {
             add { AddHandler(OnEnterEvent, value); }
             remove { RemoveHandler(OnEnterEvent, value); }
         }
 
+        public event RoutedEventHandler OnExit {
+            add { AddHandler(OnExitEvent, value); }
+            remove { RemoveHandler(OnExitEvent, value); }
+        }
+
         private void viewBox_MouseEnter(object sender, MouseEventArgs e) {
             RoutedEventArgs evargs = new RoutedEventArgs(OnEnterEvent, this);
+            RaiseEvent(evargs);
+        }
+
+        private void viewBox_MouseLeave(object sender, MouseEventArgs e) {
+            RoutedEventArgs evargs = new RoutedEventArgs(OnExitEvent, this);
             RaiseEvent(evargs);
         }
 

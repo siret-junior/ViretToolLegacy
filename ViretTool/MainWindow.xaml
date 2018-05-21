@@ -63,7 +63,7 @@
                         Content="Grid"
                         Foreground="Black"
                         Background="GreenYellow"
-                        
+                        ToolTip="Press G to switch"
                         Margin="5, 5, 2.5, 5"
                         Click="gridDisplayButton_Click"/>
                 <Button x:Name="timelineDisplayButton"
@@ -72,6 +72,7 @@
                         Foreground="Black"
                         Background="DodgerBlue"
                         Content="Timeline"
+                        ToolTip="Press T to switch"
                         Margin=" 2.5, 5, 5, 5"
                         Click="timelineDisplayButton_Click"/>
             </Grid>
@@ -107,6 +108,22 @@
             <control:ModelControl x:Name="semanticModelControlBar" ModelName="Semantic" />
             <control:SemanticModelDisplay x:Name="semanticModelDisplay" Height="150" Margin="0,0,0.2,0"/>
 
+            <Grid Background="DarkGray">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0"
+                       FontWeight="Bold"
+                       Content="Selected Frame" />
+
+                <Button Grid.Column="4"
+                        Padding="10, 0, 10, 0"
+                        Click="playerDisplayFrame_Submit"
+                        Content="Submit" />
+            </Grid>
             <Viewbox Stretch="Uniform">
                 <control:DisplayFrame x:Name="playerDisplayFrame"
                                           Height="300"

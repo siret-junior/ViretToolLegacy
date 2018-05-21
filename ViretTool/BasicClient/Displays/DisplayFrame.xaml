@@ -9,7 +9,8 @@
     <Viewbox
         Name="viewBox"
         Stretch="Fill"
-        MouseEnter="viewBox_MouseEnter">
+        MouseEnter="viewBox_MouseEnter"
+        MouseLeave="viewBox_MouseLeave">
         <Border x:Name="selectedItemRectangle"
                 BorderBrush="Yellow"
                 BorderThickness="0">
