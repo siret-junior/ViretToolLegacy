@@ -50,9 +50,28 @@
                    Visibility="Hidden"
                    VerticalAlignment="Top" />
 
+                <Grid Width="20"
+                      Height="20"
+                      VerticalAlignment="Top"
+                      HorizontalAlignment="Right"
+                      x:Name="collapsedFramesGrid"
+                      Visibility="Hidden">
+                    <Border CornerRadius="8"
+                            Margin="2"
+                            Background="Red"/>
+                    <Label x:Name="collapsedFramesLabel" 
+                           FontSize="8"
+                           Foreground="White"
+                           Padding="0"
+                           Margin="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Content="125"/>
+                </Grid>
 
 
-            <Grid Name="displayButtons"
+
+                <Grid Name="displayButtons"
                   Width="100"
                   Height="16"
                   HorizontalAlignment="Center"

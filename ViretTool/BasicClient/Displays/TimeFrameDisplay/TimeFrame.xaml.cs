@@ -23,8 +23,8 @@ namespace ViretTool.BasicClient {
     public partial class TimeFrame : UserControl {
 
         IDisplayControl ParentDisplay;
-        SingleTimeFrame[] LeftFrames;
-        SingleTimeFrame[] RightFrames;
+        DisplayFrame[] LeftFrames;
+        DisplayFrame[] RightFrames;
         DisplayFrame CenterFrame;
         
         public TimeFrame(IDisplayControl disp, int colsPerTimeline) {
@@ -36,11 +36,11 @@ namespace ViretTool.BasicClient {
         private void Fill(IDisplayControl disp, int colsPerTimeline) {
             frameGrid.Children.Clear();
             frameGrid.Columns = colsPerTimeline;
-            LeftFrames = new SingleTimeFrame[(colsPerTimeline - 1) / 2];
-            RightFrames = new SingleTimeFrame[(colsPerTimeline - 1) / 2];
+            LeftFrames = new DisplayFrame[(colsPerTimeline - 1) / 2];
+            RightFrames = new DisplayFrame[(colsPerTimeline - 1) / 2];
 
             for (int i = 0; i < (colsPerTimeline - 1) / 2; i++) {
-                LeftFrames[LeftFrames.Length - 1 - i] = new SingleTimeFrame(disp, SingleTimeFrame.Position.Left);
+                LeftFrames[LeftFrames.Length - 1 - i] = new DisplayFrame(disp);
                 frameGrid.Children.Add(LeftFrames[LeftFrames.Length - 1 - i]);
             }
 
@@ -53,7 +53,7 @@ namespace ViretTool.BasicClient {
             frameGrid.Children.Add(border);
 
             for (int i = 0; i < (colsPerTimeline - 1) / 2; i++) {
-                RightFrames[i] = new SingleTimeFrame(disp, SingleTimeFrame.Position.Right);
+                RightFrames[i] = new DisplayFrame(disp);
                 frameGrid.Children.Add(RightFrames[i]);
             }
         }
@@ -65,10 +65,7 @@ namespace ViretTool.BasicClient {
             foreach (var item in RightFrames) {
                 item.SelectIf(selectedFrames);
             }
-            CenterFrame.IsSelected = selectedFrames.Contains(CenterFrame.Frame);
-            if (GlobalItemSelector.SelectedFrame != null) {
-                CenterFrame.IsGlobalSelectedFrame = GlobalItemSelector.SelectedFrame == CenterFrame.Frame;
-            }
+            CenterFrame.SelectIf(selectedFrames);
         }
 
         internal void Clear() {
@@ -82,14 +79,20 @@ namespace ViretTool.BasicClient {
         }
 
         internal void Set(RankedTimeFrame rankedTimeFrame) {
-            for (int j = 0; j < rankedTimeFrame.LeftFrames.Count; j++) {
-                LeftFrames[j].Set(rankedTimeFrame.LeftFrames[j]);
+            var lf = rankedTimeFrame.LeftFrames;
+            var rf = rankedTimeFrame.RightFrames;
+
+            for (int j = 0; j < lf.Count; j++) {
+                int skipped = lf.Count > j + 1 ? lf[j + 1].Item2 : 0;
+                LeftFrames[j].Set(lf[j].Item1, skippedFrames:skipped);
             }
 
-            CenterFrame.Frame = rankedTimeFrame.RankedFrame.Frame;
+            int skippedCenter = (lf.Count > 0 ? lf[0].Item2 : 0) + (rf.Count > 0 ? rf[0].Item2 : 0);
+            CenterFrame.Set(rankedTimeFrame.RankedFrame.Frame, skippedFrames:skippedCenter);
 
-            for (int j = 0; j < rankedTimeFrame.RightFrames.Count; j++) {
-                RightFrames[j].Set(rankedTimeFrame.RightFrames[j]);
+            for (int j = 0; j < rf.Count; j++) {
+                int skipped = rf.Count > j + 1 ? rf[j + 1].Item2 : 0;
+                RightFrames[j].Set(rf[j].Item1, skippedFrames: skipped);
             }
 
         }

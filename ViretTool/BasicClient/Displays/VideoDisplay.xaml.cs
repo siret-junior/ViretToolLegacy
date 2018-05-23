@@ -49,6 +49,8 @@ namespace ViretTool.BasicClient
             UpdateSelectionVisualization();
         }
 
+        DataModel.Frame LastFrame;
+
         public void DisplayFrameVideo(DataModel.Frame frame, bool doSwitch=true)
         {
             // skip if nothing to show
@@ -62,6 +64,16 @@ namespace ViretTool.BasicClient
                 frameReductionDense.IsChecked = true;
                 frameReductionSampled.IsChecked = false;
             }
+            else if (LastFrame != null && Math.Abs(LastFrame.ID - frame.ID) < (mDisplayWidth - 1) / 2) {
+                foreach (var item in DisplayedFrames) {
+                    if (item.Frame == LastFrame) {
+                        item.BringIntoView();
+                        return;
+                    }
+                }
+            }
+            LastFrame = frame;
+
             LastVideoId = frame.FrameVideo.VideoID;
 
             List<DataModel.Frame> framesToDisplay = frame.FrameVideo.Frames;
@@ -90,7 +102,7 @@ namespace ViretTool.BasicClient
             // display frames
             for (int i = 0; i < framesToDisplay.Count; i++)
             {
-                DisplayedFrames[i].Frame = framesToDisplay[i];
+                DisplayedFrames[i].Set(framesToDisplay[i]);
                 if (DisplayedFrames[i].Frame == frame) {
                     DisplayedFrames[i].IsGlobalSelectedFrame = true;
                     DisplayedFrames[i].BringIntoView();
@@ -123,6 +135,10 @@ namespace ViretTool.BasicClient
                 }
             } else {
                 int firstFrame = Math.Max(frames[0].ID, sourceFrame.ID - maxFrames / 2);
+                if (sourceFrame.ID - firstFrame > mDisplayWidth) {
+                    int toRemove = (sourceFrame.ID - firstFrame) % mDisplayWidth + mDisplayWidth / 2;
+                    firstFrame += toRemove;
+                }
                 int i = 0;
                 while (frames[i].ID < firstFrame) i++;
                 while (i < frames.Count && result.Count < maxFrames) {

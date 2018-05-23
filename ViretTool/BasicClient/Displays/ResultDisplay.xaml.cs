@@ -189,7 +189,7 @@ namespace ViretTool.BasicClient
                 for (int iCol = 0; iCol < mDisplayCols; iCol++)
                 {
                     if (arrangedDisplay[iRow, iCol] == null) continue; // TODO rewrite
-                    DisplayedFrames[iterator++].Frame = arrangedDisplay[iRow, iCol].Frame;
+                    DisplayedFrames[iterator++].Set(arrangedDisplay[iRow, iCol].Frame);
 
                     message += "(Frame ID:" + arrangedDisplay[iRow, iCol].Frame.ID
                             + ", Video:" + arrangedDisplay[iRow, iCol].Frame.FrameVideo.VideoID

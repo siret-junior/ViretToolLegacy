@@ -539,8 +539,7 @@ namespace ViretTool
 
         private void GlobalItemSelector_SelectedFrameChangedEvent(DataModel.Frame selectedFrame) {
             if (selectedFrame != null) {
-                playerDisplayFrame.Frame = selectedFrame;
-                playerDisplayFrame.IsGlobalSelectedFrame = true;
+                playerDisplayFrame.Set(selectedFrame, isGlobalSelected:true);
             } else {
                 playerDisplayFrame.Clear();
             }
@@ -549,11 +548,14 @@ namespace ViretTool
         public void DisplayFrameOnEnter(object sender, RoutedEventArgs e) {
             if (e == null) return;
             var df = e.OriginalSource as DisplayFrame;
-            if (df == null || df.Frame == null) return;
-            if (df.ParentDisplay == null) return;
-
-            playerDisplayFrame.Clear();
-            playerDisplayFrame.Frame = df.Frame;
+            if (df == null || df.Frame == null) {
+                var f = e.OriginalSource as DataModel.Frame;
+                if (f != null) {
+                    playerDisplayFrame.Set(f);
+                }
+                return;
+            }
+            playerDisplayFrame.Set(df.Frame);
         }
 
         public void DisplayFrameOnExit(object sender, RoutedEventArgs e) {
@@ -562,8 +564,7 @@ namespace ViretTool
             if (df == null || df.Frame == null) return;
 
             if (GlobalItemSelector.SelectedFrame != null) {
-                playerDisplayFrame.Frame = GlobalItemSelector.SelectedFrame;
-                playerDisplayFrame.IsGlobalSelectedFrame = true;
+                playerDisplayFrame.Set(GlobalItemSelector.SelectedFrame, isGlobalSelected: true);
             } else {
                 playerDisplayFrame.Clear();
             }

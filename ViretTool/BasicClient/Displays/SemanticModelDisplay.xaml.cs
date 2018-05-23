@@ -52,7 +52,7 @@ namespace ViretTool.BasicClient
             // display frames
             for (int i = 0; i < selectedFrames.Count; i++)
             {
-                DisplayedFrames[i].Frame = selectedFrames[i];
+                DisplayedFrames[i].Set(selectedFrames[i]);
             }
         }
 

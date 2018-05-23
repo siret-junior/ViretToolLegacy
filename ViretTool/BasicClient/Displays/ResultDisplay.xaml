@@ -14,43 +14,11 @@
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="1100" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
 
-
-
-            
-            <Label 
-                Grid.Column="0" 
-                Background="DarkGray"
-                FontWeight="Bold"
-                FontSize="14"
-                Content="Search results:" 
-                VerticalAlignment="Center"/>
-
-
-            <Grid
-                Grid.Column="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
-
-                <Button 
+            <!--<Button 
                     Name="filterVideoButton"
                     Grid.Column="0"
                     Content="Filter video" 
@@ -64,19 +32,25 @@
                     Margin="5,8,5,8"
                     Checked="sortDisplayCheckbox_Checked"
                     Unchecked="sortDisplayCheckbox_Unchecked"
-                    />
+                    />-->
+            <StackPanel Orientation="Horizontal"
+                            Grid.Column="0">
+                <Label 
+                Background="DarkGray"
+                FontWeight="Bold"
+                FontSize="14"
+                Content="Search results:" 
+                VerticalAlignment="Center"/>
 
-                <CheckBox
-                    Name="largeDisplayCheckbox"
-                    Grid.Column="2"
-                    Content="Large display"
-                    IsChecked="false"
-                    Margin="5,8,5,8"
-                    Checked="largeDisplayCheckbox_Checked"
-                    Unchecked="largeDisplayCheckbox_Unchecked"
-                    />
+                <Button
+                    Name="randomDisplayButton"
+                    Width="80"
+                    Margin="10,0,10,0"
+                    Click="randomDisplayButton_Click"
+                    Content="# Random #" />
+            </StackPanel>
 
-                <CheckBox
+            <!--<CheckBox
                     Name="showFilteredVideosCheckbox"
                     Grid.Column="3"
                     Content="Hide filtered videos"
@@ -94,34 +68,41 @@
                     Margin="5,8,5,8"
                     Checked="Max3FromVideoCheckbox_Checked"
                     Unchecked="Max3FromVideoCheckbox_Unchecked"
-                    />
+                    />-->
 
 
-                <Button
+            <!--<Button
                     Name="sequentialDisplayButton"
                     Grid.Column="5"
                     Click="sequentialDisplayButton_Click"
-                    Content="/ Sequential /" />
-                <Button
-                    Name="randomDisplayButton"
-                    Grid.Column="6"
-                    Click="randomDisplayButton_Click"
-                    Content="# Random #" />
-                
+                    Content="/ Sequential /" />-->
+            <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Grid.Column="1">
+                <CheckBox
+                    Name="largeDisplayCheckbox"
+                    Content="Large display"
+                    IsChecked="false"
+                    VerticalAlignment="Center"
+                    Checked="largeDisplayCheckbox_Checked"
+                    Unchecked="largeDisplayCheckbox_Unchecked"
+                    Margin="5,0,15,0"
+                    />
+
                 <Button
                     Name="firstPageButton"
-                    Grid.Column="7"
+                    Width="80"
                     Click="firstPageButton_Click"
                     Content="&lt;&lt; First" />
                 <Button
                     Name="previousPageButton"
-                    Grid.Column="8"
+                    Width="80"
                     Click="previousPageButton_Click"
                     Content="&lt; Previous" />
 
                 <Label
                     Name="currentPageNumber" 
-                    Grid.Column="9"
+                    Width="80"
                     Background="White"
                     VerticalContentAlignment="Center"
                     HorizontalContentAlignment="Left"
@@ -129,18 +110,16 @@
 
                 <Button
                     Name="nextPageButton"
-                    Grid.Column="10"
+                    Width="80"
                     Click="nextPageButton_Click"
                     Content="Next &gt;" />
                 <Button
                     Name="lastPageButton"
-                    Grid.Column="11"
+                    Width="80"
                     Click="lastPageButton_Click"
                     Content="Last &gt;&gt;" />
-
-            </Grid>
+            </StackPanel>
         </Grid>
-
         <UniformGrid x:Name="displayGrid" 
                      Grid.Row="1" 
                      Loaded="displayGrid_Loaded"/>

@@ -75,9 +75,6 @@
     <Compile Include="BasicClient\Displays\IDisplayControl.cs" />
     <Compile Include="BasicClient\Displays\IMainDisplay.cs" />
     <Compile Include="BasicClient\Displays\TimeFrameDisplay\RankedTimeFrame.cs" />
-    <Compile Include="BasicClient\Displays\TimeFrameDisplay\SingleTimeFrame.xaml.cs">
-      <DependentUpon>SingleTimeFrame.xaml</DependentUpon>
-    </Compile>
     <Compile Include="BasicClient\Displays\TimeFrameDisplay\TimeFrame.xaml.cs">
       <DependentUpon>TimeFrame.xaml</DependentUpon>
     </Compile>
@@ -158,10 +155,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BasicClient\Controls\ModelControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="BasicClient\Displays\TimeFrameDisplay\SingleTimeFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

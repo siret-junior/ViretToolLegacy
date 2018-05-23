@@ -270,6 +270,13 @@ namespace ViretTool.BasicClient {
                 }
                 if (thrIndex == mDisplayWidth) break;
             }
+
+            if (thrIndex != mDisplayWidth) {
+                i = i - dir;
+                if (fID != i) {
+                    ret.Add(new Tuple<DataModel.Frame, int>(Dataset.Frames[i], Math.Abs(fID - i) - 1));
+                }
+            }
             return ret;
         }
 
@@ -340,6 +347,7 @@ namespace ViretTool.BasicClient {
         internal void UpdateDisplayGrid() {
             ClearAndResize();
             if (GlobalItemSelector.ActiveDisplay == this) {
+                AggregateResult();
                 if (GlobalItemSelector.SelectedFrame != null) {
                     SeekToFrame(GlobalItemSelector.SelectedFrame);
                 } else {

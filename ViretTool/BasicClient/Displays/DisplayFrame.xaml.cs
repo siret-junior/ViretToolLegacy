@@ -30,7 +30,7 @@ namespace ViretTool.BasicClient
         {
             get
             { return mFrame; }
-            set
+            private set
             {
                 mFrame = value;
                 if (value != null)
@@ -38,7 +38,7 @@ namespace ViretTool.BasicClient
                     image.Source = mFrame.Bitmap;
 #if LABELS
                     videoLabel.Content = mFrame.FrameVideo.VideoID.ToString();
-                    groupLabel.Content = mFrame.FrameGroup.GroupID.ToString();
+                    //groupLabel.Content = mFrame.FrameGroup.GroupID.ToString();
                     frameLabel.Content = mFrame.ID.ToString();
 #endif
                 }
@@ -61,6 +61,36 @@ namespace ViretTool.BasicClient
             Frame = null;
             IsSelected = false;
             IsGlobalSelectedFrame = false;
+            SkippedFrames = 0;
+        }
+
+        public void SelectIf(List<DataModel.Frame> selectedFrames) {
+            IsSelected = selectedFrames.Contains(Frame);
+            if (GlobalItemSelector.SelectedFrame != null) {
+                IsGlobalSelectedFrame = GlobalItemSelector.SelectedFrame == Frame;
+            }
+        }
+
+        public void Set(DataModel.Frame frame, bool isSelected=false, bool isGlobalSelected=false, int skippedFrames= 0) {
+            Frame = frame;
+            IsSelected = isSelected;
+            IsGlobalSelectedFrame = isGlobalSelected;
+            SkippedFrames = skippedFrames;
+        }
+
+        private int mSkippedFrames = 0;
+        public int SkippedFrames { get {
+                return mSkippedFrames;
+            }
+            private set {
+                mSkippedFrames = value;
+                if (value != 0) {
+                    collapsedFramesLabel.Content = value.ToString();
+                    collapsedFramesGrid.Visibility = Visibility.Visible;
+                } else {
+                    collapsedFramesGrid.Visibility = Visibility.Hidden;
+                }
+            }
         }
 
         private bool mIsSelected = false;
@@ -82,7 +112,8 @@ namespace ViretTool.BasicClient
         private bool mIsGlobalSelectedFrame = false;
         public bool IsGlobalSelectedFrame { get {
                 return mIsGlobalSelectedFrame;
-            } set {
+            }
+            set {
                 if (value) {
                     selectedItemRectangle.BorderThickness = new Thickness(2);
                 } else if (mIsGlobalSelectedFrame) {
@@ -134,11 +165,13 @@ namespace ViretTool.BasicClient
         }
 
         private void viewBox_MouseEnter(object sender, MouseEventArgs e) {
+            if (ParentDisplay == null) return;
             RoutedEventArgs evargs = new RoutedEventArgs(OnEnterEvent, this);
             RaiseEvent(evargs);
         }
 
         private void viewBox_MouseLeave(object sender, MouseEventArgs e) {
+            if (ParentDisplay == null) return;
             RoutedEventArgs evargs = new RoutedEventArgs(OnExitEvent, this);
             RaiseEvent(evargs);
         }
@@ -167,6 +200,8 @@ namespace ViretTool.BasicClient
                 {
                     if (!(ParentDisplay is VideoDisplay)) {
                         ParentDisplay.RaiseDisplayingFrameVideoEvent(Frame);
+                        GlobalItemSelector.SelectedFrame = Frame;
+                    } else {
                         GlobalItemSelector.SelectedFrame = Frame;
                     }
                 }
@@ -197,6 +232,10 @@ namespace ViretTool.BasicClient
 
             // set frame and content
             image.Source = VideoFrames[mDisplayedVideoFrameId].Bitmap;
+
+            if (ParentDisplay == null) return;
+            RoutedEventArgs evargs = new RoutedEventArgs(OnEnterEvent, VideoFrames[mDisplayedVideoFrameId]);
+            RaiseEvent(evargs);
             //label.Content = VideoFrames[mDisplayedVideoFrameId].FrameNumber;
         }
 
@@ -267,7 +306,7 @@ namespace ViretTool.BasicClient
         {
             // TODO: find better solution: 
             // disable scrolling on video display
-            if (ParentDisplay is VideoDisplay)
+            if (ParentDisplay is VideoDisplay || Frame == null)
             {
                 return;
             }
@@ -275,14 +314,15 @@ namespace ViretTool.BasicClient
             // read all video frames (lazy)
             if (VideoFrames == null)
             {
-                DataModel.Frame[] frames = Frame.FrameVideo.VideoDataset.ReadAllVideoFrames(Frame.FrameVideo);
+                VideoFrames = Frame.FrameVideo.VideoDataset.ReadAllVideoFrames(Frame.FrameVideo);
+                //DataModel.Frame[] frames = Frame.FrameVideo.VideoDataset.ReadAllVideoFrames(Frame.FrameVideo);
 
                 // show every second
-                VideoFrames = new DataModel.Frame[frames.Length / 2];
-                for (int i = 0; i < frames.Length / 2; i++)
-                {
-                    VideoFrames[i] = frames[i * 2];
-                }
+                //VideoFrames = new DataModel.Frame[frames.Length / 2];
+                //for (int i = 0; i < frames.Length / 2; i++)
+                //{
+                //    VideoFrames[i] = frames[i * 2];
+                //}
             }
 
             if (mDisplayedVideoFrameId == -1)
@@ -317,7 +357,7 @@ namespace ViretTool.BasicClient
                 {
                     mDisplayedVideoFrameId = i;
                     DataModel.Frame videoFrame = VideoFrames[i];
-                    if (videoFrame.FrameNumber > mFrame.FrameNumber)
+                    if (videoFrame.FrameNumber >= mFrame.FrameNumber)
                     {
                         break;
                     }
