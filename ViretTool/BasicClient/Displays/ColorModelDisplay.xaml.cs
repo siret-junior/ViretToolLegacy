@@ -38,7 +38,7 @@ namespace ViretTool.BasicClient
             // clear display
             for (int i = 0; i < DisplayedFrames.Length; i++)
             {
-                DisplayedFrames[i].Frame = null;
+                DisplayedFrames[i].Clear();
             }
 
             // skip if nothing to show
@@ -53,7 +53,7 @@ namespace ViretTool.BasicClient
             ColorExampleChangingEvent?.Invoke();
             for (int i = 0; i < selectedFrames.Count; i++)
             {
-                DisplayedFrames[i].Frame = selectedFrames[i];
+                DisplayedFrames[i].Set(selectedFrames[i]);
             }
         }
 

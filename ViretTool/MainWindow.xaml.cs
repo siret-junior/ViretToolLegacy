@@ -79,15 +79,20 @@ namespace ViretTool
             timeFrameDisplay.SimilarityModel = similarityManager.mVectorModel;
             timeFrameDisplay.Dataset = mDataset;
 
+            sequentialDisplay.SimilarityModel = similarityManager.mVectorModel;
+            sequentialDisplay.Dataset = mDataset;
+            sequentialDisplay.Aggregate();
+
             // initialize selection controller
             mFrameSelectionController = new FrameSelectionController();
 
 
-            GlobalItemSelector.Displays.Add(resultDisplay);
-            GlobalItemSelector.Displays.Add(timeFrameDisplay);
+            GlobalItemSelector.Displays.Add(new Tuple<IMainDisplay, Button>(resultDisplay, gridDisplayButton));
+            GlobalItemSelector.Displays.Add(new Tuple<IMainDisplay, Button>(timeFrameDisplay, timelineDisplayButton));
+            GlobalItemSelector.Displays.Add(new Tuple<IMainDisplay, Button>(sequentialDisplay, sequentialDisplayButton));
             GlobalItemSelector.SelectedFrameChangedEvent += videoDisplay.SelectedFrameChanged;
             GlobalItemSelector.SelectedFrameChangedEvent += GlobalItemSelector_SelectedFrameChangedEvent;
-            GlobalItemSelector.Activate(resultDisplay);
+            GlobalItemSelector.Activate(sequentialDisplay);
 
             videoDisplay.ParentWindow = this;
 
@@ -440,6 +445,11 @@ namespace ViretTool
             timeFrameDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
             timeFrameDisplay.SubmittingToServerEvent += OpenSubmitWindow;
 
+            sequentialDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
+            sequentialDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
+            sequentialDisplay.SelectionSemanticSearchEvent += mFrameSelectionController.SubmitSelectionSemanticModel;
+            sequentialDisplay.SubmittingToServerEvent += OpenSubmitWindow;
+
             // frame selection events
             resultDisplay.AddingToSelectionEvent += mFrameSelectionController.AddToSelection;
             resultDisplay.RemovingFromSelectionEvent += mFrameSelectionController.RemoveFromSelection;
@@ -477,6 +487,7 @@ namespace ViretTool
                     resultDisplay.SelectedFrames = selectedFrames;
                     videoDisplay.SelectedFrames = selectedFrames;
                     timeFrameDisplay.SelectedFrames = selectedFrames;
+                    sequentialDisplay.SelectedFrames = selectedFrames;
                     //colorModelDisplay.SelectedFrames = selectedFrames;
                     semanticModelDisplay.DisplayFrames(selectedFrames);
                     semanticModelDisplay.SelectedFrames = selectedFrames;
@@ -491,6 +502,7 @@ namespace ViretTool
             resultDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             videoDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             timeFrameDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
+            sequentialDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             //colorModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
             semanticModelDisplay.DisplayingFrameVideoEvent += LogVideoDisplayed;
 
@@ -731,6 +743,7 @@ namespace ViretTool
         {
             resultDisplay.UpdateDisplayGrid();
             timeFrameDisplay.UpdateDisplayGrid();
+            sequentialDisplay.UpdateDisplayGrid();
         }
 
         private void clearAllButton_Click(object sender, RoutedEventArgs e)
@@ -819,6 +832,9 @@ namespace ViretTool
                 case Key.T:
                     timelineDisplayButton_Click(null, null);
                     break;
+                case Key.S:
+                    sequentialDisplayButton_Click(null, null);
+                    break;
             }
         }
 
@@ -859,8 +875,8 @@ namespace ViretTool
             GlobalItemSelector.Activate(timeFrameDisplay);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e) {
-
+        private void sequentialDisplayButton_Click(object sender, RoutedEventArgs e) {
+            GlobalItemSelector.Activate(sequentialDisplay);
         }
     }
 

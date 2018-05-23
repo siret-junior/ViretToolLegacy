@@ -10,7 +10,7 @@ using ViretTool.DataModel;
 namespace ViretTool.BasicClient.Displays
 {
     public class GlobalItemSelector {
-        public static List<IMainDisplay> Displays = new List<IMainDisplay>();
+        public static List<Tuple<IMainDisplay, Button>> Displays = new List<Tuple<IMainDisplay, Button>>();
 
         public static event SelectedFrameChangedEventHandler SelectedFrameChangedEvent;
         public delegate void SelectedFrameChangedEventHandler(DataModel.Frame selectedFrame);
@@ -31,11 +31,19 @@ namespace ViretTool.BasicClient.Displays
         public static IMainDisplay ActiveDisplay { get; set; }
 
         public static void Activate(IMainDisplay display) {
-            foreach (var item in Displays) {
-                item.DisplayHidden();
+            foreach (var t in Displays) {
+                t.Item1.DisplayHidden();
+                t.Item2.Background = System.Windows.Media.Brushes.DodgerBlue;
             }
-            ActiveDisplay = display;
-            display.DisplaySelected();
+
+            foreach (var t in Displays) {
+                if (t.Item1 == display) {
+                    ActiveDisplay = display;
+                    display.DisplaySelected();
+                    t.Item2.Background = System.Windows.Media.Brushes.Gray;
+                    break;
+                }
+            }
         }
         
     }

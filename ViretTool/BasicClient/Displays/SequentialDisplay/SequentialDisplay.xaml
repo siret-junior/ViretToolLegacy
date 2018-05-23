@@ -1,0 +1,71 @@
+﻿<local:DisplayControl x:Class="ViretTool.BasicClient.SequentialDisplay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ViretTool.BasicClient"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Background="DarkGray"
+              Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal"
+                        Grid.Column="0">
+                <Label
+                    FontWeight="Bold"
+                    FontSize="14"
+                    Content="Sequentialy Ordered Display"
+                    VerticalAlignment="Center"/>
+
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                        Grid.Column="1">
+
+
+                <Button
+                    Name="firstPageButton"
+                    Width="80"
+                    Click="firstPageButton_Click"
+                    Content="&lt;&lt; First" />
+                <Button
+                    Name="previousPageButton"
+                    Width="80"
+                    Click="previousPageButton_Click"
+                    Content="&lt; Previous" />
+
+                <Label
+                    Name="currentPageNumber"
+                    Background="White"
+                    Width="80"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Left"
+                    Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:SequentialDisplay}}, Mode=TwoWay, Path=Page}" />
+
+                <Button
+                    Name="nextPageButton"
+                    Click="nextPageButton_Click"
+                    Width="80"
+                    Content="Next &gt;" />
+
+                <Button
+                    Name="lastPageButton"
+                    Click="lastPageButton_Click"
+                    Width="80"
+                    Content="Last &gt;&gt;" />
+            </StackPanel>
+        </Grid>
+
+        <UniformGrid x:Name="frameGrid"
+                     Rows="7" Columns="10" Grid.Row="1"
+                     Loaded="frameGrid_Loaded"/>
+    </Grid>
+</local:DisplayControl>

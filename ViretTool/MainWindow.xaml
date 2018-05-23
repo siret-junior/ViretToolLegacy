@@ -55,6 +55,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
 
                 <Button x:Name="gridDisplayButton"
@@ -62,7 +63,7 @@
                         Height="32"
                         Content="Grid"
                         Foreground="Black"
-                        Background="GreenYellow"
+                        Background="DodgerBlue"
                         ToolTip="Press G to switch"
                         Margin="5, 5, 2.5, 5"
                         Click="gridDisplayButton_Click"/>
@@ -73,8 +74,17 @@
                         Background="DodgerBlue"
                         Content="Timeline"
                         ToolTip="Press T to switch"
-                        Margin=" 2.5, 5, 5, 5"
+                        Margin=" 2.5, 5, 2.5, 5"
                         Click="timelineDisplayButton_Click"/>
+                <Button x:Name="sequentialDisplayButton"
+                        Grid.Column="2"
+                        Height="32"
+                        Foreground="Black"
+                        Background="DodgerBlue"
+                        Content="Sequential"
+                        ToolTip="Press S to switch"
+                        Margin=" 2.5, 5, 5, 5"
+                        Click="sequentialDisplayButton_Click"/>
             </Grid>
 
 
@@ -170,7 +180,11 @@
                 x:Name="timeFrameDisplay" 
                 Grid.Row="0"
                 Visibility="Hidden"/>
-            
+            <control:SequentialDisplay 
+                x:Name="sequentialDisplay" 
+                Grid.Row="0"
+                Visibility="Hidden"/>
+
             <GridSplitter 
                 Grid.Row="1"
                 Height="5"

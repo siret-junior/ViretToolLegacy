@@ -97,11 +97,9 @@ namespace ViretTool.BasicClient
                 ResizeDisplay(nRows, nColumns, displayGrid);
 
                 // TODO: recompute correct page
+                DisplayPage(0, updateSelected: false);
                 if (GlobalItemSelector.SelectedFrame != null) {
-                    DisplayPage(0, updateSelected:false);
                     SeekToFrame(GlobalItemSelector.SelectedFrame);
-                } else {
-                    DisplayPage(0);
                 }
             }
 

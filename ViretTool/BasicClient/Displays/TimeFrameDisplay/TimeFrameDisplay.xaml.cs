@@ -82,6 +82,10 @@ namespace ViretTool.BasicClient {
         }
 
         private void ControlUIChanged(object sender, EventArgs e) {
+            if (GlobalItemSelector.ActiveDisplay != this) {
+                RefillNeeded = true;
+                return;
+            }
             AggregateResult();
             if (GlobalItemSelector.SelectedFrame != null) {
                 SeekToFrame(GlobalItemSelector.SelectedFrame);
@@ -137,7 +141,13 @@ namespace ViretTool.BasicClient {
                     return;
                 }
 
+                int cache = aggregatedUpTo_ResultIndex;
                 AggregateUpTo(aggregatedUpTo + TimelinesPerPage * 2);
+                if (aggregatedUpTo_ResultIndex == cache) {
+                    MessageBox.Show("Frame not availible, probably some filter is set. Click Clear All to reset filters.", "Frame not availible :(",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
             }
         }
 
