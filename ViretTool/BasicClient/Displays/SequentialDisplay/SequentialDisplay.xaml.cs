@@ -98,6 +98,9 @@ namespace ViretTool.BasicClient {
             }
         }
 
+        private DataModel.Frame FirstFrame;
+        private DataModel.Frame LastFrame;
+
         public void DisplayPage(int page, bool updateSelected = true) {
             if (page < 0) {
                 page = 0;
@@ -120,6 +123,10 @@ namespace ViretTool.BasicClient {
             for (; j < DisplayedFrames.Length; j++) {
                 DisplayedFrames[j].Clear();
             }
+
+            FirstFrame = Results[offset].Item1;
+            LastFrame = Results[offset + count - 1].Item1;
+
             UpdateSelectionVisualization();
         }
 
@@ -219,6 +226,24 @@ namespace ViretTool.BasicClient {
             } else {
                 DisplayPage(0);
             }
+        }
+
+        private void previousDayButton_Click(object sender, RoutedEventArgs e) {
+            if (FirstFrame == null) return;
+
+            int vID = FirstFrame.FrameVideo.VideoID;
+            if (FirstFrame == Dataset.Videos[vID].Frames[0]) vID--;
+            if (vID < 0) return;
+
+            SeekToFrame(Dataset.Videos[vID].Frames[0]);
+        }
+
+        private void nextDayButton_Click(object sender, RoutedEventArgs e) {
+            if (LastFrame == null) return;
+            int vID = LastFrame.FrameVideo.VideoID + 1;
+            if (vID >= Dataset.Videos.Count) return;
+
+            SeekToFrame(Dataset.Videos[vID].Frames[0]);
         }
     }
 }

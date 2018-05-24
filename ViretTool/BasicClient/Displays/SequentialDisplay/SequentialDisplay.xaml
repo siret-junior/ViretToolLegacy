@@ -78,13 +78,18 @@
 
                 <Button
                     Name="firstPageButton"
-                    Width="80"
                     Click="firstPageButton_Click"
+                    Width="80"
                     Content="&lt;&lt; First" />
                 <Button
-                    Name="previousPageButton"
+                    Name="previousDayButton"
+                    Click="previousDayButton_Click"
                     Width="80"
+                    Content="&#9664;  Day" />
+                <Button
+                    Name="previousPageButton"
                     Click="previousPageButton_Click"
+                    Width="80"
                     Content="&lt; Previous" />
 
                 <Label
@@ -100,11 +105,16 @@
                     Click="nextPageButton_Click"
                     Width="80"
                     Content="Next &gt;" />
-
+                <Button
+                    Name="nextDayButton"
+                    Click="nextDayButton_Click"
+                    Width="80"
+                    Content="Day  &#9654;">
+                </Button>
                 <Button
                     Name="lastPageButton"
-                    Click="lastPageButton_Click"
                     Width="80"
+                    Click="lastPageButton_Click"
                     Content="Last &gt;&gt;" />
             </StackPanel>
         </Grid>

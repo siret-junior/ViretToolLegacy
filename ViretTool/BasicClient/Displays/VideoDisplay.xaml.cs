@@ -51,7 +51,7 @@ namespace ViretTool.BasicClient
 
         DataModel.Frame LastFrame;
 
-        public void DisplayFrameVideo(DataModel.Frame frame, bool doSwitch=true)
+        public void DisplayFrameVideo(DataModel.Frame frame, bool doSwitch=true, bool displayTypeChanged=false)
         {
             // skip if nothing to show
             if (frame == null)
@@ -64,7 +64,7 @@ namespace ViretTool.BasicClient
                 frameReductionDense.IsChecked = true;
                 frameReductionSampled.IsChecked = false;
             }
-            else if (LastFrame != null && Math.Abs(LastFrame.ID - frame.ID) < (mDisplayWidth - 1) / 2) {
+            else if (!displayTypeChanged && LastFrame != null && Math.Abs(LastFrame.ID - frame.ID) < (mDisplayWidth - 1) / 2) {
                 foreach (var item in DisplayedFrames) {
                     if (item.Frame == LastFrame) {
                         item.BringIntoView();
@@ -161,14 +161,14 @@ namespace ViretTool.BasicClient
         private void FrameReductionSampled_Checked(object sender, RoutedEventArgs e) {
             mFrameReductionSampled = true;
             if (GlobalItemSelector.SelectedFrame != null) {
-                DisplayFrameVideo(GlobalItemSelector.SelectedFrame);
+                DisplayFrameVideo(GlobalItemSelector.SelectedFrame, displayTypeChanged: true);
             }
         }
 
         private void FrameReductionDense_Checked(object sender, RoutedEventArgs e) {
             mFrameReductionSampled = false;
             if (GlobalItemSelector.SelectedFrame != null) {
-                DisplayFrameVideo(GlobalItemSelector.SelectedFrame, doSwitch:false);
+                DisplayFrameVideo(GlobalItemSelector.SelectedFrame, doSwitch:false, displayTypeChanged:true);
             }
         }
     }
