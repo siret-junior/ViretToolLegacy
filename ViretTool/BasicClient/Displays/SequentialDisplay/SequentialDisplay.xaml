@@ -6,6 +6,10 @@
              xmlns:local="clr-namespace:ViretTool.BasicClient"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:DoubleToStringConverter x:Key="doubleConverter" />
+        <local:RadioEnumToBooleanConverter x:Key="enumConverter" />
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
@@ -25,6 +29,21 @@
                     FontSize="14"
                     Content="Sequentialy Ordered Display"
                     VerticalAlignment="Center"/>
+
+                <StackPanel Orientation="Horizontal" Margin="10,0,10,0" VerticalAlignment="Center">
+                    <RadioButton GroupName="TimelineThresholdType" IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:SequentialDisplay}},
+                        Mode=TwoWay, Path=Type, Converter={StaticResource enumConverter}, ConverterParameter=Similarity}" Checked="ControlUIChanged" Margin="0,0,5,0">Similarity</RadioButton>
+                    <RadioButton GroupName="TimelineThresholdType" IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:SequentialDisplay}},
+                        Mode=TwoWay, Path=Type, Converter={StaticResource enumConverter}, ConverterParameter=Time}" Checked="ControlUIChanged">Time</RadioButton>
+                </StackPanel>
+
+                <Slider VerticalAlignment="Center"
+                        Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:SequentialDisplay}}, Mode=TwoWay, Path=Threshold}"
+                        Minimum="0.01" Maximum="0.99" SmallChange="0.01" Width="100" PreviewMouseUp="ControlUIChanged"/>
+                <TextBlock TextAlignment="Right"
+                   Width="40"
+                   VerticalAlignment="Center"
+                   Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:SequentialDisplay}}, Mode=TwoWay, Path=Threshold, Converter={StaticResource doubleConverter}, ConverterParameter=PercentageOff}" />
 
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"

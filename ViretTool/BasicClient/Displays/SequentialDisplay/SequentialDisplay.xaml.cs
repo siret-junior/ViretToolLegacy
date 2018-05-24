@@ -25,6 +25,7 @@ namespace ViretTool.BasicClient {
 
         public Dataset Dataset;
         public RankingModel.SimilarityModels.FloatVectorModel SimilarityModel;
+        public enum ThresholdType { Similarity, Time }
 
         public SequentialDisplay() : base(true) {
             InitializeComponent();
@@ -33,6 +34,7 @@ namespace ViretTool.BasicClient {
 
         public static readonly DependencyProperty PageProperty = DependencyProperty.Register("Page", typeof(int), typeof(SequentialDisplay), new FrameworkPropertyMetadata(0));
         public static readonly DependencyProperty ThresholdProperty = DependencyProperty.Register("Threshold", typeof(double), typeof(SequentialDisplay), new FrameworkPropertyMetadata(0.3d));
+        public static readonly DependencyProperty TypeProperty = DependencyProperty.Register("Type", typeof(ThresholdType), typeof(SequentialDisplay), new FrameworkPropertyMetadata(ThresholdType.Similarity));
 
         public int Page {
             get { return (int)GetValue(PageProperty); }
@@ -41,17 +43,25 @@ namespace ViretTool.BasicClient {
         
         public double Threshold {
             get { return (double)GetValue(ThresholdProperty); }
-            //set { SetValue(ThresholdProperty, value); }
+            set { SetValue(ThresholdProperty, value); }
+        }
+
+        public ThresholdType Type {
+            get { return (ThresholdType)GetValue(TypeProperty); }
+            set { SetValue(TypeProperty, value); }
         }
 
         public int FramesPerPage {
             get { return DisplayedFrames.Length; }
         }
 
-        private Dictionary<int, int> Map = new Dictionary<int, int>();
-        private List<Tuple<DataModel.Frame, int>> Results = new List<Tuple<DataModel.Frame, int>>();
+        private Dictionary<int, int> Map;
+        private List<Tuple<DataModel.Frame, int>> Results;
 
         public void Aggregate() {
+            Map = new Dictionary<int, int>();
+            Results = new List<Tuple<DataModel.Frame, int>>();
+
             int i = 0;
             int pos = 0;
             while (i < Dataset.Frames.Count) {
@@ -64,8 +74,14 @@ namespace ViretTool.BasicClient {
 
                     i++;
                     while (i < Dataset.Frames.Count && Dataset.Frames[i].FrameVideo.VideoID == vID) {
-                        double d = RankingModel.SimilarityModels.FloatVectorModel.ComputeDistance(
-                            SimilarityModel.mFloatVectors[fID], SimilarityModel.mFloatVectors[i]);
+                        double d = 0;
+                        if (Type == ThresholdType.Similarity) {
+                            d = RankingModel.SimilarityModels.FloatVectorModel.ComputeDistance(
+                                SimilarityModel.mFloatVectors[fID], SimilarityModel.mFloatVectors[i]);
+                        } else {
+                            d = Math.Abs(Dataset.Frames[fID].FrameNumber - Dataset.Frames[i].FrameNumber);
+                            d = d / 99;
+                        }
 
                         if (Threshold > d) {
                             Map.Add(i, pos);
@@ -194,5 +210,15 @@ namespace ViretTool.BasicClient {
             UpdateDisplayGrid();
         }
 
+        private void ControlUIChanged(object sender, EventArgs e) {
+            if (GlobalItemSelector.ActiveDisplay != this) return;
+
+            Aggregate();
+            if (GlobalItemSelector.SelectedFrame != null) {
+                SeekToFrame(GlobalItemSelector.SelectedFrame);
+            } else {
+                DisplayPage(0);
+            }
+        }
     }
 }
