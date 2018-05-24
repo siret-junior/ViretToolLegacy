@@ -30,6 +30,32 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                         Grid.Column="1">
 
+                <Label 
+                    Content="Columns:"
+                    VerticalAlignment="Center"/>
+
+                <Grid Width="32"
+                      Margin="5,0,15,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Button
+                        Name="columsUp"
+                        Click="columsUp_Click"
+                        Grid.Row="0"
+                        Padding="0,-2,0,2"
+                        VerticalAlignment="Center"
+                        Content="&#9650;" />
+
+                    <Button
+                        Grid.Row="1"
+                        Name="columsDown"
+                        Click="columsDown_Click"
+                        Padding="0,-2,0,2"
+                        VerticalAlignment="Center"
+                        Content="&#9660;" />
+                </Grid>
 
                 <Button
                     Name="firstPageButton"

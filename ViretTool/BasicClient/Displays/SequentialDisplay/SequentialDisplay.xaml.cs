@@ -116,14 +116,14 @@ namespace ViretTool.BasicClient {
 
 
         const double DESIRED_ASPECT_RATIO = 3.0 / 4.0;
-        int nColumns = 10;
+        public int Columns { get; private set; } = 10;
 
         public void UpdateDisplayGrid() {
-            double desiredFrameHeight = frameGrid.ActualWidth / nColumns * DESIRED_ASPECT_RATIO;
+            double desiredFrameHeight = frameGrid.ActualWidth / Columns * DESIRED_ASPECT_RATIO;
             int nRows = (int)((frameGrid.ActualHeight + desiredFrameHeight / 2) / desiredFrameHeight);
 
-            if (nRows != mDisplayRows || nColumns != mDisplayCols) {
-                ResizeDisplay(nRows, nColumns, frameGrid);
+            if (nRows != mDisplayRows || Columns != mDisplayCols) {
+                ResizeDisplay(nRows, Columns, frameGrid);
 
                 if (GlobalItemSelector.SelectedFrame != null) {
                     SeekToFrame(GlobalItemSelector.SelectedFrame);
@@ -181,5 +181,18 @@ namespace ViretTool.BasicClient {
         private void lastPageButton_Click(object sender, RoutedEventArgs e) {
             DisplayPage(Results.Count);
         }
+
+        private void columsUp_Click(object sender, RoutedEventArgs e) {
+            if (Columns >= 20) return;
+            Columns += 2;
+            UpdateDisplayGrid();
+        }
+
+        private void columsDown_Click(object sender, RoutedEventArgs e) {
+            if (Columns <= 4) return;
+            Columns -= 2;
+            UpdateDisplayGrid();
+        }
+
     }
 }

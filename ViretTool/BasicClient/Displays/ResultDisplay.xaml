@@ -6,13 +6,13 @@
              xmlns:local="clr-namespace:ViretTool.BasicClient"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1100">
-    <Grid Background="DarkGray">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid>
+        <Grid Background="DarkGray">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />

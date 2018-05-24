@@ -31,7 +31,7 @@
 
             <Label Name="videoLabel" 
                    FontSize="8"
-                   Padding="1"
+                   Padding="0"
                    Background="LightSkyBlue"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top" />

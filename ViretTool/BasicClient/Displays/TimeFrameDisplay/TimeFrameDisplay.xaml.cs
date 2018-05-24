@@ -196,16 +196,21 @@ namespace ViretTool.BasicClient {
                 timeFrameGrid.Columns = TimelinesPerRow;
 
                 UITimeFrames = new TimeFrame[TimelinesPerPage];
+                
                 for (int i = 0; i < TimelinesPerPage; i++) {
                     UITimeFrames[i] = new TimeFrame(this, ColumsPerTimeline);
-                    if (TimelinesPerRow > 1 && i % TimelinesPerRow != TimelinesPerRow - 1) {
-                        var border = new Border();
-                        border.BorderBrush = Brushes.DarkGray;
-                        border.BorderThickness = new Thickness(0,0,5,0);
-                        border.Child = UITimeFrames[i];
-                        timeFrameGrid.Children.Add(border);
-                    } else {
-                        timeFrameGrid.Children.Add(UITimeFrames[i]);
+                }
+                for (int j = 0; j < Rows; j++) {
+                    for (int i = 0; i < TimelinesPerRow; i++) {
+                        if (i != TimelinesPerRow - 1) {
+                            var border = new Border();
+                            border.BorderBrush = Brushes.DarkGray;
+                            border.BorderThickness = new Thickness(0, 0, 5, 0);
+                            border.Child = UITimeFrames[j + i * Rows];
+                            timeFrameGrid.Children.Add(border);
+                        } else {
+                            timeFrameGrid.Children.Add(UITimeFrames[j + i * Rows ]);
+                        }
                     }
                 }
             } else {
