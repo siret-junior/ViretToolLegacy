@@ -9,7 +9,7 @@ using ViretTool.BasicClient;
 
 namespace ViretTool.Utils {
     class Submission {
-        private HttpClient mClient;
+        private HttpClient mClient = new HttpClient();
 
         public Submission() {
             IP = new IPAddress(new byte[] { 0, 0, 0, 0 });
@@ -67,6 +67,31 @@ namespace ViretTool.Utils {
             } catch (Exception) {
                 IsConnected = false;
                 return -1;
+            }
+        }
+
+        public async void SendLSC(string frameName) {
+            string browsingString = VBSLogger.AppendTimeAndGetLogString();
+
+            try {
+                const int TEAM_ID = 2;
+
+                string list =
+                    "team=" + TEAM_ID + "&" +
+                    "image=" + frameName;
+
+                const string DEMO_LSC_URL = "http://demo2.itec.aau.at:80/vbs/lsc/submit?";
+                const string LSC_URL = "";
+
+                string URI = DEMO_LSC_URL + list;
+                var response = await mClient.GetAsync(URI);
+
+                Logger.LogInfo(this, "Submission: " + URI);
+                Logger.LogInfo(this, "Response: " + response.Content.ReadAsStringAsync().Result);
+
+            } catch (Exception ex) {
+                string msg = ex.Message;
+                IsConnected = false;
             }
         }
 

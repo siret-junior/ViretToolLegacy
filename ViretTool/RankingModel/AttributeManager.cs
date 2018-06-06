@@ -7,14 +7,14 @@ using ViretTool.DataModel;
 
 namespace ViretTool.RankingModel.AttributeModels
 {
-    public class AttributeManager
+    public static class AttributeManager
     {
-        private DataModel.Dataset mDataset;
+        private static DataModel.Dataset mDataset;
 
-        private SourceFileModel mSourceFileModel;
-        private DateTimeModel mDateTimeModel;
+        private static SourceFileModel mSourceFileModel;
+        private static DateTimeModel mDateTimeModel;
 
-        public AttributeManager(DataModel.Dataset dataset)
+        public static void Initialize(DataModel.Dataset dataset)
         {
             mDataset = dataset;
 
@@ -23,13 +23,15 @@ namespace ViretTool.RankingModel.AttributeModels
         }
 
 
-        public string GetSourceFile(Frame frame)
+        public static string GetSourceFile(Frame frame)
         {
+            if (frame.ID == -1) return null;
             return mSourceFileModel.GetSourceFile(frame);
         }
 
-        public DateTime GetDateTime(Frame frame)
+        public static DateTime GetDateTime(Frame frame)
         {
+            if (frame.ID == -1) return new DateTime();
             return mDateTimeModel.GetDateTime(frame);
         }
     }

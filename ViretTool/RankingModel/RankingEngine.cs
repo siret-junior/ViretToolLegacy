@@ -21,14 +21,12 @@ namespace ViretTool.RankingModel
         private readonly SimilarityManager mSimilarityManager;
         private readonly FilterManager mFilterManager;
 
-        public readonly AttributeManager mAttributeManager;
-
         private List<RankedFrame> mFilteredRankedSortedResult;
 
         public delegate void RankedResultEventHandler(List<RankedFrame> rankedResult);
         public event RankedResultEventHandler RankingChangedEvent;
 
-        public bool ComputeResult { get; set; }
+        public int ComputeResult { get; set; }
 
         private double mPercentageOfDatabaseKeyword = 0.5;
         private double mPercentageOfDatabaseColor = 0.975;
@@ -41,14 +39,12 @@ namespace ViretTool.RankingModel
 
         public RankingEngine(
             SimilarityManager similarityManager, 
-            FilterManager filterManager, 
-            AttributeManager attributeManager)
+            FilterManager filterManager)
         {
             mSimilarityManager = similarityManager;
             mFilterManager = filterManager;
-            mAttributeManager = attributeManager;
 
-            ComputeResult = true;
+            ComputeResult = 0;
         }
 
         public void ResetEngine()
@@ -73,7 +69,7 @@ namespace ViretTool.RankingModel
         /// </summary>
         private void ComputeFilteredRankedSortedResult()
         {
-            if (!ComputeResult)
+            if (ComputeResult > 0)
                 return;
 
             List<DataModel.Frame> filteredFrames = mFilterManager.GetMaskFilteredFrames();
@@ -97,7 +93,8 @@ namespace ViretTool.RankingModel
 
         public bool SortByKeyword {
             get { return mSortByKeyword; }
-            set { mSortByKeyword = value;
+            set {
+                mSortByKeyword = value;
                     ComputeFilteredRankedSortedResult(); }
         }
 

@@ -75,8 +75,8 @@ namespace ViretTool
             // initialize ranking engine
             SimilarityManager similarityManager = new SimilarityManager(mDataset);
             FilterManager filterManager = new FilterManager(mDataset);
-            AttributeManager attributeManager = new AttributeManager(mDataset);
-            mRankingEngine = new RankingEngine(similarityManager, filterManager, attributeManager);
+            AttributeManager.Initialize(mDataset);
+            mRankingEngine = new RankingEngine(similarityManager, filterManager);
 
             timeFrameDisplay.SimilarityModel = similarityManager.mVectorModel;
             timeFrameDisplay.Dataset = mDataset;
@@ -123,9 +123,9 @@ namespace ViretTool
             // model filters
             keywordSearchControlBar.DefaultValue = 50;
             keywordSearchControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
-                mRankingEngine.ComputeResult = false;
+                mRankingEngine.ComputeResult++;
                 mRankingEngine.SortByKeyword = useForSorting;
-                mRankingEngine.ComputeResult = true;
+                mRankingEngine.ComputeResult--;
                 mRankingEngine.SetFilterThresholdForKeywordModel(value);
             };
             keywordSearchControlBar.ModelClearedEvent += () => {
@@ -134,9 +134,9 @@ namespace ViretTool
 
             sketchCanvasControlBar.DefaultValue = 90;
             sketchCanvasControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
-                mRankingEngine.ComputeResult = false;
+                mRankingEngine.ComputeResult++;
                 mRankingEngine.SortByColor = useForSorting;
-                mRankingEngine.ComputeResult = true;
+                mRankingEngine.ComputeResult--;
                 mRankingEngine.SetFilterThresholdForColorModel(value);
             };
             sketchCanvasControlBar.ModelClearedEvent += () => {
@@ -145,9 +145,9 @@ namespace ViretTool
 
             semanticModelControlBar.DefaultValue = 70;
             semanticModelControlBar.ModelSettingChangedEvent += (value, useForSorting) => {
-                mRankingEngine.ComputeResult = false;
+                mRankingEngine.ComputeResult++;
                 mRankingEngine.SortBySemantic = useForSorting;
-                mRankingEngine.ComputeResult = true;
+                mRankingEngine.ComputeResult--;
                 mRankingEngine.SetFilterThresholdForSemanticModel(value);
             };
             semanticModelControlBar.ModelClearedEvent += () => {
@@ -198,11 +198,11 @@ namespace ViretTool
                     if (query != null)
                     {
                         VBSLogger.AppendActionIncludeTimeParameter('K', true);
-                        mRankingEngine.ComputeResult = false;
+                        mRankingEngine.ComputeResult++;
                         semanticModelControlBar.UncheckMe();
                         sketchCanvasControlBar.UncheckMe();
                         keywordSearchControlBar.CheckMe();
-                        mRankingEngine.ComputeResult = true;
+                        mRankingEngine.ComputeResult--;
                     }
                     else
                     {
@@ -249,11 +249,11 @@ namespace ViretTool
                     if (sketch.Count > 0)
                     {
                         VBSLogger.AppendActionIncludeTimeParameter('C', true);
-                        mRankingEngine.ComputeResult = false;
+                        mRankingEngine.ComputeResult++;
                         keywordSearchControlBar.UncheckMe();
                         semanticModelControlBar.UncheckMe();
                         sketchCanvasControlBar.CheckMe();
-                        mRankingEngine.ComputeResult = true;
+                        mRankingEngine.ComputeResult--;
                     }
                     else
                     {
@@ -332,11 +332,11 @@ namespace ViretTool
                     if (frameSelection.Count > 0)
                     {
                         VBSLogger.AppendActionIncludeTimeParameter('S', true);
-                        mRankingEngine.ComputeResult = false;
+                        mRankingEngine.ComputeResult++;
                         keywordSearchControlBar.UncheckMe();
                         sketchCanvasControlBar.UncheckMe();
                         semanticModelControlBar.CheckMe();
-                        mRankingEngine.ComputeResult = true;
+                        mRankingEngine.ComputeResult--;
                     }
                     else
                     {
@@ -428,6 +428,13 @@ namespace ViretTool
                     resultDisplay.ResultFrames = rankedResult;
                     timeFrameDisplay.ResultFrames = rankedResult;
                     //mFrameSelectionController.ResetSelection();
+
+                    if (rankedResult == null || (rankedResult.Count == mDataset.Frames.Count && rankedResult[rankedResult.Count - 1].Rank == 1 - rankedResult.Count)) {
+                        if (GlobalItemSelector.ActiveDisplay != sequentialDisplay)
+                            GlobalItemSelector.Activate(sequentialDisplay);
+                    } else if (GlobalItemSelector.ActiveDisplay == sequentialDisplay) {
+                        GlobalItemSelector.Activate(resultDisplay);
+                    }
 
                     // build query objects string
                     int resultSize = rankedResult != null ? rankedResult.Count : 0;
@@ -752,7 +759,7 @@ namespace ViretTool
         {
             //VBSLogger.AppendActionIncludeTimeParameter('X', true);
             // TODO: without reranking in between
-            mRankingEngine.ComputeResult = false;
+            mRankingEngine.ComputeResult++;
             keywordSearchTextBox.Clear();
             sketchCanvas.Clear();
             mFrameSelectionController.ResetSelection();
@@ -763,7 +770,7 @@ namespace ViretTool
 
             keywordSearchControlBar.Clear();
             sketchCanvasControlBar.Clear();
-            mRankingEngine.ComputeResult = true;
+            mRankingEngine.ComputeResult--;
 
             semanticModelControlBar.Clear();
 
@@ -829,12 +836,15 @@ namespace ViretTool
                     }
                     break;
                 case Key.G:
+                    if (e.OriginalSource as TextBox != null) break;
                     gridDisplayButton_Click(null, null);
                     break;
                 case Key.T:
+                    if (e.OriginalSource as TextBox != null) break;
                     timelineDisplayButton_Click(null, null);
                     break;
                 case Key.S:
+                    if (e.OriginalSource as TextBox != null) break;
                     sequentialDisplayButton_Click(null, null);
                     break;
             }
@@ -972,13 +982,20 @@ namespace ViretTool
 
         private void SubmitToServer(DataModel.Frame frame)
         {
-            mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+            //mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
 
-            // logging
-            string currentTask = GetCurrentTaskId();
+            //// logging
+            //string currentTask = GetCurrentTaskId();
+
+            string frameFile = AttributeManager.GetSourceFile(frame);
+            if (frameFile == null) {
+                MessageBox.Show("Cannot submit this image, do not use scrolling to submit.");
+                return;
+            }
+            mSubmissionClient.SendLSC(frameFile);
 
             // log message
-            string message = currentTask + ", frame submitted: "
+            string message = "frame submitted: "
                     + "(Frame ID:" + frame.ID
                     + ", Video:" + frame.FrameVideo.VideoID
                     + ", Number:" + frame.FrameNumber + ")";

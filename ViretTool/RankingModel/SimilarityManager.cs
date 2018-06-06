@@ -156,7 +156,7 @@ namespace ViretTool.RankingModel.SimilarityModels
             List<RankedFrame> sequentialRanking = new List<RankedFrame>();
 
             foreach (DataModel.Frame f in filteredFrames)
-                sequentialRanking.Add(new RankedFrame(f, f.ID));
+                sequentialRanking.Add(new RankedFrame(f, -f.ID));
 
             return sequentialRanking;
         }

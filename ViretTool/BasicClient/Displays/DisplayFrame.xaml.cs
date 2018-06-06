@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ViretTool.BasicClient.Displays;
+using ViretTool.RankingModel.AttributeModels;
 
 namespace ViretTool.BasicClient
 {
@@ -60,6 +61,7 @@ namespace ViretTool.BasicClient
         public void Clear() {
             Frame = null;
             IsSelected = false;
+            timestamp.Content = null;
             IsGlobalSelectedFrame = false;
             SkippedFrames = 0;
         }
@@ -73,6 +75,8 @@ namespace ViretTool.BasicClient
 
         public void Set(DataModel.Frame frame, bool isSelected=false, bool isGlobalSelected=false, int skippedFrames= 0) {
             Frame = frame;
+            DateTime dt = AttributeManager.GetDateTime(frame);
+            timestamp.Content = dt.Ticks == 0 ? null : dt.ToString("H:mm");
             IsSelected = isSelected;
             IsGlobalSelectedFrame = isGlobalSelected;
             SkippedFrames = skippedFrames;

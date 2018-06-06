@@ -28,7 +28,12 @@
                 Stroke="Transparent"
                 StrokeThickness="4" />
 
-
+            <Label Name="timestamp" 
+                   FontSize="8"
+                   Padding="0"
+                   Background="LightSkyBlue"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top" />
             <Label Name="videoLabel" 
                    FontSize="8"
                    Padding="0"
