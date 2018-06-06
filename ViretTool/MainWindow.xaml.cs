@@ -17,6 +17,7 @@ using ViretTool.BasicClient;
 using ViretTool.BasicClient.Displays;
 using ViretTool.DataModel;
 using ViretTool.RankingModel;
+using ViretTool.RankingModel.AttributeModels;
 using ViretTool.RankingModel.FilterModels;
 using ViretTool.RankingModel.SimilarityModels;
 using ViretTool.Utils;
@@ -74,7 +75,8 @@ namespace ViretTool
             // initialize ranking engine
             SimilarityManager similarityManager = new SimilarityManager(mDataset);
             FilterManager filterManager = new FilterManager(mDataset);
-            mRankingEngine = new RankingEngine(similarityManager, filterManager);
+            AttributeManager attributeManager = new AttributeManager(mDataset);
+            mRankingEngine = new RankingEngine(similarityManager, filterManager, attributeManager);
 
             timeFrameDisplay.SimilarityModel = similarityManager.mVectorModel;
             timeFrameDisplay.Dataset = mDataset;

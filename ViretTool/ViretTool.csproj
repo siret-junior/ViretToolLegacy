@@ -111,6 +111,9 @@
     <Compile Include="BasicClient\Displays\VideoDisplay.xaml.cs">
       <DependentUpon>VideoDisplay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RankingModel\AttributeManager.cs" />
+    <Compile Include="RankingModel\AttributeModels\DateTimeModel.cs" />
+    <Compile Include="RankingModel\AttributeModels\SourceFileModel.cs" />
     <Compile Include="RankingModel\FilterManager.cs" />
     <Compile Include="RankingModel\FilterModels\Filter.cs" />
     <Compile Include="RankingModel\FilterModels\FlowFilter.cs" />

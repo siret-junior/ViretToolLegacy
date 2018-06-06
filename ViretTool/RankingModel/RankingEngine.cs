@@ -8,6 +8,7 @@ using System.Windows.Media;
 using ViretTool.DataModel;
 using ViretTool.RankingModel.FilterModels;
 using ViretTool.RankingModel.SimilarityModels;
+using ViretTool.RankingModel.AttributeModels;
 
 namespace ViretTool.RankingModel
 {
@@ -19,6 +20,7 @@ namespace ViretTool.RankingModel
     {
         private readonly SimilarityManager mSimilarityManager;
         private readonly FilterManager mFilterManager;
+        private readonly AttributeManager mAttributeManager;
 
         private List<RankedFrame> mFilteredRankedSortedResult;
 
@@ -36,10 +38,15 @@ namespace ViretTool.RankingModel
         private bool mSortByColor = true;
         private bool mSortBySemantic = true;
 
-        public RankingEngine(SimilarityManager similarityManager, FilterManager filterManager)
+        public RankingEngine(
+            SimilarityManager similarityManager, 
+            FilterManager filterManager, 
+            AttributeManager attributeManager)
         {
             mSimilarityManager = similarityManager;
             mFilterManager = filterManager;
+            mAttributeManager = attributeManager;
+
             ComputeResult = true;
         }
 
