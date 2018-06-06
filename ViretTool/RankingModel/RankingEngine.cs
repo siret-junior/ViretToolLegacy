@@ -20,7 +20,8 @@ namespace ViretTool.RankingModel
     {
         private readonly SimilarityManager mSimilarityManager;
         private readonly FilterManager mFilterManager;
-        private readonly AttributeManager mAttributeManager;
+
+        public readonly AttributeManager mAttributeManager;
 
         private List<RankedFrame> mFilteredRankedSortedResult;
 
