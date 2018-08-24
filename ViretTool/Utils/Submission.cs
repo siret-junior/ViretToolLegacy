@@ -124,7 +124,7 @@ namespace ViretTool.Utils {
 
                 //IsConnected = responseString == "VBSfOK";
             } catch (Exception ex) {
-                string msg = ex.Message;
+                Logger.Log(this, Severity.Error, ex.Message);
                 IsConnected = false;
             }
         }
