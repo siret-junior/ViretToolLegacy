@@ -8,7 +8,12 @@
              d:DesignHeight="75" d:DesignWidth="100">
     <Viewbox
         Name="viewBox"
-        Stretch="Fill">
+        Stretch="Fill"
+        MouseEnter="viewBox_MouseEnter"
+        MouseLeave="viewBox_MouseLeave">
+        <Border x:Name="selectedItemRectangle"
+                BorderBrush="Yellow"
+                BorderThickness="0">
         <Grid 
             Background="White"
             MouseDown="Grid_MouseDown"
@@ -23,10 +28,15 @@
                 Stroke="Transparent"
                 StrokeThickness="4" />
 
-
+            <Label Name="timestamp" 
+                   FontSize="8"
+                   Padding="0"
+                   Background="LightSkyBlue"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top" />
             <Label Name="videoLabel" 
                    FontSize="8"
-                   Padding="1"
+                   Padding="0"
                    Background="LightSkyBlue"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top" />
@@ -136,5 +146,6 @@
             </Grid>
 
         </Grid>
+        </Border>
     </Viewbox>
 </UserControl>

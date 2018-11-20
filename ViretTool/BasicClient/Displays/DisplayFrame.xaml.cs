@@ -37,7 +37,7 @@ namespace ViretTool.BasicClient
                     image.Source = mFrame.Bitmap;
 #if LABELS
                     videoLabel.Content = mFrame.FrameVideo.VideoID.ToString();
-                    groupLabel.Content = mFrame.FrameGroup.GroupID.ToString();
+                    //groupLabel.Content = mFrame.FrameGroup.GroupID.ToString();
                     frameLabel.Content = mFrame.ID.ToString();
 #endif
                 }
@@ -100,8 +100,31 @@ namespace ViretTool.BasicClient
             ParentDisplay = null;
         }
 
+        public static readonly RoutedEvent OnEnterEvent = EventManager.RegisterRoutedEvent("OnEnter", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(DisplayFrame));
+        public static readonly RoutedEvent OnExitEvent = EventManager.RegisterRoutedEvent("OnExit", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(DisplayFrame));
 
-        
+        public event RoutedEventHandler OnEnter {
+            add { AddHandler(OnEnterEvent, value); }
+            remove { RemoveHandler(OnEnterEvent, value); }
+        }
+
+        public event RoutedEventHandler OnExit {
+            add { AddHandler(OnExitEvent, value); }
+            remove { RemoveHandler(OnExitEvent, value); }
+        }
+
+        private void viewBox_MouseEnter(object sender, MouseEventArgs e) {
+            if (ParentDisplay == null) return;
+            RoutedEventArgs evargs = new RoutedEventArgs(OnEnterEvent, this);
+            RaiseEvent(evargs);
+        }
+
+        private void viewBox_MouseLeave(object sender, MouseEventArgs e) {
+            if (ParentDisplay == null) return;
+            RoutedEventArgs evargs = new RoutedEventArgs(OnExitEvent, this);
+            RaiseEvent(evargs);
+        }
+
         private void UpdateSelectionVisualization()
         {
             switch (mIsSelected)
@@ -153,6 +176,10 @@ namespace ViretTool.BasicClient
 
             // set frame and content
             image.Source = VideoFrames[mDisplayedVideoFrameId].Bitmap;
+
+            if (ParentDisplay == null) return;
+            RoutedEventArgs evargs = new RoutedEventArgs(OnEnterEvent, VideoFrames[mDisplayedVideoFrameId]);
+            RaiseEvent(evargs);
             //label.Content = VideoFrames[mDisplayedVideoFrameId].FrameNumber;
         }
 
@@ -201,7 +228,7 @@ namespace ViretTool.BasicClient
             }
 
             // display buttons
-            if (Frame != null)
+            if (Frame != null && ParentDisplay != null)
             {
                 displayButtons.Visibility = Visibility.Visible;
             }
@@ -223,7 +250,7 @@ namespace ViretTool.BasicClient
         {
             // TODO: find better solution: 
             // disable scrolling on video display
-            if (ParentDisplay is VideoDisplay)
+            if (ParentDisplay is VideoDisplay || Frame == null)
             {
                 return;
             }
@@ -273,7 +300,7 @@ namespace ViretTool.BasicClient
                 {
                     mDisplayedVideoFrameId = i;
                     DataModel.Frame videoFrame = VideoFrames[i];
-                    if (videoFrame.FrameNumber > mFrame.FrameNumber)
+                    if (videoFrame.FrameNumber >= mFrame.FrameNumber)
                     {
                         break;
                     }

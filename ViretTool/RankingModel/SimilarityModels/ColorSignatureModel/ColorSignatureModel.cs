@@ -69,6 +69,12 @@ namespace ViretTool.RankingModel.SimilarityModels
         {
             float[] distances = new float[mDataset.Frames.Count];
 
+            // initialize to -1
+            for (int i = 0; i < distances.Length; i++)
+            {
+                distances[i] = -1;
+            }
+
             // transform [x, y] to a list of investigated positions in mGridRadius
             Tuple<int[], Color, bool> t = PrepareQuery(qc);
 
@@ -84,7 +90,8 @@ namespace ViretTool.RankingModel.SimilarityModels
                     foreach (int offset in t.Item1)
                         minRank = Math.Min(minRank, L2SquareDistance(R, signature[offset], G, signature[offset + 1], B, signature[offset + 2]));
 
-                    distances[i] -= Convert.ToSingle(Math.Sqrt(minRank));
+                    //distances[i] -= Convert.ToSingle(Math.Sqrt(minRank));
+                    distances[i] *= Convert.ToSingle(Math.Sqrt(minRank));
                 }
                 else
                 {
@@ -92,7 +99,8 @@ namespace ViretTool.RankingModel.SimilarityModels
                     foreach (int offset in t.Item1)
                         avgRank += Math.Sqrt(L2SquareDistance(R, signature[offset], G, signature[offset + 1], B, signature[offset + 2]));
 
-                    distances[i] -= Convert.ToSingle(avgRank / t.Item1.Length);
+                    //distances[i] -= Convert.ToSingle(avgRank / t.Item1.Length);
+                    distances[i] *= Convert.ToSingle(avgRank / t.Item1.Length);
                 }              
             });
 
