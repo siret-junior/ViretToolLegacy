@@ -134,13 +134,25 @@ namespace ViretTool.RankingModel.SimilarityModels
         {
             List<RankedFrame> rankedFrames = new List<RankedFrame>();
 
-            foreach (DataModel.Video v in mDataset.Videos)
+            foreach (DataModel.Video video in mDataset.Videos)
             {
-                int idx = v.Frames.Count / 2;
+                int randomFrameIndex;
+                
+                if (video.Frames.Count > 6)
+                {
+                    randomFrameIndex = 3 + (random.Next() % (video.Frames.Count - 6));
+                }
+                else if (video.Frames.Count > 0)
+                {
+                    randomFrameIndex = video.Frames.Count / 2;
+                }
+                else
+                {
+                    // no frames in the video
+                    continue;
+                }
 
-                if (v.Frames.Count > 6) idx = 3 + (random.Next() % (v.Frames.Count - 6));
-
-                rankedFrames.Add(new RankedFrame(v.Frames[idx], random.Next()));
+                rankedFrames.Add(new RankedFrame(video.Frames[randomFrameIndex], random.Next()));
             }
 
             return rankedFrames;
@@ -156,7 +168,7 @@ namespace ViretTool.RankingModel.SimilarityModels
             List<RankedFrame> sequentialRanking = new List<RankedFrame>();
 
             foreach (DataModel.Frame f in filteredFrames)
-                sequentialRanking.Add(new RankedFrame(f, -f.ID));
+                sequentialRanking.Add(new RankedFrame(f, -f.Id));
 
             return sequentialRanking;
         }
@@ -250,7 +262,7 @@ namespace ViretTool.RankingModel.SimilarityModels
 
                 // TODO: multipliers and vector instructions
                 foreach (List<RankedFrame> list in rankingListsForSorting)
-                    rf.Rank += list[rf.Frame.ID].Rank;
+                    rf.Rank += list[rf.Frame.Id].Rank;
             });
 
             return aggregatedResult;

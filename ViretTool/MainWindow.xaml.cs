@@ -96,6 +96,7 @@ namespace ViretTool
             //        "..\\..\\..\\TestData\\Trailers\\Trailers-8fps-selected.topology");
 
             mDataset = FromConfigFile("ViretToolConfig.txt");
+            
 
             // initialize ranking engine
             SimilarityManager similarityManager = new SimilarityManager(mDataset);
@@ -364,8 +365,8 @@ namespace ViretTool
                         for (int i = 0; i < frameSelection.Count; i++)
                         {
                             DataModel.Frame frame = frameSelection[i];
-                            querySelection += "(Frame ID:" + frame.ID
-                            + ", Video:" + frame.FrameVideo.VideoID
+                            querySelection += "(Frame ID:" + frame.Id
+                            + ", Video:" + frame.ParentVideo.Id
                             + ", Number:" + frame.FrameNumber + "), ";
                             queryCount++;
                         }
@@ -565,7 +566,15 @@ namespace ViretTool
             // load database object
             try
             {
-                return new Dataset(thumbnailsAllFile, thumbnailsSelectedFile, topologyFile);
+                // TODO: new code integration
+                //Dataset dataset = DatasetProvider.FromFilelist(topologyFile, "V3C1-first750");
+                //Dataset dataset = DatasetProvider.FromFilelist(@"c:\Datasets\V3C1-first750\KeyFrames\filelist.txt", "V3C1-first750");
+                //DatasetProvider.ToBinaryFile(dataset, topologyFile + ".topology");
+                //Dataset dataset = DatasetProvider.FromBinaryFile(topologyFile);
+                Dataset dataset = DatasetProvider.ConstructDataset(thumbnailsAllFile, thumbnailsSelectedFile, topologyFile);
+
+                //return new Dataset(thumbnailsAllFile, thumbnailsSelectedFile, topologyFile);
+                return dataset;
             }
             catch (Exception ex)
             {
@@ -660,15 +669,15 @@ namespace ViretTool
 
         private void SubmitToServer(DataModel.Frame frame)
         {
-            mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+            mSubmissionClient.Send(frame.ParentVideo.Id, frame.FrameNumber);
 
             // logging
             //string currentTask = GetCurrentTaskId();
 
             // log message
             string message = /*currentTask + */", frame submitted: "
-                    + "(Frame ID:" + frame.ID
-                    + ", Video:" + frame.FrameVideo.VideoID
+                    + "(Frame ID:" + frame.Id
+                    + ", Video:" + frame.ParentVideo.Id
                     + ", Number:" + frame.FrameNumber + ")";
             Logger.LogInfo(this, message);
         }
@@ -679,12 +688,12 @@ namespace ViretTool
         private void LogVideoDisplayed(DataModel.Frame frame)
         {
             videoDisplay.DisplayFrameVideo(frame);
-            selectedVideo = frame.FrameVideo;
+            selectedVideo = frame.ParentVideo;
 
             // log message
             string message = "Video displayed: "
-                    + "(Frame ID:" + frame.ID
-                    + ", Video:" + frame.FrameVideo.VideoID
+                    + "(Frame ID:" + frame.Id
+                    + ", Video:" + frame.ParentVideo.Id
                     + ", Number:" + frame.FrameNumber + ")";
             Logger.LogInfo(this, message);
         }
@@ -887,15 +896,15 @@ namespace ViretTool
 
         private void SubmitToServer(DataModel.Frame frame)
         {
-            mSubmissionClient.Send(frame.FrameVideo.VideoID, frame.FrameNumber);
+            mSubmissionClient.Send(frame.ParentVideo.Id, frame.FrameNumber);
 
             // logging
             string currentTask = GetCurrentTaskId();
 
             // log message
             string message = currentTask + ", frame submitted: "
-                    + "(Frame ID:" + frame.ID
-                    + ", Video:" + frame.FrameVideo.VideoID
+                    + "(Frame ID:" + frame.Id
+                    + ", Video:" + frame.ParentVideo.Id
                     + ", Number:" + frame.FrameNumber + ")";
             Logger.LogInfo(this, message);
         }

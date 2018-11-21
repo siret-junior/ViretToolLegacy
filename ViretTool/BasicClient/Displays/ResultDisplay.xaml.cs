@@ -22,7 +22,8 @@ namespace ViretTool.BasicClient
     /// </summary>
     public partial class ResultDisplay : DisplayControl, INotifyPropertyChanged
     {
-        const double DESIRED_ASPECT_RATIO = 3.0 / 4.0;
+        //const double DESIRED_ASPECT_RATIO = 3.0 / 4.0;
+        const double DESIRED_ASPECT_RATIO = 9.0 / 16.0;
 
         int nColumns = 10;
         const int SMALL_DISPLAY_COLUMNS = 10;
@@ -177,8 +178,8 @@ namespace ViretTool.BasicClient
                     if (arrangedDisplay[iRow, iCol] == null) continue; // TODO rewrite
                     DisplayedFrames[iterator++].Frame = arrangedDisplay[iRow, iCol].Frame;
 
-                    message += "(Frame ID:" + arrangedDisplay[iRow, iCol].Frame.ID
-                            + ", Video:" + arrangedDisplay[iRow, iCol].Frame.FrameVideo.VideoID
+                    message += "(Frame ID:" + arrangedDisplay[iRow, iCol].Frame.Id
+                            + ", Video:" + arrangedDisplay[iRow, iCol].Frame.ParentVideo.Id
                             + ", Number:" + arrangedDisplay[iRow, iCol].Frame.FrameNumber + "), ";
 
                     if (iterator > framesToDisplay.Count)

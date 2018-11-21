@@ -28,7 +28,7 @@ namespace BlackAndWhiteFilter {
 
             int threshold = int.Parse(args[3]);
             // TODO: Dataset should support loading only one file (eg. AllFrames only without SelectedFrames and TopologyFile)
-            var dataset = new ViretTool.DataModel.Dataset(args[0], args[1], args[2]);
+            var dataset = DatasetProvider.ConstructDataset(args[0], args[1], args[2]);
 
             // prepare arrays with statistics for each frame
             float[] bwDeltaValues = new float[dataset.Frames.Count];
@@ -58,7 +58,6 @@ namespace BlackAndWhiteFilter {
             // TODO - use constants for filenames
             StoreFilterValues(dataset.GetFileNameByExtension(".bwfilter"), bwDeltaValues, dataset);
             StoreFilterValues(dataset.GetFileNameByExtension(".pbcfilter"), pbValues, dataset);
-            
         }
 
         private static void StoreFilterValues(string filename, float[] filterValues, Dataset dataset)
@@ -66,7 +65,8 @@ namespace BlackAndWhiteFilter {
             using (var FS = new FileStream(filename, FileMode.Create))
                 using (var BW = new BinaryWriter(FS))
                 {
-                    BW.Write(dataset.DatasetFileHeader);
+                    BW.Write(dataset.DatasetId.Length);
+                    BW.Write(dataset.DatasetId);
                     BW.Write((Int32)filterValues.Length);
 
                     // TODO - optimize

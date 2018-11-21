@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ViretTool.BasicClient"
              mc:Ignorable="d" 
-             d:DesignHeight="240" d:DesignWidth="320">
+             d:DesignHeight="216" d:DesignWidth="384">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -16,8 +16,8 @@
                  Grid.Row="1"
                  Stretch = "Uniform">
             <Canvas Name="sketchCanvas" 
-                    Width="320"
-                    Height="240">
+                    Width="384"
+                    Height="216">
             </Canvas>
         </Viewbox>
     </Grid>

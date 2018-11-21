@@ -59,9 +59,9 @@ namespace ViretTool.RankingModel
 
         public override string ToString()
         {
-            return "ID: " + Frame.ID.ToString("000000") 
+            return "ID: " + Frame.Id.ToString("000000") 
                 + ", rank: " + Rank.ToString("0.000000")
-                + ", video: " + Frame.FrameVideo.VideoID.ToString("00000")
+                + ", video: " + Frame.ParentVideo.Id.ToString("00000")
                 + ", frame: " + Frame.FrameNumber.ToString("000000");
         }
 

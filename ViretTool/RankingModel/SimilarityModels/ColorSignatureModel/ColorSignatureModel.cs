@@ -17,8 +17,8 @@ namespace ViretTool.RankingModel.SimilarityModels
         /// </summary>
         private List<byte[]> mColorSignatures;
 
-        private int mSignatureWidth = 20;     // TODO: load dynamically from provided initializer file
-        private int mSignatureHeight = 15;
+        private int mSignatureWidth = 32;     // TODO: load dynamically from provided initializer file
+        private int mSignatureHeight = 18;
 
         private readonly string mDescriptorsFilename;
 
@@ -115,7 +115,7 @@ namespace ViretTool.RankingModel.SimilarityModels
             {
                 RankedFrame rf = result[i];
                 foreach (DataModel.Frame queryFrame in queryFrames)
-                    rf.Rank -= L2Distance(mColorSignatures[rf.Frame.ID], mColorSignatures[queryFrame.ID]);
+                    rf.Rank -= L2Distance(mColorSignatures[rf.Frame.Id], mColorSignatures[queryFrame.Id]);
             });
 
             return result;
@@ -123,7 +123,7 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         public byte[] GetFrameColorSignature(DataModel.Frame frame)
         {
-            return mColorSignatures[frame.ID];
+            return mColorSignatures[frame.Id];
         }
 
         public static double ComputeDistance(byte[] vectorA, byte[] vectorB)
@@ -217,7 +217,7 @@ namespace ViretTool.RankingModel.SimilarityModels
             {
                 DataModel.Frame frame = mDataset.Frames[ID];
 
-                if (frame.ID != ID) throw new Exception("Frame ID mismatch.");
+                if (frame.Id != ID) throw new Exception("Frame ID mismatch.");
 
                 mColorSignatures.Add(ImageHelper.ResizeAndStoreImageToRGBByteArray(frame.GetImage(), mSignatureWidth, mSignatureHeight));
             }
@@ -226,7 +226,7 @@ namespace ViretTool.RankingModel.SimilarityModels
             using (System.IO.FileStream FS = new System.IO.FileStream(mDescriptorsFilename, System.IO.FileMode.Create))
             {
                 System.IO.BinaryWriter BW = new System.IO.BinaryWriter(FS);
-                BW.Write(mDataset.DatasetID);
+                BW.Write(mDataset.DatasetId);
                 BW.Write(mColorSignatures.Count());
 
                 foreach (byte[] descriptor in mColorSignatures)

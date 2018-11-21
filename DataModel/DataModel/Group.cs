@@ -1,45 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
 namespace ViretTool.DataModel
 {
+    /// <summary>
+    /// Represents a group of similar representative frames from a video.
+    /// </summary>
     public class Group
     {
-        public readonly int GroupID;
-
-        public readonly Video FrameVideo;
-        public readonly List<Frame> Frames;
-        public Frame GroupFrame { get; protected set; }
+        public readonly int Id;
         
+        public Video ParentVideo { get; private set; }
+        public int IdInVideo { get; private set; }
 
-        public Group(int groupID, Video frameVideo)
+        public ReadOnlyCollection<Frame> Frames { get; private set; }
+
+
+        public Group(int groupId)
         {
-            FrameVideo = frameVideo;
-            GroupID = groupID;
-
-            Frames = new List<Frame>();
+            Id = groupId;
         }
-
-        public void AddFrame(Frame frame)
-        {
-            Frames.Add(frame);
-
-            if (GroupFrame == null)
-            {
-                GroupFrame = frame;
-            }
-        }
-
 
 
         public override string ToString()
         {
-            return "ID: " + GroupID.ToString()
-                + ", Video ID: " + FrameVideo.VideoID.ToString("00000")
-                + ", frames: " + Frames.Count;
+            return "GroupId: " + Id.ToString("00000")
+                + ", Video: " + ParentVideo.Id.ToString("00000");
+        }
+
+
+        internal void SetParentVideoMapping(Video parentVideo, int idInVideo)
+        {
+            ParentVideo = parentVideo;
+            IdInVideo = idInVideo;
+        }
+
+        internal void SetFrameMappings(Frame[] frames)
+        {
+            Frames = new ReadOnlyCollection<Frame>(frames);
+            for (int i = 0; i < frames.Length; i++)
+            {
+                Frame frame = frames[i];
+                frame.SetParentGroupMapping(this, i);
+            }
         }
     }
 }

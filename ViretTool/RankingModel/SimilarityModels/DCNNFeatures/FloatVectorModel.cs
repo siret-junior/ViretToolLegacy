@@ -42,20 +42,20 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         public float[] AddQueryResultsToCache(DataModel.Frame query, bool positiveExample)
         {
-            if (mCache.ContainsKey(query.ID))
-                return mCache[query.ID];
+            if (mCache.ContainsKey(query.Id))
+                return mCache[query.Id];
 
             float[] results = new float[mDataset.Frames.Count];
 
-            float[] queryData = mFloatVectors[query.ID];
+            float[] queryData = mFloatVectors[query.Id];
 
             Parallel.For(0, results.Length, i =>
             {
-                results[i] = CosineSimilarity(mFloatVectors[mDataset.Frames[i].ID], queryData);
+                results[i] = CosineSimilarity(mFloatVectors[mDataset.Frames[i].Id], queryData);
             });
 
-            mCache.Add(query.ID, results);
-            return mCache[query.ID];
+            mCache.Add(query.Id, results);
+            return mCache[query.Id];
         }
 
         public List<RankedFrame> RankFramesBasedOnExampleFrames(
@@ -86,7 +86,7 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         public float[] GetFrameSemanticVector(DataModel.Frame frame)
         {
-            return mFloatVectors[frame.ID];
+            return mFloatVectors[frame.Id];
         }
 
         public static float ComputeDistance(float[] vectorA, float[] vectorB)

@@ -96,7 +96,8 @@ namespace ViretTool.BasicClient
 
         private void DrawGrid()
         {
-            double WX = 20, WY = 15;
+            //double WX = 20, WY = 15;
+            double WX = 32, WY = 18;
             double wx = sketchCanvas.Width / WX, wy = sketchCanvas.Height / WY;
 
             for (int i = 0; i <= WX; i++)

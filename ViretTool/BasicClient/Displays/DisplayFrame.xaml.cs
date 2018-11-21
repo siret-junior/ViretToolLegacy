@@ -36,9 +36,9 @@ namespace ViretTool.BasicClient
                 {
                     image.Source = mFrame.Bitmap;
 #if LABELS
-                    videoLabel.Content = mFrame.FrameVideo.VideoID.ToString();
+                    videoLabel.Content = mFrame.ParentVideo.Id.ToString();
                     //groupLabel.Content = mFrame.FrameGroup.GroupID.ToString();
-                    frameLabel.Content = mFrame.ID.ToString();
+                    frameLabel.Content = mFrame.Id.ToString();
 #endif
                 }
                 else
@@ -208,10 +208,11 @@ namespace ViretTool.BasicClient
                     // read all video frames (lazy)
                     if (mVideoFrames == null)
                     {
-                        mVideoFrames = Frame.FrameVideo.VideoDataset.ReadAllVideoFrames(Frame.FrameVideo);
+                        mVideoFrames = Frame.ParentVideo.ParentDataset.ReadAllVideoFrames(Frame.ParentVideo);
                     }
 
                     mDisplayedVideoFrameId = (int)((point.X / ActualWidth) * (mVideoFrames.Length - 1));
+                    if (mDisplayedVideoFrameId < 0) { mDisplayedVideoFrameId = 0; }
                     image.Source = mVideoFrames[mDisplayedVideoFrameId].Bitmap;
                 }
                 else if (e.MiddleButton == MouseButtonState.Pressed)
@@ -219,7 +220,7 @@ namespace ViretTool.BasicClient
                     // read selected keyframes
                     if (mVideoFrames == null)
                     {
-                        mVideoFrames = Frame.FrameVideo.Frames.ToArray();
+                        mVideoFrames = Frame.ParentVideo.Frames.ToArray();
                     }
 
                     mDisplayedVideoFrameId = (int)((point.X / ActualWidth) * (mVideoFrames.Length - 1));
@@ -258,7 +259,7 @@ namespace ViretTool.BasicClient
             // read all video frames (lazy)
             if (VideoFrames == null)
             {
-                DataModel.Frame[] frames = Frame.FrameVideo.VideoDataset.ReadAllVideoFrames(Frame.FrameVideo);
+                DataModel.Frame[] frames = Frame.ParentVideo.ParentDataset.ReadAllVideoFrames(Frame.ParentVideo);
 
                 // show every second
                 VideoFrames = new DataModel.Frame[frames.Length / 2];

@@ -1,57 +1,118 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ViretTool.DataModel {
-    public class Frame {
-        public Group FrameGroup { get; }
-        public Video FrameVideo { get; }
+﻿namespace ViretTool.DataModel
+{
+    /// <summary>
+    /// A representative frame selected from a shot in a video.
+    /// </summary>
+    public class Frame
+    {
+        /// <summary>
+        /// The global identifier of the representative frame in a given dataset.
+        /// </summary>
+        public readonly int Id;
         
         /// <summary>
-        /// The global identifier of the frame in a given dataset. For the set of selected frames S ranges from 0 to |S| - 1. ID is set to -1 for all extracted but not selected frames.
+        /// Number of the frame in the source video.
         /// </summary>
-        public int ID { get; }
+        public int FrameNumber { get; internal set; }
 
-        /// <summary>
-        /// The local identifier of the frame in a given video. Corresponds to the timestamp of the frame.
-        /// </summary>
-        public int FrameNumber { get; }
 
-        private byte[] mJPGThumbnail { get; }
+        // Parent mappings
+        public Video ParentVideo { get; private set; }
+        public int IdInVideo { get; private set; }
 
-        public Frame(int id, Group frameGroup, Video frameVideo, int frameNumber, byte[] JPGThumbnail) {
-            ID = id;
-            FrameGroup = frameGroup;
-            FrameVideo = frameVideo;
-            FrameNumber = frameNumber;
-            mJPGThumbnail = JPGThumbnail;
-        }
+        public Shot ParentShot { get; private set; }
+        public int IdInShot { get; private set; }
 
-        public System.Windows.Media.Imaging.BitmapSource GetImage()
+        public Group ParentGroup { get; private set; } 
+        public int IdInGroup { get; private set; }
+
+        
+        public Frame(int globalId, int frameNumber = -1)
         {
-            return ImageHelper.StreamToImage(mJPGThumbnail);
+            Id = globalId;
+            FrameNumber = frameNumber;
         }
+
 
         public override string ToString()
         {
-            return "ID: " + ID.ToString() 
-                + ", frame: " + FrameNumber.ToString("00000")
-                + ", Group ID: " + FrameGroup.GroupID.ToString("00000")
-                + ", Video ID: " + FrameVideo.VideoID.ToString("00000");
+            return "FrameId: " + Id.ToString()
+                + ", Video: " + ParentVideo.Id.ToString("00000")
+                + ", Shot: " + ParentShot.Id.ToString("00000")
+                + ", Group: " + ParentGroup.Id.ToString("00000");
         }
 
-        public System.Windows.Media.Imaging.BitmapSource Bitmap {
-            get {
-                return ImageHelper.StreamToImage(mJPGThumbnail);
+
+        internal void SetParentVideoMapping(Video parentVideo, int idInVideo)
+        {
+            ParentVideo = parentVideo;
+            IdInVideo = idInVideo;
+        }
+
+        internal void SetParentShotMapping(Shot parentShot, int idInShot)
+        {
+            ParentShot = parentShot;
+            IdInShot = idInShot;
+        }
+
+        internal void SetParentGroupMapping(Group parentGroup, int idInGroup)
+        {
+            ParentGroup = parentGroup;
+            IdInGroup = idInGroup;
+        }
+
+
+        internal void WithFrameNumber(int frameNumber)
+        {
+            FrameNumber = frameNumber;
+        }
+
+
+        // TODO: legacy code //////////////////////////////////////////////////////////////////////
+        public byte[] JPGThumbnail { get; set; }
+
+        public Frame(int id, Group frameGroup, Video frameVideo, int frameNumber, byte[] jpgThumbnail)
+        {
+            Id = id;
+            ParentGroup = frameGroup;
+            ParentVideo = frameVideo;
+            FrameNumber = frameNumber;
+            JPGThumbnail = jpgThumbnail;
+        }
+
+
+        public System.Windows.Media.Imaging.BitmapSource Bitmap
+        {
+            get
+            {
+                if (JPGThumbnail == null)
+                {
+                    JPGThumbnail = ParentVideo.ParentDataset.SelectedFramesReader.ReadFrameAt(Id).Item3;
+                }
+                return ImageHelper.StreamToImage(JPGThumbnail);
             }
         }
 
-        public System.Drawing.Bitmap ActualBitmap {
-            get {
-                return new System.Drawing.Bitmap(new System.IO.MemoryStream(mJPGThumbnail));
+        public System.Drawing.Bitmap ActualBitmap
+        {
+            get
+            {
+                if (JPGThumbnail == null)
+                {
+                    JPGThumbnail = ParentVideo.ParentDataset.SelectedFramesReader.ReadFrameAt(Id).Item3;
+                }
+                return new System.Drawing.Bitmap(new System.IO.MemoryStream(JPGThumbnail));
             }
         }
+        
+        public System.Windows.Media.Imaging.BitmapSource GetImage()
+        {
+            if (JPGThumbnail == null)
+            {
+                JPGThumbnail = ParentVideo.ParentDataset.SelectedFramesReader.ReadFrameAt(Id).Item3;
+            }
+            return ImageHelper.StreamToImage(JPGThumbnail);
+        }
+
     }
 }

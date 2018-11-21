@@ -222,7 +222,7 @@ namespace FrameMerge
             int frameId;
             try
             {
-                frameId = int.Parse(tokens[1].Substring(1));
+                frameId = int.Parse(tokens[3].Substring(1));
             }
             catch
             {

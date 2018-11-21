@@ -43,7 +43,7 @@ namespace ViretTool.BasicClient
 
         private static RankedFrame[,] SortByID(List<RankedFrame> frames, int nRows, int nCols)
         {
-            IEnumerable<RankedFrame> sortedList = frames.OrderBy(x => x.Frame.ID);
+            IEnumerable<RankedFrame> sortedList = frames.OrderBy(x => x.Frame.Id);
             return FillHorizontally(frames, nRows, nCols);
         }
 

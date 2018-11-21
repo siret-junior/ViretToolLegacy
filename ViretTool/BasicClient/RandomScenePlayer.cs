@@ -37,20 +37,20 @@ namespace ViretTool.BasicClient
             {
                 // find first video frame
                 for (int i = 0; i < resultList.Count; i++)
-                    if (resultList[i].Frame.FrameVideo.VideoID == mSearchedFrame.FrameVideo.VideoID)
+                    if (resultList[i].Frame.ParentVideo.Id == mSearchedFrame.ParentVideo.Id)
                     {
                         result = "video: " + i; break;
                     }
 
                 // find first group frame
                 for (int i = 0; i < resultList.Count; i++)
-                    if (resultList[i].Frame.FrameGroup.GroupID == mSearchedFrame.FrameGroup.GroupID)
+                    if (resultList[i].Frame.ParentGroup.Id == mSearchedFrame.ParentGroup.Id)
                     {
                         result += ", group: " + i; break;
                     }
                 // try to find the frame if not filtered
                 for (int i = 0; i < resultList.Count; i++)
-                    if (resultList[i].Frame.FrameVideo.VideoID == mSearchedFrame.FrameVideo.VideoID)
+                    if (resultList[i].Frame.ParentVideo.Id == mSearchedFrame.ParentVideo.Id)
                         if ((resultList[i].Frame.FrameNumber >= mSearchedFrame.FrameNumber - mSceneLength / 2)
                             && (resultList[i].Frame.FrameNumber <= mSearchedFrame.FrameNumber + mSceneLength / 2))
                         {
@@ -70,7 +70,7 @@ namespace ViretTool.BasicClient
 
             mSearchedFrame = v.Frames[r.Next() % (v.Frames.Count - 2)];
 
-            List<DataModel.Frame> frames = mSearchedFrame.FrameVideo.GetAllExtractedFrames();
+            List<DataModel.Frame> frames = mSearchedFrame.ParentVideo.ParentDataset.GetAllExtractedFrames(mSearchedFrame.ParentVideo.Id);
 
             mSearchedFrames = new List<DataModel.Frame>();
             for (int i = 0; i < frames.Count; i++)

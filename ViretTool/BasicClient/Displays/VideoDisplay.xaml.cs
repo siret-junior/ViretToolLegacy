@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,7 +41,8 @@ namespace ViretTool.BasicClient
                 return;
             }
 
-            List<DataModel.Frame> framesToDisplay = frame.FrameVideo.Frames;
+            // TODO: legacy workaround
+            List<DataModel.Frame> framesToDisplay = frame.ParentVideo.Frames.ToList();
 
             framesToDisplay = ReduceFrameSet(framesToDisplay, maxFramesToDisplay, frame);
             //DataModel.Frame[] allFrames = frame.FrameVideo.VideoDataset.ReadAllVideoFrames(frame.FrameVideo);

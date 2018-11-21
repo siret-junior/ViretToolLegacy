@@ -38,7 +38,7 @@ namespace ViretTool.RankingModel.SimilarityModels
             {
                 // TODO - use cache for already evaluated queries
 
-                byte[] query = mByteVectors[queryFrame.ID];
+                byte[] query = mByteVectors[queryFrame.Id];
 
                 // detect nonzero query dimensions
                 List<int> idx = new List<int>();
@@ -51,7 +51,7 @@ namespace ViretTool.RankingModel.SimilarityModels
                 Parallel.For(0, result.Count(), i =>
                 {
                     RankedFrame rankedFrame = result[i];
-                    rankedFrame.Rank += CosineSimilarity(mByteVectors[rankedFrame.Frame.ID], query, indexes);
+                    rankedFrame.Rank += CosineSimilarity(mByteVectors[rankedFrame.Frame.Id], query, indexes);
                 });
             }
 
@@ -60,7 +60,7 @@ namespace ViretTool.RankingModel.SimilarityModels
 
         public byte[] GetFrameSemanticVector(DataModel.Frame frame)
         {
-            return mByteVectors[frame.ID];
+            return mByteVectors[frame.Id];
         }
 
         public static double ComputeDistance(byte[] vectorA, byte[] vectorB)

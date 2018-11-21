@@ -29,12 +29,12 @@ namespace ViretTool.RankingModel.FilterModels
             for (int i = 0; i < rankedFrames.Count; i++)
             {
                 RankedFrame rankedFrame = rankedFrames[i];
-                int groupId = rankedFrame.Frame.FrameGroup.GroupID;
-                int videoId = rankedFrame.Frame.FrameVideo.VideoID;
+                int groupId = rankedFrame.Frame.ParentGroup.Id;
+                int videoId = rankedFrame.Frame.ParentVideo.Id;
 
                 if (videoHitCounter[videoId] < MaxGroupsPerVideo &&
                     (groupHitCounter[groupId] < 1)
-                    && (!mVideoFilterEnabled || !mVideoFilterHashset.Contains(rankedFrame.Frame.FrameVideo.VideoID)))
+                    && (!mVideoFilterEnabled || !mVideoFilterHashset.Contains(rankedFrame.Frame.ParentVideo.Id)))
                 {
                     filteredResult.Add(rankedFrames[i]);
                     groupHitCounter[groupId]++;
@@ -52,7 +52,7 @@ namespace ViretTool.RankingModel.FilterModels
 
         public void AddVideoToFilterList(Video video)
         {
-            mVideoFilterHashset.Add(video.VideoID);
+            mVideoFilterHashset.Add(video.Id);
         }
 
         public void EnableVideoFilter()

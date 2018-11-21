@@ -49,7 +49,7 @@ namespace VitretTool.EvaluationServer {
             //    "..\\..\\..\\TestData\\TRECVid700v\\TRECVid700v-KF-100x75.thumb",
             //    "..\\..\\..\\TestData\\TRECVid700v\\TRECVid700v-4fps-100x75.thumb");
 
-            var dataset = new ViretTool.DataModel.Dataset(
+            var dataset = ViretTool.DataModel.DatasetProvider.ConstructDataset(
                 "D:\\ViretTool-2018-01-30-JDI\\TRECVid\\TRECVid-4fps-100x75.thumb",
                 "D:\\ViretTool-2018-01-30-JDI\\TRECVid\\TRECVid-4fps-selected-100x75.thumb",
                 "D:\\ViretTool-2018-01-30-JDI\\TRECVid\\TRECVid-4fps-selected.topology",

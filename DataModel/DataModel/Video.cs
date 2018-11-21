@@ -1,66 +1,66 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
 namespace ViretTool.DataModel
 {
+    /// <summary>
+    /// Represents a single video of the source video dataset.
+    /// </summary>
     public class Video
     {
-        public readonly int VideoID;
-        public readonly string Name;
-
-        public readonly Dataset VideoDataset;
-        public readonly List<Group> Groups;
-        public readonly List<Frame> Frames;
-
+        public readonly int Id;
         
-        public Video(int videoID, Dataset videoDataset, string name)
+        public Dataset ParentDataset { get; internal set; }
+        public ReadOnlyCollection<Shot> Shots { get; private set; }
+        public ReadOnlyCollection<Group> Groups { get; private set; }
+        public ReadOnlyCollection<Frame> Frames { get; private set; }
+
+
+        public Video(int globalId)
         {
-            VideoDataset = videoDataset;
-            Name = name;
-            VideoID = videoID;
-
-            Groups = new List<Group>();
-            Frames = new List<Frame>();
-        }
-
-        public void AddFrame(Frame frame)
-        {
-            Frames.Add(frame);
-        }
-
-        public void AddGroup(Group group)
-        {
-            Groups.Add(group);
-        }
-
-        public List<Frame> GetAllExtractedFrames()
-        {
-            List<Frame> allExtractedFrames = new List<Frame>();
-
-            // open VideoDataset.AllExtractedFramesFilename
-            // parse frames from the big file
-            // set frame ID = -1
-            Tuple<int, int, byte[]>[] videoFrames = VideoDataset.AllExtractedFramesReader.ReadVideoFrames(VideoID);
-            foreach (Tuple<int, int, byte[]> frameData in videoFrames)
-            {
-                int videoId = frameData.Item1;
-                int frameNumber = frameData.Item2;
-                byte[] jpgThumbnail = frameData.Item3;
-
-                Frame frame = new Frame(-1, null, this, frameNumber, jpgThumbnail);
-                allExtractedFrames.Add(frame);
-            }
-
-            return allExtractedFrames;
+            Id = globalId;
         }
 
 
         public override string ToString()
         {
-            return "ID: " + VideoID.ToString("00000") + ", frames: " + Frames.Count + ", (" + Name + ")";
+            return "VideoId: " + Id.ToString("00000");
         }
+
+
+        internal void SetShotMappings(Shot[] shots)
+        {
+            Shots = new ReadOnlyCollection<Shot>(shots);
+            for (int i = 0; i < shots.Length; i++)
+            {
+                Shot shot = shots[i];
+                shot.SetParentVideoMapping(this, i);
+            }
+        }
+
+        internal void SetGroupMappings(Group[] groups)
+        {
+            Groups = new ReadOnlyCollection<Group>(groups);
+            for (int i = 0; i < groups.Length; i++)
+            {
+                Group group = groups[i];
+                group.SetParentVideoMapping(this, i);
+            }
+        }
+
+        internal void SetFrameMappings(Frame[] frames)
+        {
+            Frames = new ReadOnlyCollection<Frame>(frames);
+            for (int i = 0; i < frames.Length; i++)
+            {
+                Frame frame = frames[i];
+                frame.SetParentVideoMapping(this, i);
+            }
+        }
+
+
+
+
+        // TODO: temporary legacy code //////////////////////////////////////////////////////////////
+
     }
 }

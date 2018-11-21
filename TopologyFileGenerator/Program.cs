@@ -20,7 +20,8 @@ namespace TopologyFileGenerator
 
             //byte[] header = GenerateFileHeader("TRECVid", new DateTime(2018, 01, 26, 10, 00, 00));
             //byte[] header = GenerateFileHeader("CT24", new DateTime(2018, 03, 02, 02, 00, 00));
-            byte[] header = GenerateFileHeader("Trailers", new DateTime(2018, 03, 21, 14, 00, 00));
+            //byte[] header = GenerateFileHeader("Trailers", new DateTime(2018, 03, 21, 14, 00, 00));
+            byte[] header = GenerateFileHeader("V3C1-first750", new DateTime(2018, 11, 20, 17, 30, 00));
 
             //if(File.Exists(outputFile))
             //{
