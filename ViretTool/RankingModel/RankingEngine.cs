@@ -117,12 +117,20 @@ namespace ViretTool.RankingModel
             { mFilterManager.VideoAggregateFilterEnabled = value; ComputeFilteredRankedSortedResult(); }
         }
 
-        public int VideoAggregateFilterMaxFrames
+        public int VideoAggregateFilterMaxVideoFrames
         {
             get
-            { return mFilterManager.VideoAggregateFilterMaxFrames; }
+            { return mFilterManager.VideoAggregateFilterMaxVideoFrames; }
             set
-            { mFilterManager.VideoAggregateFilterMaxFrames = value; ComputeFilteredRankedSortedResult(); }
+            { mFilterManager.VideoAggregateFilterMaxVideoFrames = value; ComputeFilteredRankedSortedResult(); }
+        }
+
+        public int VideoAggregateFilterMaxShotFrames
+        {
+            get
+            { return mFilterManager.VideoAggregateFilterMaxShotFrames; }
+            set
+            { mFilterManager.VideoAggregateFilterMaxShotFrames = value; ComputeFilteredRankedSortedResult(); }
         }
 
         public void AddVideoToFilterList(int videoId)

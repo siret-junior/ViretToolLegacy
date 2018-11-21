@@ -127,12 +127,20 @@ namespace ViretTool.RankingModel.FilterModels
             { mVideoAggregateFilter.Enabled = value; }
         }
 
-        public int VideoAggregateFilterMaxFrames
+        public int VideoAggregateFilterMaxVideoFrames
         {
             get
-            { return mVideoAggregateFilter.MaxGroupsPerVideo; }
+            { return mVideoAggregateFilter.MaxFramesPerVideo; }
             set
-            { mVideoAggregateFilter.MaxGroupsPerVideo = value; }
+            { mVideoAggregateFilter.MaxFramesPerVideo = value; }
+        }
+
+        public int VideoAggregateFilterMaxShotFrames
+        {
+            get
+            { return mVideoAggregateFilter.MaxShotsPerVideo; }
+            set
+            { mVideoAggregateFilter.MaxShotsPerVideo = value; }
         }
 
         public void AddVideoToFilterList(int videoId)

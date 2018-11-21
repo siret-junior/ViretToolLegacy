@@ -168,7 +168,8 @@ namespace ViretTool
 
             // TODO filter GUI
             mRankingEngine.VideoAggregateFilterEnabled = true;
-            mRankingEngine.VideoAggregateFilterMaxFrames = 15;
+            mRankingEngine.VideoAggregateFilterMaxVideoFrames = 15;
+            mRankingEngine.VideoAggregateFilterMaxShotFrames = 1;
 
             keywordSearchTextBox.Init(mDataset, new string[] {
                 "GoogLeNet"//, "YFCC100M", "Audio"
@@ -523,13 +524,13 @@ namespace ViretTool
             resultDisplay.Max3FromVideoEnabledEvent +=
                 () =>
                 {
-                    mRankingEngine.VideoAggregateFilterMaxFrames = 3;
+                    mRankingEngine.VideoAggregateFilterMaxVideoFrames = 3;
 
                 };
             resultDisplay.Max3FromVideoDisabledEvent +=
                 () =>
                 {
-                    mRankingEngine.VideoAggregateFilterMaxFrames = 15;
+                    mRankingEngine.VideoAggregateFilterMaxVideoFrames = 15;
                 };
 
             // set first display
