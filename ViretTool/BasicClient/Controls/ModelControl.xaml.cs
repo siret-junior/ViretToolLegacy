@@ -67,7 +67,7 @@ namespace ViretTool.BasicClient {
             } else {
                 ModelSettingChangedEvent?.Invoke(Value/100d, UseForSorting);
             }
-            ModelClearedEvent?.Invoke();
+            //ModelClearedEvent?.Invoke();
         }
 
         private void Clear(object sender, RoutedEventArgs e) {

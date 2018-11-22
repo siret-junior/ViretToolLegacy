@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViretTool.InteractionLogging;
 
 namespace ViretTool.BasicClient
 {
@@ -279,12 +280,14 @@ namespace ViretTool.BasicClient
                 DisplayVideoFrame(mDisplayedVideoFrameId - 1);
                 LeftScrollHelper.Visibility = Visibility.Visible;
                 RightScrollHelper.Visibility = Visibility.Hidden;
+                InteractionLogger.Instance.LogInteraction("browsing", "video", "scroll", "back");
             }
             else
             {
                 DisplayVideoFrame(mDisplayedVideoFrameId + 1);
                 RightScrollHelper.Visibility = Visibility.Visible;
                 LeftScrollHelper.Visibility = Visibility.Hidden;
+                InteractionLogger.Instance.LogInteraction("browsing", "video", "scroll", "front");
             }
         }
 

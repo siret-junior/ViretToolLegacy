@@ -100,7 +100,8 @@ namespace ViretTool.Utils {
             
 
             if (mClient == null) return;
-            try {
+            try
+            {
                 //var list = new string[] { "Type=VBSf", "Name=" + TeamName, "VideoID=" + trecvidVideoId, "FrameID=" + trecvidFrameId };
 
                 const int TEAM_ID = 6;
@@ -148,7 +149,9 @@ namespace ViretTool.Utils {
                 //return await Task.Run(() = &gt; JsonObject.Parse(content));
 
                 //IsConnected = responseString == "VBSfOK";
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(this, Severity.Error, ex.Message);
                 IsConnected = false;
             }

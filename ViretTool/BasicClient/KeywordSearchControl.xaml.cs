@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ViretTool.BasicClient.Controls;
+using ViretTool.InteractionLogging;
 
 namespace ViretTool.BasicClient {
     /// <summary>
@@ -44,6 +45,7 @@ namespace ViretTool.BasicClient {
         private void textClearButton_Click(object sender, RoutedEventArgs e) {
             suggestionTextBox.ClearQuery();
             VBSLogger.AppendActionIncludeTimeParameter('K', false);
+            InteractionLogger.Instance.LogInteraction("text", "concept", "");
         }
 
         public void Init(DataModel.Dataset dataset, string[] annotationSources) {
@@ -91,8 +93,11 @@ namespace ViretTool.BasicClient {
                 }
             }
             sb.Append("}");
-
             Logger.Log(this, Severity.Debug, sb.ToString());
+
+            InteractionLogger.Instance.LogInteraction("text", "concept",
+                string.Join(", ", query.Cast<QueryTextBlock>().Select(x => x.Text)), annotationSource);
+            
 
             List<List<int>> expanded = ExpandQuery(query, mLabelProviders[annotationSource]);
             KeywordChangedEvent?.Invoke(expanded, annotationSource);

@@ -36,6 +36,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -83,6 +86,10 @@
       <DependentUpon>DisplayFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="BasicClient\FrameSelectionController.cs" />
+    <Compile Include="InteractionLogging\DataObjects\Action.cs" />
+    <Compile Include="InteractionLogging\DataObjects\Event.cs" />
+    <Compile Include="InteractionLogging\DataObjects\Log.cs" />
+    <Compile Include="InteractionLogging\InteractionLogger.cs" />
     <Compile Include="BasicClient\KeywordSearchControl.xaml.cs">
       <DependentUpon>KeywordSearchControl.xaml</DependentUpon>
     </Compile>
@@ -98,6 +105,7 @@
     <Compile Include="BasicClient\Displays\VideoDisplay.xaml.cs">
       <DependentUpon>VideoDisplay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InteractionLogging\JsonSerialization\LowercaseJsonSerializer.cs" />
     <Compile Include="RankingModel\FilterManager.cs" />
     <Compile Include="RankingModel\FilterModels\Filter.cs" />
     <Compile Include="RankingModel\FilterModels\FlowFilter.cs" />
@@ -229,5 +237,6 @@
   <ItemGroup>
     <SplashScreen Include="Resources\loading-screen.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

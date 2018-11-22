@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViretTool.InteractionLogging;
 
 namespace ViretTool.BasicClient {
     /// <summary>
@@ -60,9 +61,15 @@ namespace ViretTool.BasicClient {
         public void Reset() {
             Value = DefaultValue;
             State = FilterState.Off;
+            InteractionLogger.Instance.LogInteraction(
+                "filter", FilterName, Enum.GetName(State.GetType(), State), Value.ToString("0") + "%");
         }
 
-        private void RadioButton_Checked(object sender, RoutedEventArgs e) {
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            InteractionLogger.Instance.LogInteraction(
+                "filter", FilterName, Enum.GetName(State.GetType(), State), Value.ToString("0") + "%");
+
             FilterChangedEvent?.Invoke(State, Value/100d);
         }
 
@@ -70,6 +77,8 @@ namespace ViretTool.BasicClient {
             if (State == FilterState.Off) {
                 State = FilterState.Y;
             }
+            InteractionLogger.Instance.LogInteraction(
+                "filter", FilterName, Enum.GetName(State.GetType(), State), Value.ToString("0") + "%");
             FilterChangedEvent?.Invoke(State, Value/100d);
         }
     }

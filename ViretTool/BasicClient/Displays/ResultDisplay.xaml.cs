@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViretTool.InteractionLogging;
 using ViretTool.RankingModel;
 
 namespace ViretTool.BasicClient
@@ -264,24 +265,28 @@ namespace ViretTool.BasicClient
         private void firstPageButton_Click(object sender, RoutedEventArgs e)
         {
             VBSLogger.AppendActionIncludeTimeParameter('P', true);
+            InteractionLogger.Instance.LogInteraction("browsing", "resultList", "first page", "0");
             DisplayPage(0);
         }
 
         private void previousPageButton_Click(object sender, RoutedEventArgs e)
         {
             VBSLogger.AppendActionIncludeTimeParameter('P', true);
+            InteractionLogger.Instance.LogInteraction("browsing", "resultList", "previous page", (mPage - 1).ToString());
             DisplayPage(mPage - 1);
         }
 
         private void nextPageButton_Click(object sender, RoutedEventArgs e)
         {
             VBSLogger.AppendActionIncludeTimeParameter('P', true);
+            InteractionLogger.Instance.LogInteraction("browsing", "resultList", "next page", (mPage + 1).ToString());
             DisplayPage(mPage + 1);
         }
 
         private void lastPageButton_Click(object sender, RoutedEventArgs e)
         {
             VBSLogger.AppendActionIncludeTimeParameter('P', true);
+            InteractionLogger.Instance.LogInteraction("browsing", "resultList", "last page", (mResultFrames.Count / DisplayedFrames.Length).ToString());
             DisplayPage(mResultFrames.Count / DisplayedFrames.Length);
         }
 
@@ -299,6 +304,7 @@ namespace ViretTool.BasicClient
         private void largeDisplayCheckbox_Checked(object sender, RoutedEventArgs e)
         {
             VBSLogger.AppendActionIncludeTimeParameter('B', true);
+            InteractionLogger.Instance.LogInteraction("browsing", "toolLayout", "large display");
             nColumns = LARGE_DISPLAY_COLUMNS;
             FitDisplayToGridDimensions();
         }
@@ -306,6 +312,7 @@ namespace ViretTool.BasicClient
         private void largeDisplayCheckbox_Unchecked(object sender, RoutedEventArgs e)
         {
             VBSLogger.AppendActionIncludeTimeParameter('B', true);
+            InteractionLogger.Instance.LogInteraction("browsing", "toolLayout", "small display");
             nColumns = SMALL_DISPLAY_COLUMNS;
             FitDisplayToGridDimensions();
         }

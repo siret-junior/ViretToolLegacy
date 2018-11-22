@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ViretTool.BasicClient;
 using ViretTool.DataModel;
+using ViretTool.InteractionLogging;
 using ViretTool.RankingModel;
 using ViretTool.RankingModel.FilterModels;
 using ViretTool.RankingModel.SimilarityModels;
@@ -46,7 +47,6 @@ namespace ViretTool
 
             // TODO - use unique toolID
             mVBSLogger = new VBSLogger("1");
-
             // prepare data model
             //mDataset = new DataModel.Dataset("..\\..\\..\\TestData\\ITEC\\ITEC-KF3sec-100x75.thumb", "..\\..\\..\\TestData\\ITEC\\ITEC-4fps-100x75.thumb");
 
@@ -188,9 +188,10 @@ namespace ViretTool
                 (settings) =>
                 {
                     mSubmissionClient.Connect(settings.IPAddress, settings.Port, settings.TeamName);
+                    InteractionLogger.Instance.SetTeamName(settings.TeamName);
 
                     // log message
-                    string message = "Connect request to setver: "
+                    string message = "Connect request to server: "
                             + "(IP:" + mSettings.IPAddress
                             + ", Port:" + mSettings.Port
                             + ", TeamName:" + mSettings.TeamName 
@@ -298,6 +299,16 @@ namespace ViretTool
                     string message = "Color sketch model changed: "
                         + queryCount + " color points:" + querySketch;
                     Logger.LogInfo(sketchCanvas, message);
+
+                    InteractionLogger.Instance.LogInteraction("sketch", "color",
+                        string.Join(", ", sketch.Select(x =>
+                        "[P(" + x.Item1.X + "; " + x.Item1.Y + "), "
+                        + "C(" + x.Item2.R + "; " + x.Item2.G + "; " + x.Item2.B + "), "
+                        + "E(" + x.Item3.X + "; " + x.Item3.Y + "), "
+                        + (x.Item4 ? "all" : "any")
+                        + "]"
+                        )));
+
                 };
             //mFrameSelectionController.SelectionSubmittedColorModelEvent +=
             //    (frameSelection) =>
@@ -347,10 +358,20 @@ namespace ViretTool
                         sketchCanvasControlBar.UncheckMe();
                         semanticModelControlBar.CheckMe();
                         mRankingEngine.ComputeResult = true;
+
+                        InteractionLogger.Instance.LogInteraction("image", "dataset",
+                            string.Join(", ", frameSelection.Select(x => 
+                            "[V(" + x.ParentVideo.Id + "), F(" + x.FrameNumber + ")]")), 
+                            "select");
                     }
                     else
                     {
                         VBSLogger.AppendActionIncludeTimeParameter('S', false);
+
+                        InteractionLogger.Instance.LogInteraction("image", "dataset",
+                            string.Join(", ", frameSelection.Select(x =>
+                            "[V(" + x.ParentVideo.Id + "), F(" + x.FrameNumber + ")]")),
+                            "deselect");
                     }
                     DisableInput();
                     semanticModelDisplay.DisplayFrames(frameSelection);
@@ -389,6 +410,8 @@ namespace ViretTool
                 () =>
                 {
                     VBSLogger.AppendActionIncludeTimeParameter('B', true);
+                    InteractionLogger.Instance.LogInteraction("browsing", "toolLayout", "random");
+
                     DisableInput();
                     mRankingEngine.GenerateRandomRanking();
                     EnableInput();
@@ -401,6 +424,8 @@ namespace ViretTool
                 () =>
                 {
                     VBSLogger.AppendActionIncludeTimeParameter('B', true);
+                    InteractionLogger.Instance.LogInteraction("browsing", "toolLayout", "sequential");
+
                     DisableInput();
                     mRankingEngine.GenerateSequentialRanking();
                     EnableInput();
@@ -538,6 +563,8 @@ namespace ViretTool
 
             
             TestButton.Height = 350;
+            InteractionLogger.Instance.ResetLog();
+
         }
 
 
@@ -681,6 +708,8 @@ namespace ViretTool
                     + ", Video:" + frame.ParentVideo.Id
                     + ", Number:" + frame.FrameNumber + ")";
             Logger.LogInfo(this, message);
+
+            InteractionLogger.Instance.SubmitLog();
         }
 
         #endregion
@@ -697,6 +726,8 @@ namespace ViretTool
                     + ", Video:" + frame.ParentVideo.Id
                     + ", Number:" + frame.FrameNumber + ")";
             Logger.LogInfo(this, message);
+            InteractionLogger.Instance.LogInteraction(
+                "browsing", "video", "V(" + frame.ParentVideo.Id + "), F(" + frame.FrameNumber +  ")", "show video");
         }
 
         private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
@@ -732,6 +763,8 @@ namespace ViretTool
             // log message
             string message = "Reset of all models and their controls.";
             Logger.LogInfo(semanticModelDisplay, message);
+
+            InteractionLogger.Instance.LogInteraction("resetall");
         }
 
         private void filtersClearButton_Click(object sender, RoutedEventArgs e) {
@@ -804,6 +837,7 @@ namespace ViretTool
         {
             clearAllButton_Click(this, null);
             VBSLogger.ResetLog();
+            InteractionLogger.Instance.ResetLog();
         }
     }
 
@@ -908,6 +942,7 @@ namespace ViretTool
                     + ", Video:" + frame.ParentVideo.Id
                     + ", Number:" + frame.FrameNumber + ")";
             Logger.LogInfo(this, message);
+            InteractionLogger.Instance.SubmitLog();
         }
 
         private string GetCurrentTaskId()
