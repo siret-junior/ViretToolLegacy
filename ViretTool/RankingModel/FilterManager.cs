@@ -130,9 +130,9 @@ namespace ViretTool.RankingModel.FilterModels
         public int VideoAggregateFilterMaxFrames
         {
             get
-            { return mVideoAggregateFilter.MaxGroupsPerVideo; }
+            { return mVideoAggregateFilter.MaxFramesPerVideo; }
             set
-            { mVideoAggregateFilter.MaxGroupsPerVideo = value; }
+            { mVideoAggregateFilter.MaxFramesPerVideo = value; }
         }
 
         public void AddVideoToFilterList(int videoId)
