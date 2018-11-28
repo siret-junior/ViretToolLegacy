@@ -1,4 +1,6 @@
 ﻿#define PARALLEL
+//#define V3C1_FRAME_ID
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,6 +32,7 @@ namespace FrameExtractor
             string outputDirectory = Path.GetFullPath(args[2]);
             string framerateFile = Path.GetFullPath(args[3]);
 
+
             // parse additional arguments
             decimal frameEveryNthSecond;
             int maxParallelism;
@@ -47,7 +50,16 @@ namespace FrameExtractor
             }
 
             // parse video framerates
-            Dictionary<int, decimal> videoFramerates = ParseVideoFramerates(framerateFile);
+            Dictionary<int, decimal> videoFramerates;
+            try
+            {
+                videoFramerates = ParseVideoFramerates(framerateFile);
+            }
+            catch
+            {
+                Console.Error.Write("Error parsing framerates: ");
+                throw;
+            }
 
             // process videos
             ProcessVideos(ffmpegExe, inputVideoDirectory, outputDirectory, 
@@ -78,32 +90,63 @@ namespace FrameExtractor
             for (int index = 0; index < videoFilePaths.Length; index++)
 #endif
             {
+                // prepare file paths
                 string videoFilePath = videoFilePaths[index];
                 // create output subdirectory for each video
                 string videoFilenameWithoutExtension = Path.GetFileNameWithoutExtension(videoFilePath);
-                string videoSubdirectory = Path.Combine(outputDirectory, videoFilenameWithoutExtension);
-                Directory.CreateDirectory(videoSubdirectory);
-
-                // parse video ID
-                int videoId = ParseVideoId(videoFilenameWithoutExtension);
-
                 // create temp directory for each task
                 string extractionTempDir = Path.GetFullPath("ffmpeg_extraction_temp_" + index.ToString("00000"));
-                Directory.CreateDirectory(extractionTempDir);
+                string extractionVideoSubdirectory = null;
 
-                // extract all frames using ffmpeg binary
-                ExtractAllFrames(ffmpegExe, videoFilePath, extractionTempDir);
+                try
+                {
+                    int videoId = ParseVideoId(videoFilenameWithoutExtension);
+                    extractionVideoSubdirectory = Path.Combine(outputDirectory, videoId.ToString("00000"));
 
-                // select a subset of frames and move/rename into the output subdirectory
-                CopyEveryNthSecondFrame(extractionTempDir, videoSubdirectory,
-                    videoId, videoFramerates[videoId], frameEveryNthSecond);
+                    // skip already extracted/existing video subdirectory
+                    if (Directory.Exists(extractionVideoSubdirectory))
+                    {
+                        Console.WriteLine(string.Format(
+                            "Skipping video that appears to be already extracted: ID {0}, name: {1}", 
+                            videoId, videoFilenameWithoutExtension));
+                        return;
+                    }
+                    
+                    // extract all frames using ffmpeg binary
+                    Directory.CreateDirectory(extractionTempDir);
+                    ExtractAllFrames(ffmpegExe, videoFilePath, extractionTempDir);
 
-                // cleanup
-                Directory.Delete(extractionTempDir, true);
+                    // select a subset of frames and move/rename into the output subdirectory
+                    Directory.CreateDirectory(extractionVideoSubdirectory);
+                    CopyEveryNthSecondFrame(extractionTempDir, extractionVideoSubdirectory,
+                        videoId, videoFramerates[videoId], frameEveryNthSecond);
+                }
+                catch (Exception exception)
+                {
+                    Console.Error.WriteLine("Error extracting frames from video " 
+                        + videoFilenameWithoutExtension + ":");
+                    Console.Error.WriteLine(exception);
 
-                // compute and print statistics
-                Interlocked.Increment(ref processedCount);
-                PrintStatistics(videoFilePaths, stopwatch, processedCount, videoId);
+                    // cleanup
+                    if (Directory.Exists(extractionVideoSubdirectory))
+                    {
+                        Directory.Delete(extractionVideoSubdirectory, true);
+                    }
+
+                    return;
+                }
+                finally
+                {
+                    // cleanup
+                    if (Directory.Exists(extractionTempDir))
+                    {
+                        Directory.Delete(extractionTempDir, true);
+                    }
+                    
+                    // compute and print statistics
+                    Interlocked.Increment(ref processedCount);
+                    PrintStatistics(videoFilePaths, stopwatch, processedCount, videoFilenameWithoutExtension);
+                }
             }
 #if PARALLEL && !DEBUG
             );
@@ -160,20 +203,25 @@ namespace FrameExtractor
                 while ((line = reader.ReadLine()) != null)
                 {
                     string[] tokens = line.Split();
-                    int videoID = int.Parse(tokens[0]);
+                    int videoId = int.Parse(tokens[0]);
+#if V3C1_FRAME_ID
+                    Console.WriteLine(string.Format(
+                        "Warning: decrementing video ID by 1 for V3C1 dataset: {0} -> {1}", videoId, videoId - 1));
+                    videoId--;
+#endif
 
                     string[] division = tokens[1].Split('/');
                     decimal num0 = int.Parse(division[0]);
                     decimal num1 = int.Parse(division[1]);
                     decimal framerateValue = num0 / num1;
-                    videoFramerates.Add(videoID, framerateValue);
+                    videoFramerates.Add(videoId, framerateValue);
                 }
             }
             Console.WriteLine("DONE!");
             return videoFramerates;
         }
 
-        private static void PrintStatistics(string[] videoFilePaths, Stopwatch stopwatch, int processedCount, int videoId)
+        private static void PrintStatistics(string[] videoFilePaths, Stopwatch stopwatch, int processedCount, string videoName)
         {
             double processedPerSecond = processedCount / (stopwatch.ElapsedMilliseconds * 0.001);
             int secondsRemaining = (int)((videoFilePaths.Length - processedCount) / processedPerSecond);
@@ -181,7 +229,7 @@ namespace FrameExtractor
             int minutesRemaining = secondsRemaining / 60 % 60;
             secondsRemaining = secondsRemaining % 60;
 
-            Console.WriteLine("Video ID:{0} processed. {1} of {2}, ({3} per second, {4}h {5}m {6}s remaining).", videoId,
+            Console.WriteLine("Video ID:{0} processed. {1} of {2}, ({3} per second, {4}h {5}m {6}s remaining).", videoName,
                 processedCount, videoFilePaths.Length, processedPerSecond.ToString("0.000"),
                 hoursRemaining.ToString("00"), minutesRemaining.ToString("00"), secondsRemaining.ToString("00"));
         }
@@ -192,6 +240,13 @@ namespace FrameExtractor
             try
             {
                 videoId = int.Parse(videoFilenameWithoutExtension);
+
+#if V3C1_FRAME_ID
+                Console.WriteLine(string.Format(
+                    "Warning: decrementing video ID by 1 for V3C1 dataset: {0} -> {1}", videoId, videoId - 1));
+                videoId--;
+#endif
+
             }
             catch
             {
@@ -219,6 +274,7 @@ namespace FrameExtractor
 
             process.EnableRaisingEvents = true;
             process.Start();
+            process.PriorityClass = ProcessPriorityClass.BelowNormal;
             process.WaitForExit();
 
             if (process.ExitCode != 0)
