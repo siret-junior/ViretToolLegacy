@@ -66,6 +66,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BasicClient\Controls\CompetitionPanel.xaml.cs">
+      <DependentUpon>CompetitionPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BasicClient\Controls\CompetitionScenePlayer.cs" />
     <Compile Include="BasicClient\Controls\DoubleToStringConverter.cs" />
     <Compile Include="BasicClient\Controls\FilterControl.xaml.cs">
       <DependentUpon>FilterControl.xaml</DependentUpon>
@@ -140,6 +144,10 @@
     <Compile Include="RankingModel\SimilarityModels\DCNNFeatures\ByteVectorModel.cs" />
     <Compile Include="RankingModel\SimilarityModels\DCNNKeywords\KeywordSubModel.cs" />
     <Compile Include="RankingModel\RankedFrame.cs" />
+    <Page Include="BasicClient\Controls\CompetitionPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="BasicClient\Controls\FilterControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

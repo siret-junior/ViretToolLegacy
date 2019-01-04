@@ -174,7 +174,8 @@ namespace ViretTool.RankingModel.SimilarityModels
         }
 
         // TODO: different aggregation strategies (sum, max)
-        public List<RankingModel.RankedFrame> GetMaxNormalizedFinalRanking(List<DataModel.Frame> frames, bool keywordBasedRanking, bool colorSignatureBasedRanking, bool vectorBasedRanking)
+        public List<RankingModel.RankedFrame> GetMaxNormalizedFinalRanking(List<DataModel.Frame> frames,
+            bool keywordBasedRanking, bool colorSignatureBasedRanking, bool vectorBasedRanking)
         {
             // rankings are kept max-normalized
 

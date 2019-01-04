@@ -11,7 +11,8 @@ namespace ViretTool.RankingModel.FilterModels.MaskFilters
         private float[] mFrameAttribute;
         public float Threshold { get; private set; }
 
-        public ThresholdFilter(DataModel.Dataset dataset, float[] frameAttribute) : base(dataset, new bool[dataset.Frames.Count])
+        public ThresholdFilter(DataModel.Dataset dataset, float[] frameAttribute) 
+            : base(dataset, new bool[dataset.Frames.Count])
         {
             mFrameAttribute = frameAttribute;
         }
@@ -24,7 +25,8 @@ namespace ViretTool.RankingModel.FilterModels.MaskFilters
             else return Mask;
         }
 
-        public ThresholdFilter(DataModel.Dataset dataset, string frameAttributeFileName) : base(dataset, new bool[dataset.Frames.Count])
+        public ThresholdFilter(DataModel.Dataset dataset, string frameAttributeFileName) 
+            : base(dataset, new bool[dataset.Frames.Count])
         {
             if (!System.IO.File.Exists(frameAttributeFileName))
             {

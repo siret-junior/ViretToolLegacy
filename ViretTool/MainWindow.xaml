@@ -94,7 +94,13 @@
                 <Label x:Name="trainingSearchLabel"
                     Grid.Column="1" />
             </Grid>
+            <!--<control:CompetitionPanel x:Name="competitionPlayer" Height="150" Margin="0,0,0.2,0"/>-->
+            <Button Height="54" x:Name="TimeButton" Background="Black" Foreground="White"  VerticalContentAlignment="Center" FontSize="24" Content="5:00" />
             <Button Height="200" x:Name="TestButton" VerticalContentAlignment="Top" />
+            <Button Height="32" x:Name="ScoreButton" Background="Gray" Foreground="White"  VerticalContentAlignment="Center" FontSize="16" Content="Score:" />
+            <Button Height="32" x:Name="AvgScoreButton" Background="Gray" Foreground="White"  VerticalContentAlignment="Center" FontSize="16" Content="Average score:" />
+
+
         </StackPanel>
 
         <GridSplitter Grid.Column="1" 

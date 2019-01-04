@@ -441,7 +441,9 @@ namespace ViretTool
 
             // TODO - show mRandomScenePlayer.ReturnSearchedItemPosition
             mRandomScenePlayer = new RandomScenePlayer(mDataset, TestButton, 200);
-
+            mRandomScenePlayer.TimeButton = TimeButton;
+            mRandomScenePlayer.ScoreButton = ScoreButton;
+            mRandomScenePlayer.AvgScoreButton = AvgScoreButton;
 
             // ranking model output visualization
             mRankingEngine.RankingChangedEvent += 
@@ -451,11 +453,11 @@ namespace ViretTool
                     if (rankedResult != null && rankedResult.Count > 0)
                     {
                         string trainingSearchString = mRandomScenePlayer.ReturnSearchedItemPosition(rankedResult);
-                        trainingSearchLabel.Content = trainingSearchString;
+                        //trainingSearchLabel.Content = trainingSearchString;
                     }
                     else
                     {
-                        trainingSearchLabel.Content = "";
+                        //trainingSearchLabel.Content = "";
                     }
 
                     resultDisplay.ResultFrames = rankedResult;
@@ -690,13 +692,14 @@ namespace ViretTool
 
         private void OpenSubmitWindow(DataModel.Frame frame)
         {
-            SubmitWindow window = new SubmitWindow(mSubmissionClient, frame);
+            SubmitWindow window = new SubmitWindow(mSubmissionClient, frame, mRandomScenePlayer);
             window.ShowDialog();
         }
 
 
         private void SubmitToServer(DataModel.Frame frame)
         {
+            mRandomScenePlayer.Submit(frame.ParentVideo.Id, frame.FrameNumber);
             mSubmissionClient.Send(frame.ParentVideo.Id, frame.FrameNumber);
 
             // logging
@@ -845,11 +848,13 @@ namespace ViretTool
     {
         private Submission mSubmissionClient;
         private DataModel.Frame mFrame;
+        private RandomScenePlayer randomScenePlayer;
 
-        public SubmitWindow(Submission submissionClient, DataModel.Frame frame)
+        public SubmitWindow(Submission submissionClient, DataModel.Frame frame, RandomScenePlayer mRandomScenePlayer = null)
         {
             mSubmissionClient = submissionClient;
             mFrame = frame;
+            randomScenePlayer = mRandomScenePlayer;
 
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             this.SizeToContent = SizeToContent.WidthAndHeight;
@@ -925,6 +930,7 @@ namespace ViretTool
 
         private void submit_Click(object sender, RoutedEventArgs e)
         {
+            randomScenePlayer?.Submit(mFrame.ParentVideo.Id, mFrame.FrameNumber);
             SubmitToServer(mFrame);
             Close();
         }

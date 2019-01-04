@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ViretTool.DataModel;
 
 namespace TopologyFileGenerator
 {
@@ -16,6 +17,10 @@ namespace TopologyFileGenerator
             string outputFile = Path.GetFullPath(args[2]);
 
             // TODO: group file
+            string datasetName = "V3C1";
+            Dataset dataset = DatasetProvider.FromFilelist(inputDirectory, datasetName);
+            DatasetProvider.ToBinaryFile(dataset, datasetName + ".dataset");
+            return;
 
 
             //byte[] header = GenerateFileHeader("TRECVid", new DateTime(2018, 01, 26, 10, 00, 00));

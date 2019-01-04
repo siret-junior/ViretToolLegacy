@@ -90,21 +90,21 @@ namespace ViretTool.DataLayer.DataIO.DatasetIO
             }
             else
             {
-                // IDs do not increment sequentially!
-                // create missing videos
-                int missingVideoId = lastVideoId + 1;
-                while (missingVideoId != videoId)
-                {
-                    Video video = GetOrAppendVideo(missingVideoId++);
-                    Shot shot = GetOrAppendShot(video, 0, 0, 0);
-                    Group group = GetOrAppendGroup(video, 0);
-                    //Frame frame = AppendFrame(video, shot, group, 0);
-                }
-                // try to append the video again
-                return GetOrAppendVideo(videoId);
-                
-                //throw new ArgumentException(string.Format(
-                //    "Input video IDs do not increment sequentially: last {0}, current: {1}", lastVideoId, videoId));
+                //// IDs do not increment sequentially!
+                //// create missing videos
+                //int missingVideoId = lastVideoId + 1;
+                //while (missingVideoId != videoId)
+                //{
+                //    Video video = GetOrAppendVideo(missingVideoId++);
+                //    Shot shot = GetOrAppendShot(video, 0, 0, 0);
+                //    Group group = GetOrAppendGroup(video, 0);
+                //    //Frame frame = AppendFrame(video, shot, group, 0);
+                //}
+                //// try to append the video again
+                //return GetOrAppendVideo(videoId);
+
+                throw new ArgumentException(string.Format(
+                    "Input video IDs do not increment sequentially: last {0}, current: {1}", lastVideoId, videoId));
             }
         }
 
@@ -135,8 +135,11 @@ namespace ViretTool.DataLayer.DataIO.DatasetIO
             }
             else if (lastShotId + 1 < shotId)
             {
+                // IDs do not increment sequentially!
+                throw new ArgumentException(string.Format(
+                    "Input shot IDs do not increment sequentially: last {0}, current: {1}", lastShotId, shotId));
                 // TODO: missing shot fix
-                return GetOrAppendShot(video, lastShotId + 1, shotEndFrame, shotEndFrame);
+                //return GetOrAppendShot(video, lastShotId + 1, shotEndFrame, shotEndFrame);
             }
             else
             {

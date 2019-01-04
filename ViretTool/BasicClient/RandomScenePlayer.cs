@@ -6,17 +6,25 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows;
+using ViretTool.InteractionLogging;
+using System.Windows.Media;
 
 namespace ViretTool.BasicClient
 {
-    class RandomScenePlayer
+    public class RandomScenePlayer
     {
         private Button mButton;
         private DataModel.Dataset mDataset;
         private DataModel.Frame mSearchedFrame = null;
         private List<DataModel.Frame> mSearchedFrames = null;
         private System.Windows.Threading.DispatcherTimer mDispatcherTimer;
+        private System.Windows.Threading.DispatcherTimer mTimeRemainingTimer;
         private int mSceneLength;
+
+        public Button TimeButton { get; set; }
+        public Button ScoreButton { get; set; }
+        public Button AvgScoreButton { get; set; }
+        List<int> scores = new List<int>();
 
         public RandomScenePlayer(DataModel.Dataset dataset, Button button, int sceneLength)
         {
@@ -28,6 +36,11 @@ namespace ViretTool.BasicClient
             mDispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             mDispatcherTimer.Tick += ShowImage;
             mDispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 250);
+
+            mTimeRemainingTimer = new System.Windows.Threading.DispatcherTimer();
+            mTimeRemainingTimer.Tick += UpdateTimer;
+            mTimeRemainingTimer.Interval = new TimeSpan(0, 0, 0, 1, 0);
+
         }
 
         public string ReturnSearchedItemPosition(List<RankingModel.RankedFrame> resultList)
@@ -65,10 +78,17 @@ namespace ViretTool.BasicClient
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            secondsLeft = TASK_DURATION_SECONDS;
+            SetTimeButton(secondsLeft);
+            TimeButton.Background = Brushes.Black;
+            mTimeRemainingTimer.Start();
+
             Random r = new Random();
             DataModel.Video v = mDataset.Videos[r.Next() % mDataset.Videos.Count];
 
             mSearchedFrame = v.Frames[r.Next() % (v.Frames.Count - 2)];
+            InteractionLogger.Instance.LogInteraction("task", "start",
+                "V(" + mSearchedFrame.ParentVideo.Id + "), F(" + mSearchedFrame.IdInVideo + ")");
 
             List<DataModel.Frame> frames = mSearchedFrame.ParentVideo.ParentDataset.GetAllExtractedFrames(mSearchedFrame.ParentVideo.Id);
 
@@ -82,12 +102,47 @@ namespace ViretTool.BasicClient
 
             mTickCounter = r.Next() % mSearchedFrames.Count();
             mDispatcherTimer.Start();
+
+            InteractionLogger.Instance.ResetLog();
+        }
+
+        private void SetTimeButton(int secondsLeft)
+        {
+            if (secondsLeft >= 0)
+            {
+                int minutes = secondsLeft / 60;
+                int seconds = secondsLeft % 60;
+                if (TimeButton != null)
+                {
+                    TimeButton.Content = "Time: " + minutes.ToString("0") + ":" + seconds.ToString("00")
+                    + ", score: " + EvaluateEffort(secondsLeft, 0).ToString("000");
+                }
+            }
+
+            if (secondsLeft == 0)
+            {
+                mTimeRemainingTimer.Stop();
+                TimeButton.Background = Brushes.DarkRed;
+            }
+        }
+
+        private void UpdateTimer(object sender, EventArgs e)
+        {
+            secondsLeft--;
+            SetTimeButton(secondsLeft);
+
+            if (secondsLeft == 0)
+            {
+                mTimeRemainingTimer.Stop();
+            }
         }
 
         public void Reset()
         {
             mDispatcherTimer.Stop();
+            mTimeRemainingTimer.Stop();
             mButton.Content = null;
+            scores.Clear();
         }
 
         private int mTickCounter;
@@ -100,6 +155,32 @@ namespace ViretTool.BasicClient
                 VerticalAlignment = VerticalAlignment.Top
             };
             mTickCounter++;
+        }
+
+
+        public void Submit(int videoId, int frameNumber)
+        {
+            int searchedVideoId = mSearchedFrames[0].ParentVideo.Id;
+            int searchedFrameNumberStart = mSearchedFrames[0].FrameNumber;
+            int searchedFrameNumberEnd = mSearchedFrames[mSearchedFrames.Count - 1].FrameNumber;
+
+            if (videoId == searchedVideoId
+                && frameNumber >= searchedFrameNumberStart
+                && frameNumber <= searchedFrameNumberEnd)
+            {
+                mTimeRemainingTimer.Stop();
+                TimeButton.Background = Brushes.DarkGreen;
+                ScoreButton.Content += " 0,";
+            }
+        }
+
+
+        private const int TASK_DURATION_SECONDS = 5 * 60;
+        private int secondsLeft = TASK_DURATION_SECONDS;
+
+        private int EvaluateEffort(int secondsRemaining, int nTries)
+        {
+            return (int)Math.Max(0, (50 + 50 * ((double)secondsRemaining / TASK_DURATION_SECONDS) - nTries * 10));
         }
 
     }

@@ -307,7 +307,7 @@ namespace FrameExtractor
                     + "." + extension);
                 string fileTo = Path.Combine(copyToDirectory,
                     "v" + videoId.ToString("00000") 
-                    + "_f" + frameId.ToString("00000")
+                    + "_f" + frameId.ToString("000000")
                     + "_" + second.ToString("0000.00", CultureInfo.InvariantCulture) + "sec"
                     + "." + extension);
 
