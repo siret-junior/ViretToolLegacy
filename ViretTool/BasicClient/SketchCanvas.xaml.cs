@@ -84,6 +84,7 @@ namespace ViretTool.BasicClient
 
                 foreach (ColorPoint CP in mColorPoints)
                 {
+                    // TODO: log XY position pixel, and width/height
                     Point position = new Point(CP.Position.X / sketchCanvas.Width, CP.Position.Y / sketchCanvas.Height);
                     Point ellipseAxis = new Point(CP.SearchRadiusX / sketchCanvas.Width, CP.SearchRadiusY / sketchCanvas.Height);
 
